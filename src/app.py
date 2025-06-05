@@ -1,17 +1,12 @@
 from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
-
-@app.route('/')
-def home():
-    return "¡Hola, mundo desde TerapiTrack!"
-
-@app.route('/about')
-def about():
-    return "Esta es la página sobre nosotros."
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///TerapiTrack.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
 
 if __name__ == '__main__':
-    app.run(debug=True)
-
-# Modificación para probar la integración con Jira
-# Modificación para probar la integración con Jira
+    with app.app_context():
+        db.create_all()
+    print("Tablas creadas correctamente")
