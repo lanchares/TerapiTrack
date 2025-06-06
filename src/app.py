@@ -5,7 +5,7 @@ def create_app():
     app = Flask(__name__)
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///TerapiTrack.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['SECRET_KEY'] = 'tu-clave-secreta-super-segura'
+    app.config['SECRET_KEY'] = '1234'
 
     db.init_app(app)
 
