@@ -1,21 +1,24 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-
+from extensiones import db
 
 def create_app():
     app = Flask(__name__)
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///TerapiTrack.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['SECRET_KEY'] = '1234' 
-    
+    app.config['SECRET_KEY'] = 'tu-clave-secreta-super-segura'
 
-    db = SQLAlchemy()
+    db.init_app(app)
 
     # Importar modelos para asegurar que se registran en SQLAlchemy
-    from models.usuario import Usuario
-    from models.paciente import Paciente
-    from models.profesional import Profesional
-
+    from modelos.usuario import Usuario
+    from modelos.paciente import Paciente
+    from modelos.profesional import Profesional
+    from modelos.ejercicio import Ejercicio
+    from modelos.sesion import Sesion
+    from modelos.ejercicio_sesion import EjercicioSesion
+    from modelos.evaluacion import Evaluacion
+    from modelos.videoRespuesta import VideoRespuesta
+    from modelos.asociaciones import PacienteProfesional, EjercicioProfesional
 
     @app.route('/')
     def index():
