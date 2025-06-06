@@ -1,4 +1,4 @@
-from app import db
+from extensiones import db
 from datetime import date
 
 class Evaluacion(db.Model):

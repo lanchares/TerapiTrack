@@ -1,4 +1,4 @@
-from app import db
+from extensiones import db
 
 class EjercicioSesion(db.Model):
     __tablename__ = 'Ejercicio_Sesion'
@@ -6,6 +6,7 @@ class EjercicioSesion(db.Model):
     Id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     Sesion_Id = db.Column(db.Integer, db.ForeignKey('Sesion.Id'), nullable=False)
     Ejercicio_Id = db.Column(db.Integer, db.ForeignKey('Ejercicio.Id'), nullable=False)
+    Orden = db.Column(db.Integer, default=1)
     
     __table_args__ = (
         db.UniqueConstraint('Sesion_Id', 'Ejercicio_Id', name='unique_ejercicio_sesion'),

@@ -1,4 +1,4 @@
-from app import db
+from extensiones import db
 
 class Ejercicio(db.Model):
     __tablename__ = 'Ejercicio'
