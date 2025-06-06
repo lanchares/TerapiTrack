@@ -8,10 +8,6 @@ ENV/
 __pycache__/
 *.pyc
 
-# Bases de datos locales (si usas SQLite)
-*.sqlite
-*.db
-
 # Directorio de instancia de Flask
 instance/
 
