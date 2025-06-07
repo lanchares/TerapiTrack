@@ -19,24 +19,6 @@ instance/
 .coverage
 htmlcov/
 
-# Directorios generados por herramientas de construcción o distribución
-dist/
-build/
-*.egg-info/
-
-# Carpetas específicas del IDE/editor (VSCode, PyCharm, Sublime Text)
-.vscode/
-.idea/
-*.sublime-*
-
-# Carpetas de entorno virtual Python
-.venv/
-venv/
-env/
-
-# Carpetas del sistema operativo (macOS)
-.DS_Store
-
 # Otros archivos generados automáticamente
 __pycache__/
 
