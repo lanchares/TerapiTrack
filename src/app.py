@@ -15,10 +15,10 @@ def create_app():
     from modelos.profesional import Profesional
     from modelos.ejercicio import Ejercicio
     from modelos.sesion import Sesion
-    from modelos.ejercicio_sesion import EjercicioSesion
+    from modelos.ejercicio_sesion import Ejercicio_Sesion
     from modelos.evaluacion import Evaluacion
     from modelos.videoRespuesta import VideoRespuesta
-    from modelos.asociaciones import PacienteProfesional, EjercicioProfesional
+    from modelos.asociaciones import Paciente_Profesional, Ejercicio_Profesional
 
     @app.route('/')
     def index():

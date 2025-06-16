@@ -4,4 +4,4 @@ from flask_login import LoginManager
 
 # Instancias globales sin app
 db = SQLAlchemy()
-
+login_manager = LoginManager()
