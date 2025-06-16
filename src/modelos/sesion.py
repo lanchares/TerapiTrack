@@ -7,8 +7,8 @@ class Sesion(db.Model):
     Id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     Paciente_Id = db.Column(db.Integer, db.ForeignKey('Paciente.Usuario_Id'), nullable=False)
     Profesional_Id = db.Column(db.Integer, db.ForeignKey('Profesional.Usuario_Id'), nullable=False)
-    Fecha_Asignacion = db.Column(db.Date, default=date.today)
-    Estado = db.Column(db.String(20), nullable=False, default='PENDIENTE')
+    Fecha_Asignacion = db.Column(db.Date, nullable=False, default=date.today)
+    Estado = db.Column(db.String(20), nullable=False)
     Fecha_Programada = db.Column(db.Date, nullable=False)
     
     __table_args__ = (
@@ -25,5 +25,37 @@ class Sesion(db.Model):
     profesional = db.relationship('Profesional', back_populates='sesiones')
     
     # Relación 1:N con Ejercicio_Sesion (una sesión puede tener muchos ejercicios)
-    ejercicios_sesion = db.relationship('EjercicioSesion', cascade='all, delete-orphan')
+    ejercicios_sesion = db.relationship('Ejercicio_Sesion', cascade='all, delete-orphan',
+                                        back_populates='sesion')
     
+    # Métodos propios del modelo Sesion
+    def es_pendiente(self):
+        return self.Estado == 'PENDIENTE'
+    
+    def es_completada(self):
+        return self.Estado == 'COMPLETADA'
+
+    def es_cancelada(self):
+        return self.Estado == 'CANCELADA'
+
+    def obtener_ejercicios(self):
+        return len(self.ejercicios_sesion)
+        
+    def fecha_programada_legible(self):
+        return self.Fecha_Programada.strftime('%d/%m/%Y') if self.Fecha_Programada else ""
+
+
+    def __repr__(self):
+        """Representación legible para depuración."""
+        return f"<Sesion Id={self.Id} Estado={self.Estado} Fecha_Programada={self.Fecha_Programada}>"
+
+    def to_dict(self):
+        """Serializa la sesión a un diccionario."""
+        return {
+            "Id": self.Id,
+            "Paciente_Id": self.Paciente_Id,
+            "Profesional_Id": self.Profesional_Id,
+            "Fecha_Asignacion": str(self.Fecha_Asignacion),
+            "Estado": self.Estado,
+            "Fecha_Programada": str(self.Fecha_Programada)
+        }
