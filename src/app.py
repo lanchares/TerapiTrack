@@ -1,5 +1,5 @@
 from flask import Flask
-from extensiones import db
+from src.extensiones import db
 
 def create_app():
     app = Flask(__name__)
@@ -10,15 +10,15 @@ def create_app():
     db.init_app(app)
 
     # Importar modelos para asegurar que se registran en SQLAlchemy
-    from modelos.usuario import Usuario
-    from modelos.paciente import Paciente
-    from modelos.profesional import Profesional
-    from modelos.ejercicio import Ejercicio
-    from modelos.sesion import Sesion
-    from modelos.ejercicio_sesion import Ejercicio_Sesion
-    from modelos.evaluacion import Evaluacion
-    from modelos.videoRespuesta import VideoRespuesta
-    from modelos.asociaciones import Paciente_Profesional, Ejercicio_Profesional
+    from src.modelos.usuario import Usuario
+    from src.modelos.paciente import Paciente
+    from src.modelos.profesional import Profesional
+    from src.modelos.ejercicio import Ejercicio
+    from src.modelos.sesion import Sesion
+    from src.modelos.ejercicio_sesion import Ejercicio_Sesion
+    from src.modelos.evaluacion import Evaluacion
+    from src.modelos.videoRespuesta import VideoRespuesta
+    from src.modelos.asociaciones import Paciente_Profesional, Ejercicio_Profesional
 
     @app.route('/')
     def index():
