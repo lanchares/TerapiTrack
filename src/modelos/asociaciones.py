@@ -1,4 +1,4 @@
-from extensiones import db
+from src.extensiones import db
 from datetime import date
 
 class Paciente_Profesional(db.Model):
@@ -28,7 +28,7 @@ class Ejercicio_Profesional(db.Model):
     Ejercicio_Id = db.Column(db.Integer, db.ForeignKey('Ejercicio.Id'), primary_key=True)
     
     def __repr__(self):
-        return f"<EjercicioProfesional Usuario_Id={self.Usuario_Id} Ejercicio_Id={self.Ejercicio_Id}>"
+        return f"<EjercicioProfesional Usuario_Id={self.Profesional_Id} Ejercicio_Id={self.Ejercicio_Id}>"
 
     def to_dict(self):
         return {

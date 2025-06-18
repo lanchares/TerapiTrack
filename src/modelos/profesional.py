@@ -1,4 +1,4 @@
-from extensiones import db
+from src.extensiones import db
 
 class Profesional(db.Model):
     __tablename__ = 'Profesional'

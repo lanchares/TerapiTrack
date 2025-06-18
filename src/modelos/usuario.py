@@ -1,4 +1,4 @@
-from extensiones import db
+from src.extensiones import db
 from datetime import date
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
@@ -29,11 +29,11 @@ class Usuario(db.Model, UserMixin):
                                   back_populates='usuario', 
                                   cascade='all, delete-orphan')
 
-    def set_password(self, password):
+    def set_contraseña(self, password):
         """Cifra y almacena la contraseña del usuario."""
         self.Contraseña = generate_password_hash(password)
 
-    def check_password(self, password):
+    def check_contraseña(self, password):
         """Verifica si la contraseña proporcionada coincide con la almacenada."""
         return check_password_hash(self.Contraseña, password)
 

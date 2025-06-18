@@ -1,4 +1,4 @@
-from extensiones import db
+from src.extensiones import db
 from datetime import date
 
 class Sesion(db.Model):
