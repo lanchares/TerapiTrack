@@ -117,4 +117,4 @@ class TestUsuario:
             usuario.set_contraseña("1234")
             db.session.add(usuario)
             db.session.commit()
-            assert usuario.obtener_id() == str(usuario.Id)
+            assert usuario.get_id() == str(usuario.Id)
