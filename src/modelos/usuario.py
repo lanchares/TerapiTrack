@@ -1,6 +1,5 @@
-from src.extensiones import db
+from src.extensiones import db, bcrypt
 from datetime import date
-from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 
 class Usuario(db.Model, UserMixin):
@@ -31,11 +30,11 @@ class Usuario(db.Model, UserMixin):
 
     def set_contraseña(self, password):
         """Cifra y almacena la contraseña del usuario."""
-        self.Contraseña = generate_password_hash(password)
+        self.Contraseña = bcrypt.generate_password_hash(password).decode('utf-8')
 
     def check_contraseña(self, password):
         """Verifica si la contraseña proporcionada coincide con la almacenada."""
-        return check_password_hash(self.Contraseña, password)
+        return bcrypt.check_password_hash(self.Contraseña, password)
 
     def es_admin(self):
         return self.Rol_Id == 0
@@ -46,7 +45,7 @@ class Usuario(db.Model, UserMixin):
     def es_profesional(self):
         return self.Rol_Id == 2
     
-    def obtener_id(self):
+    def get_id(self):
         """Devuelve el identificador único del usuario (para Flask-Login)."""
         return str(self.Id)
 
