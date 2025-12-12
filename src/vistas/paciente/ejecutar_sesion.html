@@ -222,9 +222,18 @@ document.addEventListener("DOMContentLoaded", function() {
         setInterval(comprobarEstadoSesion, 2000);
     }
 
+    let ultimoEjercicioRecibido = null;
+    let cambioEnProceso = false;
+
+
     async function comprobarEstadoSesion() {
+        // Evitar cambios simultáneos
+        if (cambioEnProceso) {
+            console.log('⏸️ Cambio en proceso, saltando polling...');
+            return;
+        }
+
         try {
-            console.log(`🔍 Consultando sesión ${sesionId}...`);
             const resp = await fetch(`/profesional/api/sesion/${sesionId}/estado`);
             
             if (!resp.ok) {
@@ -233,72 +242,145 @@ document.addEventListener("DOMContentLoaded", function() {
             }
 
             const data = await resp.json();
-            console.log("📦 Recibido:", data);
-
-            const terminada = data.terminada;
-            if (terminada) {
+            
+            // Verificar si la sesión terminó
+            if (data.terminada) {
                 isSessionActive = false;
-                waitingOverlay.classList.add('d-none');
+                waitingOverlay.classList.remove('d-none');
                 ejercicioNombre.textContent = 'Sesión finalizada por tu terapeuta';
                 ejercicioTipo.textContent = '';
+                demoVideo.pause();
+                stopRecording();
                 setTimeout(() => {
                     window.location.href = "{{ url_for('paciente.dashboard') }}";
-                }, 3000);
+                }, 2000);
                 return;
             }
 
             const ejercicioActivoId = data.ejercicio_activo_id;
 
+            // Aún no hay ejercicio activo
             if (ejercicioActivoId === null || ejercicioActivoId === undefined) {
-                console.log("⏳ Aún no ha empezado");
+                console.log("⏳ Esperando que el profesional inicie...");
                 return;
             }
 
-            console.log(`✅ Ejercicio activo: ${ejercicioActivoId}`);
-
+            // Encontrar el índice del ejercicio
             const index = ejercicios.findIndex(ej => ej.Id === ejercicioActivoId);
 
             if (index === -1) {
-                console.warn(`⚠️ Ejercicio ${ejercicioActivoId} no encontrado`);
+                console.error(`❌ Ejercicio ${ejercicioActivoId} no encontrado en la lista`);
                 return;
             }
 
+            // Primera vez que se activa la sesión
             if (!isSessionActive) {
-                console.log("🎬 Iniciando sesión...");
+                console.log("🎬 Iniciando sesión por primera vez...");
                 isSessionActive = true;
                 waitingOverlay.classList.add('d-none');
                 document.getElementById('exitButton').style.display = 'none';
-                loadExercise(index);
+                ultimoEjercicioRecibido = ejercicioActivoId;
+                cambioEnProceso = true;
+                await loadExercise(index);
+                cambioEnProceso = false;
                 return;
             }
 
-            if (index !== currentExercise) {
-                console.log(`🔄 Cambiando ejercicio ${currentExercise} → ${index}`);
+            // Detectar cambio de ejercicio
+            if (ejercicioActivoId !== ultimoEjercicioRecibido) {
+                console.log(`🔄 Cambio detectado: ${ultimoEjercicioRecibido} → ${ejercicioActivoId}`);
+                ultimoEjercicioRecibido = ejercicioActivoId;
+                cambioEnProceso = true;
+                
+                // Detener grabación actual
                 stopRecording();
-                setTimeout(() => loadExercise(index), 1000);
+                
+                // Esperar antes de cargar el nuevo ejercicio
+                await new Promise(resolve => setTimeout(resolve, 500));
+                await loadExercise(index);
+                cambioEnProceso = false;
             }
         } catch (e) {
-            console.error("❌ Error:", e);
+            console.error("❌ Error en polling:", e);
+            cambioEnProceso = false;
         }
     }
 
+
     // LÓGICA DE EJERCICIOS
-    function loadExercise(index) {
+    async function loadExercise(index) {
         if (index >= totalExercises) {
             endSession();
             return;
         }
 
+        console.log(`🎯 Cargando ejercicio ${index + 1}/${totalExercises}`);
         currentExercise = index;
 
         const ejercicio = ejercicios[index];
+        
+        // Actualizar título inmediatamente
         ejercicioNombre.textContent = ejercicio.ejercicio.Nombre;
         ejercicioTipo.textContent = ejercicio.ejercicio.Tipo;
 
-        demoVideo.src = ejercicio.ejercicio.Video;
-        demoVideo.play();
+        // CRUCIAL: Limpiar completamente el video anterior
+        console.log('🧹 Limpiando video anterior...');
+        demoVideo.pause();
+        demoVideo.removeAttribute('src');
+        demoVideo.load(); // Resetear completamente el elemento video
+        
+        // Esperar a que se limpie el estado
+        await new Promise(resolve => setTimeout(resolve, 300));
 
-        setTimeout(startRecording, 2000);
+        // Determinar ruta del video
+        let videoSrc = ejercicio.ejercicio.Video;
+        if (videoSrc.startsWith('ejercicio_')) {
+            videoSrc = "/static/uploads/ejercicios/" + videoSrc;
+        } else if (!videoSrc.startsWith('/static/')) {
+            videoSrc = "/static/videos/" + videoSrc;
+        }
+
+        console.log(`📹 Cargando nuevo video: ${videoSrc}`);
+        
+        // Cargar el nuevo video
+        demoVideo.src = videoSrc;
+        demoVideo.load();
+
+        // Esperar a que el video esté listo
+        return new Promise((resolve) => {
+            let timeoutId;
+            
+            const onCanPlay = async () => {
+                clearTimeout(timeoutId);
+                demoVideo.removeEventListener('canplay', onCanPlay);
+                
+                try {
+                    await demoVideo.play();
+                    console.log('✅ Video demo reproduciendo correctamente');
+                    
+                    // Esperar 1 segundo antes de iniciar grabación
+                    await new Promise(r => setTimeout(r, 1000));
+                    startRecording();
+                    resolve();
+                } catch (err) {
+                    console.error('❌ Error reproduciendo video:', err);
+                    // Intentar iniciar grabación de todos modos
+                    startRecording();
+                    resolve();
+                }
+            };
+
+            demoVideo.addEventListener('canplay', onCanPlay);
+
+            // Timeout de seguridad (5 segundos)
+            timeoutId = setTimeout(() => {
+                demoVideo.removeEventListener('canplay', onCanPlay);
+                console.warn('⚠️ Timeout esperando video, forzando inicio');
+                demoVideo.play().catch(console.error);
+                startRecording();
+                resolve();
+            }, 5000);
+        });
     }
 
     function startRecording() {

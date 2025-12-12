@@ -353,7 +353,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Seleccionar ejercicio
     exerciseCards.forEach((card, index) => {
-        card.addEventListener('click', () => {
+        card.addEventListener('click', async () => {
             if (card.classList.contains('completed')) {
                 showMessage('Este ejercicio ya ha sido completado', 'info');
                 return;
@@ -368,17 +368,20 @@ document.addEventListener("DOMContentLoaded", function() {
                 showMessage('No hay cámara disponible en este equipo. Solo se muestra el vídeo demo.', 'warning');
             }
 
-            // Si había uno grabando, solo lo paramos si hay cámara
+            // Si había uno grabando, finalizarlo correctamente
             if (cameraAvailable && isRecording) {
                 stopRecording();
                 const prevSelected = document.querySelector('.exercise-card.selected');
                 if (prevSelected && !prevSelected.classList.contains('completed')) {
                     markExerciseAsCompleted(prevSelected);
                 }
+                // Esperar a que termine la subida
+                await new Promise(resolve => setTimeout(resolve, 800));
             }
 
+            // Limpiar selecciones previas
             exerciseCards.forEach(c => c.classList.remove('selected'));
-
+            
             updateCompletedCount();
             updateProgress();
             updateFinishLastExerciseButton();
@@ -387,15 +390,26 @@ document.addEventListener("DOMContentLoaded", function() {
             currentExerciseIndex = index;
 
             const ejercicioSesionId = card.dataset.ejercicioSesionId;
-            notificarEjercicioActivo(parseInt(ejercicioSesionId));
-
             const videoPath = card.dataset.video;
             const nombre = card.dataset.nombre;
             const tipo = card.dataset.tipo;
 
+            // Actualizar UI inmediatamente
             ejercicioActualNombre.textContent = nombre;
             ejercicioTipo.textContent = tipo;
 
+            const statusBadge = card.querySelector('.status-badge');
+            statusBadge.textContent = 'Cargando...';
+            statusBadge.className = 'badge bg-info status-badge';
+
+            // CRUCIAL: Limpiar completamente el video anterior
+            demoVideo.pause();
+            demoVideo.removeAttribute('src');
+            demoVideo.load(); // Resetear el elemento video
+            demoVideo.style.display = 'none';
+            noVideoSelected.style.display = 'flex';
+
+            // Determinar ruta del video
             let videoSrc;
             if (videoPath.startsWith('ejercicio_')) {
                 videoSrc = "/static/uploads/ejercicios/" + videoPath;
@@ -403,55 +417,45 @@ document.addEventListener("DOMContentLoaded", function() {
                 videoSrc = "/static/videos/" + videoPath;
             }
 
-            // Actualizar UI inmediatamente
-            ejercicioActualNombre.textContent = nombre;
-            ejercicioTipo.textContent = tipo;
+            console.log(`📹 Cargando nuevo video: ${videoSrc}`);
+
+            // Esperar un momento para que se limpie el estado
+            await new Promise(resolve => setTimeout(resolve, 200));
+
+            // Cargar el nuevo video
+            demoVideo.src = videoSrc;
+            demoVideo.load();
+            demoVideo.style.display = 'block';
             noVideoSelected.style.display = 'none';
 
-            const statusBadge = card.querySelector('.status-badge');
-            statusBadge.textContent = 'Cargando...';
-            statusBadge.className = 'badge bg-info status-badge';
-
-            // Cambiar vídeo con carga correcta
-            demoVideo.src = videoSrc;
-            demoVideo.style.display = 'block';
-            demoVideo.currentTime = 0;
-
-            // ESPERAR a que el vídeo cargue antes de continuar
-            demoVideo.addEventListener('loadeddata', function onVideoLoaded() {
-                demoVideo.removeEventListener('loadeddata', onVideoLoaded); // Evitar duplicados
+            // Reproducir el video y esperar confirmación
+            try {
+                await demoVideo.play();
+                console.log('✅ Video demo cargado y reproduciendo');
                 
-                demoVideo.play().catch(err => {
-                    console.error('Error al reproducir vídeo:', err);
-                    showMessage('Error al cargar el vídeo de demostración', 'warning');
-                });
-
+                // Video cargado exitosamente
                 statusBadge.textContent = 'Grabando';
                 statusBadge.className = 'badge bg-warning status-badge';
 
-                if (cameraAvailable) {
-                    setTimeout(() => {
-                        startRecording(ejercicioSesionId);
-                        updateFinishLastExerciseButton();
-                    }, 500);  // Reducido de 1000ms a 500ms
-                }
-            }, { once: true });  // Solo ejecutar UNA VEZ
+                // Notificar al paciente
+                await notificarEjercicioActivo(parseInt(ejercicioSesionId));
+                console.log('✅ Paciente notificado');
 
-            // Timeout de seguridad por si el vídeo no carga
-            setTimeout(() => {
-                if (demoVideo.readyState < 3) {  // HAVE_FUTURE_DATA
-                    console.warn('Vídeo tardó en cargar, forzando inicio');
-                    statusBadge.textContent = 'Grabando';
-                    statusBadge.className = 'badge bg-warning status-badge';
-                    
-                    if (cameraAvailable) {
-                        startRecording(ejercicioSesionId);
-                        updateFinishLastExerciseButton();
-                    }
+                // Iniciar grabación si hay cámara
+                if (cameraAvailable) {
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    startRecording(ejercicioSesionId);
+                    updateFinishLastExerciseButton();
                 }
-            }, 3000);  // Si no carga en 3 segundos, forzar
+            } catch (err) {
+                console.error('❌ Error al cargar video:', err);
+                statusBadge.textContent = 'Error';
+                statusBadge.className = 'badge bg-danger status-badge';
+                showMessage('Error al cargar el vídeo de demostración', 'danger');
+            }
         });
     });
+
 
 
     // Subir vídeo
