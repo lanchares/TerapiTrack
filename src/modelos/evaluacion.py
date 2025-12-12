@@ -11,10 +11,11 @@ class Evaluacion(db.Model):
     
     __table_args__ = (
         db.CheckConstraint(
-            'Puntuacion >= 1 AND Puntuacion <= 5',
+            '"Puntuacion" >= 1 AND "Puntuacion" <= 5',
             name='check_puntuacion_rango'
         ),
     )
+
     
     # Relación 1:1 con EjercicioSesion
     ejercicio_sesion = db.relationship('Ejercicio_Sesion', back_populates='evaluacion')

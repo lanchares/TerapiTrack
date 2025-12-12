@@ -9,10 +9,11 @@ class Profesional(db.Model):
     
     __table_args__ = (
         db.CheckConstraint(
-            "Tipo_Profesional IN ('MEDICO', 'ENFERMERO', 'TERAPEUTA', 'PSICOLOGO')",
+            '"Tipo_Profesional" IN (\'MEDICO\', \'ENFERMERO\', \'TERAPEUTA\', \'PSICOLOGO\')',
             name='check_tipo_profesional'
         ),
     )
+
     
     # Relación 1:1 con Usuario 
     usuario = db.relationship('Usuario', back_populates='profesional')

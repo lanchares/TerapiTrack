@@ -12,11 +12,9 @@ class Sesion(db.Model):
     Fecha_Programada = db.Column(db.DateTime, nullable=False)
     
     __table_args__ = (
-        db.CheckConstraint(
-            "Estado IN ('PENDIENTE', 'COMPLETADA', 'CANCELADA')",
-            name='check_estado_sesion'
-        ),
-    )
+    db.CheckConstraint('"Estado" IN (\'PENDIENTE\', \'COMPLETADA\', \'CANCELADA\')', name='check_estado_sesion'),
+)
+
     
     # Relación N:1 con Paciente (muchas sesiones de un paciente)
     paciente = db.relationship('Paciente', back_populates='sesiones')
