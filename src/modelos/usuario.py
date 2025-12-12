@@ -15,9 +15,10 @@ class Usuario(db.Model, UserMixin):
     Estado = db.Column(db.Integer, nullable=False, default=1)
 
     __table_args__ = (
-        db.CheckConstraint('Rol_Id IN (0, 1, 2)', name='check_rol_id'),
-        db.CheckConstraint('Estado IN (0, 1)', name='check_estado'),
+        db.CheckConstraint('"Rol_Id" IN (0, 1, 2)', name='check_rol_id'),
+        db.CheckConstraint('"Estado" IN (0, 1)', name='check_estado'),
     )
+
     # Relaciones 1:1 con Paciente
     paciente = db.relationship('Paciente', uselist=False, 
                                back_populates='usuario', 
