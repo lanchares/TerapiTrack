@@ -6,12 +6,24 @@ from src.modelos import Ejercicio, Sesion, Evaluacion, VideoRespuesta, Paciente,
 from src.modelos.asociaciones import Paciente_Profesional, Ejercicio_Profesional
 from datetime import datetime, timedelta
 from src.extensiones import db
+import cloudinary
+import cloudinary.uploader
 import os
+import time
 from src.config import Config
 from collections import defaultdict
 
 
 profesional_bp = Blueprint('profesional', __name__, url_prefix='/profesional')
+
+
+# Configurar Cloudinary
+cloudinary.config(
+    cloud_name=os.getenv('CLOUDINARY_CLOUD_NAME'),
+    api_key=os.getenv('CLOUDINARY_API_KEY'),
+    api_secret=os.getenv('CLOUDINARY_API_SECRET')
+)
+
 
 # Estado de sesiones en memoria: { sesion_id: ejercicio_activo_id }
 estado_sesiones_tiempo_real = {}
@@ -608,34 +620,56 @@ def ver_progreso(paciente_id):
 @profesional_bp.route('/guardar_video/<int:ejercicio_sesion_id>', methods=['POST'])
 @login_required
 def guardar_video(ejercicio_sesion_id):
-    """Guardar video de respuesta (CU7)"""
-    ejercicio_sesion = Ejercicio_Sesion.query.get_or_404(ejercicio_sesion_id)
+    """Guardar video de respuesta en Cloudinary (CU7)"""
+    try:
+        ejercicio_sesion = Ejercicio_Sesion.query.get_or_404(ejercicio_sesion_id)
+        
+        if 'video' not in request.files:
+            return jsonify({'success': False, 'error': 'No se encontró el archivo'}), 400
+        
+        video_file = request.files['video']
+        
+        if video_file.filename == '':
+            return jsonify({'success': False, 'error': 'Archivo vacío'}), 400
+        
+        # Subir a Cloudinary
+        upload_result = cloudinary.uploader.upload(
+            video_file,
+            resource_type="video",
+            folder="terapitrack/respuestas",
+            public_id=f"respuesta_{ejercicio_sesion_id}_{int(time.time())}",
+            overwrite=True
+        )
+        
+        # La URL del video en Cloudinary
+        video_url = upload_result['secure_url']
+        
+        # Guardar la URL en la base de datos
+        video_respuesta = VideoRespuesta.query.filter_by(Ejercicio_Sesion_Id=ejercicio_sesion_id).first()
+        
+        fecha_expiracion = datetime.now() + timedelta(days=30)
+        
+        if video_respuesta:
+            video_respuesta.Ruta_Almacenamiento = video_url
+            video_respuesta.Fecha_Expiracion = fecha_expiracion
+        else:
+            video_respuesta = VideoRespuesta(
+                Ejercicio_Sesion_Id=ejercicio_sesion_id,
+                Ruta_Almacenamiento=video_url,
+                Fecha_Expiracion=fecha_expiracion
+            )
+            db.session.add(video_respuesta)
+        
+        db.session.commit()
+        
+        print(f"✅ Video guardado en Cloudinary: {video_url}")
+        return jsonify({'success': True, 'mensaje': 'Video guardado correctamente'}), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        print(f"❌ Error al guardar video: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
-    # OPCIONAL: comenta este bloque mientras pruebas, para evitar "Sin permisos"
-    # if ejercicio_sesion.sesion.Profesional_Id != current_user.Id:
-    #     return jsonify(success=False, error='Sin permisos')
-
-    video = request.files.get('video')
-    if not video:
-        return jsonify(success=False, error='No se recibió video')
-
-    upload_dir = os.path.join(Config.UPLOAD_FOLDER, 'respuestas')
-    if not os.path.exists(upload_dir):
-        os.makedirs(upload_dir)
-
-    filename = f"respuesta_{ejercicio_sesion_id}_{datetime.now().timestamp()}.webm"
-    video_path = os.path.join(upload_dir, filename)
-    video.save(video_path)
-
-    nuevo_video = VideoRespuesta(
-        Ejercicio_Sesion_Id=ejercicio_sesion_id,
-        Ruta_Almacenamiento=filename,
-        Fecha_Expiracion=datetime.now() + timedelta(days=30)
-    )
-    db.session.add(nuevo_video)
-    db.session.commit()
-
-    return jsonify(success=True)
 
 
 @profesional_bp.route('/ver_evaluacion/<int:ejercicio_sesion_id>')

@@ -42,7 +42,7 @@
                     <h6>Video del paciente:</h6>
                     {% if item.video_respuesta %}
                     <video controls class="w-100 rounded" style="max-height: 250px;">
-                        <source src="{{ url_for('static', filename='uploads/respuestas/' + item.video_respuesta.Ruta_Almacenamiento) }}" type="video/webm">
+                        <source src="{{ item.video_respuesta.Ruta_Almacenamiento }}" type="video/webm">
                         Tu navegador no soporta videos.
                     </video>
                     {% else %}

@@ -21,8 +21,8 @@
             <div class="col-md-6 mb-4">
                 <h5>Video demostrativo:</h5>
                 <video controls class="w-100 rounded" style="max-height: 300px;">
-                    {% if ejercicio_sesion.ejercicio.Video.startswith('ejercicio_') %}
-                        <source src="{{ url_for('static', filename='uploads/ejercicios/' + ejercicio_sesion.ejercicio.Video) }}" type="video/mp4">
+                    {% if ejercicio_sesion.ejercicio.Video.startswith('http') %}
+                        <source src="{{ ejercicio_sesion.ejercicio.Video }}" type="video/webm">
                     {% else %}
                         <source src="{{ url_for('static', filename='videos/' + ejercicio_sesion.ejercicio.Video) }}" type="video/mp4">
                     {% endif %}
@@ -30,13 +30,13 @@
                 </video>
                 <p class="mt-2 small text-muted">{{ ejercicio_sesion.ejercicio.Descripcion }}</p>
             </div>
-            
-            <!-- Video del paciente -->
+
+            <!-- Video del paciente (líneas ~29-42) -->
             <div class="col-md-6 mb-4">
                 <h5>Video del paciente:</h5>
                 {% if video_respuesta %}
                 <video controls class="w-100 rounded" style="max-height: 300px;">
-                    <source src="{{ url_for('static', filename='uploads/respuestas/' + video_respuesta.Ruta_Almacenamiento) }}" type="video/webm">
+                    <source src="{{ video_respuesta.Ruta_Almacenamiento }}" type="video/webm">
                     Tu navegador no soporta videos.
                 </video>
                 <p class="mt-2 small text-muted">
@@ -52,6 +52,7 @@
                 </div>
                 {% endif %}
             </div>
+
         </div>
         
         <!-- Formulario de evaluación solo si hay video -->
