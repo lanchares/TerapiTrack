@@ -166,6 +166,24 @@
         0%, 50% { opacity: 1; }
         51%, 100% { opacity: 0.3; }
     }
+
+    /* Asegurar que el botón sea clickeable */
+    #finishLastExerciseBtn {
+        position: relative;
+        z-index: 10;
+        pointer-events: auto !important;
+    }
+
+    /* Evitar que el scroll tape el botón */
+    .exercise-list {
+        padding-bottom: 10px; /* Espacio para no tapar el botón */
+    }
+
+    /* Contenedor del progreso */
+    .mt-3.p-2.bg-white.rounded.border {
+        position: relative;
+        z-index: 5;
+    }
 </style>
 
 <script>
@@ -385,22 +403,53 @@ document.addEventListener("DOMContentLoaded", function() {
                 videoSrc = "/static/videos/" + videoPath;
             }
 
-            demoVideo.src = videoSrc;
-            demoVideo.style.display = 'block';
-            demoVideo.currentTime = 0;
-            demoVideo.play();
+            // Actualizar UI inmediatamente
+            ejercicioActualNombre.textContent = nombre;
+            ejercicioTipo.textContent = tipo;
             noVideoSelected.style.display = 'none';
 
             const statusBadge = card.querySelector('.status-badge');
-            statusBadge.textContent = 'Grabando';
-            statusBadge.className = 'badge bg-warning status-badge';
+            statusBadge.textContent = 'Cargando...';
+            statusBadge.className = 'badge bg-info status-badge';
 
-            if (cameraAvailable) {   // ← SOLO SI HAY CÁMARA
-                setTimeout(() => {
-                    startRecording(ejercicioSesionId);
-                    updateFinishLastExerciseButton();
-                }, 1000);
-            }
+            // Cambiar vídeo con carga correcta
+            demoVideo.src = videoSrc;
+            demoVideo.style.display = 'block';
+            demoVideo.currentTime = 0;
+
+            // ESPERAR a que el vídeo cargue antes de continuar
+            demoVideo.addEventListener('loadeddata', function onVideoLoaded() {
+                demoVideo.removeEventListener('loadeddata', onVideoLoaded); // Evitar duplicados
+                
+                demoVideo.play().catch(err => {
+                    console.error('Error al reproducir vídeo:', err);
+                    showMessage('Error al cargar el vídeo de demostración', 'warning');
+                });
+
+                statusBadge.textContent = 'Grabando';
+                statusBadge.className = 'badge bg-warning status-badge';
+
+                if (cameraAvailable) {
+                    setTimeout(() => {
+                        startRecording(ejercicioSesionId);
+                        updateFinishLastExerciseButton();
+                    }, 500);  // Reducido de 1000ms a 500ms
+                }
+            }, { once: true });  // Solo ejecutar UNA VEZ
+
+            // Timeout de seguridad por si el vídeo no carga
+            setTimeout(() => {
+                if (demoVideo.readyState < 3) {  // HAVE_FUTURE_DATA
+                    console.warn('Vídeo tardó en cargar, forzando inicio');
+                    statusBadge.textContent = 'Grabando';
+                    statusBadge.className = 'badge bg-warning status-badge';
+                    
+                    if (cameraAvailable) {
+                        startRecording(ejercicioSesionId);
+                        updateFinishLastExerciseButton();
+                    }
+                }
+            }, 3000);  // Si no carga en 3 segundos, forzar
         });
     });
 
