@@ -1,8 +1,8 @@
 {
   "retencion_videos": "30",
   "limite_almacenamiento": "5",
-  "notificaciones_email": "disabled",
+  "notificaciones_email": "enabled",
   "backup_automatico": "daily",
-  "ultima_modificacion": "2025-12-12T12:25:14.733267",
+  "ultima_modificacion": "2025-12-14T00:05:11.251170",
   "modificado_por": 1
 }

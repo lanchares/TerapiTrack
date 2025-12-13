@@ -71,8 +71,11 @@
                                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                 </div>
                                 <div class="modal-body">
-                                    <video controls class="w-100">
-                                        {% if ejercicio.Video.startswith('ejercicio_') %}
+                                    <video id="videoEjercicio{{ ejercicio.Id }}" controls class="w-100">
+                                        {% if ejercicio.Video.startswith('http') %}
+                                            <!-- Vídeos en URL (Cloudinary u otros) -->
+                                            <source src="{{ ejercicio.Video }}" type="video/mp4">
+                                        {% elif ejercicio.Video.startswith('ejercicio_') %}
                                             <!-- Videos creados por profesionales -->
                                             <source src="{{ url_for('static', filename='uploads/ejercicios/' + ejercicio.Video) }}" type="video/mp4">
                                         {% else %}
@@ -100,4 +103,20 @@
         </div>
     </div>
 </div>
+
+<!-- Script para pausar el vídeo al cerrar cualquier modal de ejercicio -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const modals = document.querySelectorAll('.modal');
+    modals.forEach(modal => {
+        modal.addEventListener('hidden.bs.modal', function () {
+            const videos = modal.querySelectorAll('video');
+            videos.forEach(video => {
+                video.pause();
+                video.currentTime = 0;
+            });
+        });
+    });
+});
+</script>
 {% endblock %}

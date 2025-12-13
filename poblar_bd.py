@@ -216,7 +216,8 @@ def poblar_datos():
                 # Crear video de respuesta (simulado)
                 video_resp = VideoRespuesta(
                     Ejercicio_Sesion_Id=es.Id,
-                    Ruta_Almacenamiento=f"respuesta_{es.Id}_{datetime.now().timestamp()}.webm",
+                    # Simular URL de Cloudinary en vez de un nombre suelto
+                    Ruta_Almacenamiento=f"cloudinary://<438427374897353>:<jlQrF-JJ4yAMoScxwDj78J_W3k8>@dck4l5hfp",
                     Fecha_Expiracion=date.today() + timedelta(days=30)
                 )
                 db.session.add(video_resp)

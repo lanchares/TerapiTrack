@@ -19,8 +19,8 @@
         <form method="GET" class="row g-3">
             <div class="col-md-3">
                 <label for="search" class="form-label">Buscar paciente:</label>
-                <input type="text" name="search" id="search" class="form-control" 
-                       placeholder="Nombre o apellidos..." 
+                <input type="text" name="search" id="search" class="form-control"
+                       placeholder="Nombre o apellidos..."
                        value="{{ search }}">
             </div>
             <div class="col-md-3">
@@ -28,7 +28,7 @@
                 <select name="profesional" id="profesional" class="form-select">
                     <option value="">Todos los profesionales</option>
                     {% for prof_usuario, prof_data in profesionales %}
-                    <option value="{{ prof_usuario.Id }}" 
+                    <option value="{{ prof_usuario.Id }}"
                             {% if profesional_filter == prof_usuario.Id|string %}selected{% endif %}>
                         {{ prof_usuario.Nombre }} {{ prof_usuario.Apellidos }} - {{ prof_data.Tipo_Profesional }}
                     </option>
@@ -37,12 +37,12 @@
             </div>
             <div class="col-md-2">
                 <label for="fecha_desde" class="form-label">Desde:</label>
-                <input type="date" name="fecha_desde" id="fecha_desde" class="form-control" 
+                <input type="date" name="fecha_desde" id="fecha_desde" class="form-control"
                        value="{{ fecha_desde }}">
             </div>
             <div class="col-md-2">
                 <label for="fecha_hasta" class="form-label">Hasta:</label>
-                <input type="date" name="fecha_hasta" id="fecha_hasta" class="form-control" 
+                <input type="date" name="fecha_hasta" id="fecha_hasta" class="form-control"
                        value="{{ fecha_hasta }}">
             </div>
             <div class="col-md-2 d-flex align-items-end">
@@ -70,6 +70,7 @@
                 </thead>
                 <tbody>
                     {% for relacion in relaciones %}
+                    {% set modal_id = 'desvincularModal-' ~ relacion.vinculacion.Paciente_Id ~ '-' ~ relacion.vinculacion.Profesional_Id %}
                     <tr>
                         <td>
                             <strong>{{ relacion.paciente_usuario.Nombre }} {{ relacion.paciente_usuario.Apellidos }}</strong><br>
@@ -81,21 +82,52 @@
                         </td>
                         <td>{{ relacion.profesional.Especialidad }}</td>
                         <td>{{ relacion.vinculacion.Fecha_Asignacion|datetimeformat('%d/%m/%Y') }}</td>
-                        <!-- En la celda de Acciones -->
                         <td>
-                            <form method="POST"
-                                action="{{ url_for('admin.desvincular_paciente_profesional',
-                                paciente_id=relacion.vinculacion.Paciente_Id,
-                                profesional_id=relacion.vinculacion.Profesional_Id) }}"
-                                class="d-inline"
-                                onsubmit="return confirm('¿Desvincular esta relación?')">
-                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                                <button type="submit" class="btn btn-sm btn-danger">
-                                    <i class="bi bi-unlink"></i> Desvincular
-                                </button>
-                            </form>
-                        </td>
+                            <!-- Botón que abre el modal -->
+                            <button type="button"
+                                    class="btn btn-sm btn-danger"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#{{ modal_id }}">
+                                <i class="bi bi-unlink"></i> Desvincular
+                            </button>
 
+                            <!-- Modal de confirmación -->
+                            <div class="modal fade" id="{{ modal_id }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header bg-danger text-white">
+                                            <h5 class="modal-title">
+                                                <i class="bi bi-unlink me-2"></i>Confirmar desvinculación
+                                            </h5>
+                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>
+                                                ¿Seguro que deseas desvincular al paciente
+                                                <strong>{{ relacion.paciente_usuario.Nombre }} {{ relacion.paciente_usuario.Apellidos }}</strong>
+                                                del profesional
+                                                <strong>{{ relacion.profesional_usuario.Nombre }} {{ relacion.profesional_usuario.Apellidos }}</strong>?
+                                            </p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                Cancelar
+                                            </button>
+                                            <form method="POST"
+                                                  action="{{ url_for('admin.desvincular_paciente_profesional',
+                                                  paciente_id=relacion.vinculacion.Paciente_Id,
+                                                  profesional_id=relacion.vinculacion.Profesional_Id) }}"
+                                                  class="d-inline">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                                <button type="submit" class="btn btn-danger">
+                                                    <i class="bi bi-unlink"></i> Desvincular
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
                     </tr>
                     {% else %}
                     <tr>
