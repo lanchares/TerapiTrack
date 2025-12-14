@@ -28,6 +28,9 @@ cloudinary.config(
 estado_sesiones_tiempo_real = {}
 estado_sesion_terminada = set()
 
+ultimo_cambio_sesion = {}
+MIN_INTERVAL_CAMBIO = 6  # segundos mínimo entre cambios
+
 # ---------------------------
 # Dashboard profesional
 # ---------------------------
@@ -445,8 +448,24 @@ def actualizar_estado_sesion(sesion_id):
     if ejercicio_activo_id is None:
         return jsonify({"error": "Falta ejercicio_activo_id"}), 400
 
+    ahora = time()
+    anterior = estado_sesiones_tiempo_real.get(sesion_id)
+    ultimo = ultimo_cambio_sesion.get(sesion_id)
+
+    # Bloquear cambio distinto demasiado rápido
+    if (anterior is not None and
+        ejercicio_activo_id != anterior and
+        ultimo is not None and
+        ahora - ultimo < MIN_INTERVAL_CAMBIO):
+        return jsonify({
+            "ok": False,
+            "sesion_id": sesion_id,
+            "ejercicio_activo_id": anterior
+        })
+
     estado_sesiones_tiempo_real[sesion_id] = ejercicio_activo_id
-    # por si se marca terminada y luego se reanuda
+    ultimo_cambio_sesion[sesion_id] = ahora
+
     if sesion_id in estado_sesion_terminada:
         estado_sesion_terminada.discard(sesion_id)
 

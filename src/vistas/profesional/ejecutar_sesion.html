@@ -530,6 +530,12 @@ document.addEventListener("DOMContentLoaded", function() {
 const sesionId = {{ sesion.Id }};
 
 async function notificarEjercicioActivo(ejercicioId) {
+    if (ejercicioId === ultimoEjercicioNotificado) {
+        console.log("🔁 Mismo ejercicio, no notifico:", ejercicioId);
+        return;
+    }
+    ultimoEjercicioNotificado = ejercicioId;
+
     console.log("🔔 Notificando:", ejercicioId);
     try {
         const csrfToken = document.querySelector('meta[name=csrf-token]').getAttribute('content');
