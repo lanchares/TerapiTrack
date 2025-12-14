@@ -10,7 +10,6 @@ import cloudinary
 import cloudinary.uploader
 import os
 import time
-from time import time
 from src.config import Config
 from collections import defaultdict
 
@@ -449,7 +448,7 @@ def actualizar_estado_sesion(sesion_id):
     if ejercicio_activo_id is None:
         return jsonify({"error": "Falta ejercicio_activo_id"}), 400
 
-    ahora = time()
+    ahora = time.time()
     anterior = estado_sesiones_tiempo_real.get(sesion_id)
     ultimo = ultimo_cambio_sesion.get(sesion_id)
 
