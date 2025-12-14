@@ -528,6 +528,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 <script>
 const sesionId = {{ sesion.Id }};
+let ultimoEjercicioNotificado = null;  // ← AÑADIR ESTO
 
 async function notificarEjercicioActivo(ejercicioId) {
     if (ejercicioId === ultimoEjercicioNotificado) {
@@ -554,5 +555,6 @@ async function notificarEjercicioActivo(ejercicioId) {
     }
 }
 </script>
+
 
 {% endblock %}
