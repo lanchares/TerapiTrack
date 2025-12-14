@@ -243,6 +243,7 @@ document.addEventListener("DOMContentLoaded", function() {
             }
 
             const data = await resp.json();
+            console.log("Estado recibido:", data);
             
             // Verificar si la sesión terminó
             if (data.terminada) {
