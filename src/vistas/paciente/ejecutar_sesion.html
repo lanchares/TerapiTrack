@@ -274,6 +274,11 @@ document.addEventListener("DOMContentLoaded", function() {
                 return;
             }
 
+            if (index === currentExercise) {
+                // Ya estoy mostrando este ejercicio, no vuelvo a cargarlo
+                return;
+            }
+
             // Primera vez que se activa la sesión
             if (!isSessionActive) {
                 console.log("🎬 Iniciando sesión por primera vez...");
