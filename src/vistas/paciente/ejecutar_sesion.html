@@ -187,29 +187,30 @@ document.addEventListener("DOMContentLoaded", function() {
 
         function updateMiniController() {
             fetch('/paciente/get_controller_state')
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        // En Heroku: parar el bucle si el endpoint no existe
+                        throw new Error('controller_unavailable');
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     if (!data.error) {
                         Object.keys(miniButtons).forEach(btn => {
-                            if (data[btn]) {
-                                miniButtons[btn].classList.add('active');
-                            } else {
-                                miniButtons[btn].classList.remove('active');
-                            }
+                            if (data[btn]) miniButtons[btn].classList.add('active');
+                            else miniButtons[btn].classList.remove('active');
                         });
-
-                        // Y para volver a la lista de sesiones mientras aún no ha empezado
                         if (!isSessionActive && data.Y) {
                             window.location.href = "{{ url_for('paciente.mis_sesiones') }}";
                             return;
                         }
                     }
+                    setTimeout(updateMiniController, 100);
                 })
                 .catch(err => {
-                    // Mando no disponible, continuar sin errores
+                    console.warn('Mando no disponible, se desactiva el polling.');
+                    // NO volvemos a llamar a updateMiniController aquí
                 });
-
-            setTimeout(updateMiniController, 100);
         }
 
         updateMiniController();
