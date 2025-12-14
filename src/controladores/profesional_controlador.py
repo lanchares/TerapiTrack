@@ -10,6 +10,7 @@ import cloudinary
 import cloudinary.uploader
 import os
 import time
+from time import time
 from src.config import Config
 from collections import defaultdict
 
