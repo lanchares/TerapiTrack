@@ -155,6 +155,11 @@ document.addEventListener("DOMContentLoaded", function() {
     let timerInterval;
     let currentExercise = -1;
     let totalExercises = ejercicios.length;
+    let ultimoEjercicioRecibido = null;
+    let cambioEnProceso = false;
+    let lastChangeTime = 0;              // ← nuevo
+    const MIN_CHANGE_INTERVAL = 8000;    // ← nuevo (8 s, ajustable)
+
 
     // Inicializar cámara automáticamente
     initCamera();
@@ -223,10 +228,6 @@ document.addEventListener("DOMContentLoaded", function() {
         setInterval(comprobarEstadoSesion, 2000);
     }
 
-    let ultimoEjercicioRecibido = null;
-    let cambioEnProceso = false;
-
-
     async function comprobarEstadoSesion() {
         // Evitar cambios simultáneos
         if (cambioEnProceso) {
@@ -260,6 +261,13 @@ document.addEventListener("DOMContentLoaded", function() {
             }
 
             const ejercicioActivoId = data.ejercicio_activo_id;
+
+            // Si ya tengo un ejercicio y el servidor devuelve null, lo ignoro
+            if ((ejercicioActivoId === null || ejercicioActivoId === undefined) && ultimoEjercicioRecibido !== null) {
+                console.log("🔁 Estado volvió a null, lo ignoro y mantengo", ultimoEjercicioRecibido);
+                return;
+            }
+
 
             // Aún no hay ejercicio activo
             if (ejercicioActivoId === null || ejercicioActivoId === undefined) {
@@ -295,18 +303,23 @@ document.addEventListener("DOMContentLoaded", function() {
 
             // Detectar cambio de ejercicio
             if (ejercicioActivoId !== ultimoEjercicioRecibido) {
+                const now = Date.now();
+                if (now - lastChangeTime < MIN_CHANGE_INTERVAL) {
+                    console.log("Cambio ignorado por intervalo mínimo:", ejercicioActivoId);
+                    return;
+                }
+                lastChangeTime = now;
+
                 console.log(`🔄 Cambio detectado: ${ultimoEjercicioRecibido} → ${ejercicioActivoId}`);
                 ultimoEjercicioRecibido = ejercicioActivoId;
                 cambioEnProceso = true;
-                
-                // Detener grabación actual
+
                 stopRecording();
-                
-                // Esperar antes de cargar el nuevo ejercicio
                 await new Promise(resolve => setTimeout(resolve, 500));
                 await loadExercise(index);
                 cambioEnProceso = false;
             }
+
         } catch (e) {
             console.error("❌ Error en polling:", e);
             cambioEnProceso = false;
