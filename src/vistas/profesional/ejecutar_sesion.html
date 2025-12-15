@@ -18,11 +18,11 @@
 <!-- Pantalla dividida optimizada -->
 <div class="container-fluid p-0">
     <div class="row g-0" style="height: 85vh;">
-        <!-- Cámara del paciente (75% de ancho) -->
+        <!-- Cámara del profesional (preview) -->
         <div class="col-md-9 border-end position-relative" style="background-color: #000;">
             <video id="cameraPreview" autoplay playsinline class="w-100 h-100" muted style="object-fit: cover;"></video>
             
-            <!-- Indicador de grabación -->
+            <!-- Indicador + título -->
             <div class="position-absolute top-0 start-0 w-100 p-3 bg-dark bg-opacity-75">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
@@ -45,9 +45,9 @@
             </div>
         </div>
 
-        <!-- Panel lateral más pequeño (25% de ancho) -->
+        <!-- Panel lateral (video demo + lista) -->
         <div class="col-md-3 d-flex flex-column h-100 bg-light">
-            <!-- Video de ejemplo más pequeño -->
+            <!-- Video demo -->
             <div class="border-bottom" style="height: 35%;">
                 <div class="p-2 bg-primary text-white text-center">
                     <small class="fw-bold">VIDEO DEMO</small>
@@ -66,7 +66,7 @@
                 </div>
             </div>
 
-            <!-- Lista de ejercicios (65% del panel) -->
+            <!-- Lista ejercicios -->
             <div class="flex-grow-1 p-2">
                 <h6 class="fw-bold mb-2 text-center">Ejercicios ({{ ejercicios|length }})</h6>
                 <div class="exercise-list" style="max-height: 100%; overflow-y: auto;">
@@ -92,7 +92,7 @@
                     {% endfor %}
                 </div>
 
-                <!-- Progreso de sesión con botón para último ejercicio -->
+                <!-- Progreso -->
                 <div class="mt-3 p-2 bg-white rounded border">
                     <div class="d-flex justify-content-between align-items-center mb-1">
                         <small class="fw-bold">Progreso</small>
@@ -101,7 +101,6 @@
                     <div class="progress" style="height: 8px;">
                         <div id="progressBar" class="progress-bar bg-success" style="width: 0%;"></div>
                     </div>
-                    <!-- Botón para finalizar último ejercicio -->
                     <button id="finishLastExerciseBtn" class="btn btn-success btn-sm w-100 mt-2 d-none">
                         <i class="bi bi-check-circle me-1"></i>Finalizar Ejercicio
                     </button>
@@ -111,7 +110,7 @@
     </div>
 </div>
 
-<!-- Toast para mensajes -->
+<!-- Toast mensajes -->
 <div class="toast-container position-fixed bottom-0 end-0 p-3">
     <div id="liveToast" class="toast" role="alert">
         <div class="toast-header">
@@ -167,207 +166,16 @@
         51%, 100% { opacity: 0.3; }
     }
 
-    /* Asegurar que el botón sea clickeable */
     #finishLastExerciseBtn {
         position: relative;
         z-index: 10;
         pointer-events: auto !important;
     }
 
-    /* Evitar que el scroll tape el botón */
     .exercise-list {
-        padding-bottom: 10px; /* Espacio para no tapar el botón */
+        padding-bottom: 10px;
     }
 
-    /* Contenedor del progreso */
-    .mt-3.p-2.bg-white.rounded.border {
-        position: relative;
-        z-index: 5;
-    }
-</style>
-
-{% extends "base.html" %}
-
-{% block title %}Ejecutar Sesión - TerapiTrack{% endblock %}
-
-{% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>
-        <i class="bi bi-camera-video me-2"></i>Sesión con {{ sesion.paciente.usuario.Nombre }}
-        <span class="badge bg-primary">En progreso</span>
-    </h2>
-    <div>
-        <button id="btnFinalizar" class="btn btn-success">
-            <i class="bi bi-check-circle me-1"></i>Finalizar Sesión
-        </button>
-    </div>
-</div>
-
-<!-- Pantalla dividida optimizada -->
-<div class="container-fluid p-0">
-    <div class="row g-0" style="height: 85vh;">
-        <!-- Cámara del paciente (75% de ancho) -->
-        <div class="col-md-9 border-end position-relative" style="background-color: #000;">
-            <video id="cameraPreview" autoplay playsinline class="w-100 h-100" muted style="object-fit: cover;"></video>
-            
-            <!-- Indicador de grabación -->
-            <div class="position-absolute top-0 start-0 w-100 p-3 bg-dark bg-opacity-75">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h4 class="text-white mb-0" id="ejercicioActualNombre">Selecciona un ejercicio para comenzar</h4>
-                        <small class="text-warning" id="ejercicioTipo"></small>
-                    </div>
-                    <div id="recordingIndicator" class="d-none">
-                        <span class="recording-dot"></span>
-                        <span class="text-danger fw-bold">GRABANDO</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Contador de tiempo -->
-            <div class="position-absolute bottom-0 start-0 w-100 p-3 bg-dark bg-opacity-75">
-                <div class="text-center">
-                    <div id="timer" class="text-white fs-2 fw-bold">00:00</div>
-                    <small class="text-muted">Tiempo de grabación</small>
-                </div>
-            </div>
-        </div>
-
-        <!-- Panel lateral más pequeño (25% de ancho) -->
-        <div class="col-md-3 d-flex flex-column h-100 bg-light">
-            <!-- Video de ejemplo más pequeño -->
-            <div class="border-bottom" style="height: 35%;">
-                <div class="p-2 bg-primary text-white text-center">
-                    <small class="fw-bold">VIDEO DEMO</small>
-                </div>
-                <div class="position-relative h-100">
-                    <video id="demoVideo" controls autoplay muted class="w-100 h-100" style="display: none; object-fit: cover;">
-                        <source src="" type="video/mp4">
-                        Tu navegador no soporta videos.
-                    </video>
-                    <div id="noVideoSelected" class="d-flex align-items-center justify-content-center h-100 text-muted">
-                        <div class="text-center">
-                            <i class="bi bi-play-circle fs-3"></i>
-                            <p class="mt-1 small">Selecciona ejercicio</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Lista de ejercicios (65% del panel) -->
-            <div class="flex-grow-1 p-2">
-                <h6 class="fw-bold mb-2 text-center">Ejercicios ({{ ejercicios|length }})</h6>
-                <div class="exercise-list" style="max-height: 100%; overflow-y: auto;">
-                    {% for ejercicio in ejercicios %}
-                    <div class="exercise-card card mb-2" 
-                         data-ejercicio-sesion-id="{{ ejercicio.Id }}"
-                         data-ejercicio-id="{{ ejercicio.EjercicioId }}"
-                         data-video="{{ ejercicio.ejercicio.Video }}"
-                         data-nombre="{{ ejercicio.ejercicio.Nombre }}"
-                         data-tipo="{{ ejercicio.ejercicio.Tipo }}"
-                         data-descripcion="{{ ejercicio.ejercicio.Descripcion }}"
-                         data-index="{{ loop.index0 }}"
-                         style="cursor: pointer; transition: all 0.3s ease;">
-                        <div class="card-body p-2">
-                            <h6 class="card-title mb-1 small">{{ ejercicio.ejercicio.Nombre }}</h6>
-                            <p class="card-text small text-muted mb-1">{{ ejercicio.ejercicio.Tipo }}</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <small class="text-muted">{{ ejercicio.ejercicio.Duracion }}s</small>
-                                <span class="badge bg-secondary status-badge">Pendiente</span>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-
-                <!-- Progreso de sesión con botón para último ejercicio -->
-                <div class="mt-3 p-2 bg-white rounded border">
-                    <div class="d-flex justify-content-between align-items-center mb-1">
-                        <small class="fw-bold">Progreso</small>
-                        <span id="progressText" class="small text-muted">0/{{ ejercicios|length }}</span>
-                    </div>
-                    <div class="progress" style="height: 8px;">
-                        <div id="progressBar" class="progress-bar bg-success" style="width: 0%;"></div>
-                    </div>
-                    <!-- Botón para finalizar último ejercicio -->
-                    <button id="finishLastExerciseBtn" class="btn btn-success btn-sm w-100 mt-2 d-none">
-                        <i class="bi bi-check-circle me-1"></i>Finalizar Ejercicio
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Toast para mensajes -->
-<div class="toast-container position-fixed bottom-0 end-0 p-3">
-    <div id="liveToast" class="toast" role="alert">
-        <div class="toast-header">
-            <strong class="me-auto">TerapiTrack</strong>
-            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
-        </div>
-        <div class="toast-body" id="toastMessage">
-            Mensaje
-        </div>
-    </div>
-</div>
-
-<style>
-    .exercise-card {
-        transition: all 0.3s ease;
-        cursor: pointer;
-    }
-    
-    .exercise-card:hover:not(.completed):not(.disabled) {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    }
-    
-    .exercise-card.selected {
-        border: 2px solid #0d6efd !important;
-        background-color: #e7f3ff;
-        transform: scale(1.02);
-    }
-    
-    .exercise-card.completed {
-        border: 2px solid #198754 !important;
-        background-color: #d1eddd;
-        cursor: not-allowed;
-    }
-    
-    .exercise-card.disabled {
-        opacity: 0.6;
-        pointer-events: none;
-    }
-    
-    .recording-dot {
-        display: inline-block;
-        width: 12px;
-        height: 12px;
-        background-color: #dc3545;
-        border-radius: 50%;
-        margin-right: 8px;
-        animation: blink 1s infinite;
-    }
-    
-    @keyframes blink {
-        0%, 50% { opacity: 1; }
-        51%, 100% { opacity: 0.3; }
-    }
-
-    /* Asegurar que el botón sea clickeable */
-    #finishLastExerciseBtn {
-        position: relative;
-        z-index: 10;
-        pointer-events: auto !important;
-    }
-
-    /* Evitar que el scroll tape el botón */
-    .exercise-list {
-        padding-bottom: 10px; /* Espacio para no tapar el botón */
-    }
-
-    /* Contenedor del progreso */
     .mt-3.p-2.bg-white.rounded.border {
         position: relative;
         z-index: 5;
@@ -391,7 +199,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const progressBar = document.getElementById('progressBar');
     const progressText = document.getElementById('progressText');
 
-    // Variables de estado
+    // Estado
     let completedExercises = 0;
     let totalExercises = {{ ejercicios|length }};
     let currentExerciseIndex = -1;
@@ -399,7 +207,7 @@ document.addEventListener("DOMContentLoaded", function() {
     let startTime;
     let timerInterval;
 
-    // Inicializar cámara SOLO como preview (sin grabar ni subir)
+    // Cámara SOLO preview
     async function initCamera() {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ 
@@ -416,7 +224,6 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    // Actualizar barra de progreso
     function updateProgress() {
         const percentage = (completedExercises / totalExercises) * 100;
         progressBar.style.width = `${percentage}%`;
@@ -429,7 +236,6 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    // Mostrar mensajes
     function showMessage(message, type = "info") {
         document.getElementById('toastMessage').textContent = message;
         toast.show();
@@ -490,7 +296,7 @@ document.addEventListener("DOMContentLoaded", function() {
         timer.textContent = `${minutes}:${seconds}`;
     }
 
-    // Seleccionar ejercicio
+    // Selección de ejercicio
     exerciseCards.forEach((card, index) => {
         card.addEventListener('click', async () => {
             if (card.classList.contains('completed')) {
@@ -507,7 +313,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 showMessage('No hay cámara disponible en este equipo. Solo se muestra el vídeo demo.', 'warning');
             }
 
-            // Antes de cambiar, si había uno seleccionado, lo marcas como completado opcionalmente
+            // Si había uno seleccionado, marcarlo como completado y resetear estado
             const prevSelected = document.querySelector('.exercise-card.selected');
             if (prevSelected && !prevSelected.classList.contains('completed')) {
                 markExerciseAsCompleted(prevSelected);
@@ -515,9 +321,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 await new Promise(resolve => setTimeout(resolve, 800));
             }
 
-            // Limpiar selecciones previas
             exerciseCards.forEach(c => c.classList.remove('selected'));
-            
             updateCompletedCount();
             updateProgress();
             updateFinishLastExerciseButton();
@@ -530,7 +334,6 @@ document.addEventListener("DOMContentLoaded", function() {
             const nombre = card.dataset.nombre;
             const tipo = card.dataset.tipo;
 
-            // Actualizar UI inmediatamente
             ejercicioActualNombre.textContent = nombre;
             ejercicioTipo.textContent = tipo;
 
@@ -538,14 +341,14 @@ document.addEventListener("DOMContentLoaded", function() {
             statusBadge.textContent = 'Cargando...';
             statusBadge.className = 'badge bg-info status-badge';
 
-            // Limpiar completamente el video anterior
+            // Limpiar video anterior
             demoVideo.pause();
             demoVideo.removeAttribute('src');
             demoVideo.load();
             demoVideo.style.display = 'none';
             noVideoSelected.style.display = 'flex';
 
-            // Determinar ruta del video
+            // Ruta vídeo
             let videoSrc;
             if (videoPath.startsWith('ejercicio_')) {
                 videoSrc = "/static/uploads/ejercicios/" + videoPath;
@@ -569,11 +372,9 @@ document.addEventListener("DOMContentLoaded", function() {
                 statusBadge.textContent = 'En curso';
                 statusBadge.className = 'badge bg-warning status-badge';
 
-                // Notificar al paciente el nuevo ejercicio activo
                 await notificarEjercicioActivo(parseInt(ejercicioSesionId));
                 console.log('✅ Paciente notificado');
 
-                // Iniciar contador local (solo UI)
                 stopTimer();
                 startTimer();
 
@@ -653,7 +454,6 @@ async function notificarEjercicioActivo(ejercicioId) {
     }
 }
 
-// Resetear ejercicio activo a null
 async function resetEjercicioActivo() {
     console.log("🔔 Reseteando ejercicio activo (null)");
     try {
@@ -674,6 +474,5 @@ async function resetEjercicioActivo() {
     }
 }
 </script>
-
 
 {% endblock %}
