@@ -206,7 +206,7 @@
     max-width: 650px;
     margin: 0 auto;
     background: linear-gradient(145deg, #e0e0e0, #f0f0f0);
-    border-radius: 60px;              /* más redondo, tipo SNES */
+    border-radius: 60px;
     padding: 2.5rem 4.5rem;
     box-shadow: 0 10px 30px rgba(0,0,0,0.3);
 }
@@ -387,46 +387,60 @@
     z-index: 1000;
     box-shadow: 0 4px 15px rgba(0,0,0,0.5);
 }
-
 </style>
 
+{% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const backBtn = document.getElementById('btn-back');
+    let gamepadIndex = null;
     let lastButtonStates = { Y: false, up: false, down: false };
-    
-    function monitorController() {
-        fetch('/paciente/get_controller_state')
-            .then(response => response.json())
-            .then(data => {
-                if (!data.error) {
-                    // Monitorear botón Y
-                    if (data.Y && !lastButtonStates.Y) {
-                        backBtn.click();
-                    }
-                    
-                    // SCROLL CON ↑ ↓
-                    if (data.up && !lastButtonStates.up) {
-                        window.scrollBy(0, -200);
-                    }
-                    
-                    if (data.down && !lastButtonStates.down) {
-                        window.scrollBy(0, 200);
-                    }
-                    
-                    lastButtonStates = { 
-                        Y: data.Y, 
-                        up: data.up || false,
-                        down: data.down || false
-                    };
-                }
-            })
-            .catch(() => {});
-        
-        setTimeout(monitorController, 100);
+
+    window.addEventListener('gamepadconnected', (e) => {
+        gamepadIndex = e.gamepad.index;
+        console.log('🎮 Mando conectado (ayuda):', e.gamepad.id);
+        requestAnimationFrame(pollGamepad);
+    });
+
+    window.addEventListener('gamepaddisconnected', () => {
+        console.log('🎮 Mando desconectado (ayuda)');
+        gamepadIndex = null;
+    });
+
+    function pollGamepad() {
+        if (gamepadIndex === null) return;
+
+        const pads = navigator.getGamepads();
+        const gp = pads[gamepadIndex];
+        if (!gp) {
+            requestAnimationFrame(pollGamepad);
+            return;
+        }
+
+        // Mapping estándar: 0=A, 1=B, 2=X, 3=Y
+        const btnY = gp.buttons[3]?.pressed || false;
+        const up   = (gp.axes[1] || 0) < -0.5;
+        const down = (gp.axes[1] || 0) >  0.5;
+
+        const states = { Y: btnY, up, down };
+
+        // Y: volver (flanco de subida)
+        if (states.Y && !lastButtonStates.Y) {
+            backBtn.click();
+        }
+
+        // Scroll ↑ ↓ (flanco de subida)
+        if (states.up && !lastButtonStates.up) {
+            window.scrollBy(0, -200);
+        }
+        if (states.down && !lastButtonStates.down) {
+            window.scrollBy(0, 200);
+        }
+
+        lastButtonStates = states;
+        requestAnimationFrame(pollGamepad);
     }
-    
-    monitorController();
 });
 </script>
+{% endblock %}
 {% endblock %}

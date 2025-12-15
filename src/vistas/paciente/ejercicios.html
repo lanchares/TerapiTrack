@@ -205,6 +205,7 @@
 }
 </style>
 
+{% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const backBtn = document.getElementById('btn-back');
@@ -214,6 +215,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     let selectedExerciseIndex = 0;
     let currentEjercicio = null;
+    let gamepadIndex = null;
     let lastButtonStates = { Y: false, A: false, left: false, right: false, up: false, down: false };
     
     console.log(`Found ${exerciseWrappers.length} exercises for navigation`);
@@ -267,7 +269,6 @@ document.addEventListener('DOMContentLoaded', function() {
         modal.style.display = 'flex';
     }
 
-
     function cerrarEjercicioGrande() {
         modal.classList.remove('show');
         modal.style.display = 'none';
@@ -289,86 +290,101 @@ document.addEventListener('DOMContentLoaded', function() {
             highlightExercise(selectedExerciseIndex);
         });
     });
-    
-    // Monitorear mando SNES
-    function monitorController() {
-        fetch('/paciente/get_controller_state')
-            .then(response => response.json())
-            .then(data => {
-                if (!data.error) {
-                    // Botón Y - Volver (funciona siempre)
-                    if (data.Y && !lastButtonStates.Y) {
-                        if (modal.classList.contains('show')) {
-                            // Si el modal está abierto, cerrarlo
-                            cerrarEjercicioGrande();
-                        } else {
-                            // Si no, volver al dashboard
-                            backBtn.click();
-                        }
-                    }
-                    
-                    // Botón A - Mostrar ejercicio en grande (solo si no está el modal abierto)
-                    if (data.A && !lastButtonStates.A && !modal.classList.contains('show')) {
-                        mostrarEjercicioGrande();
-                    }
-                    
-                    // Navegación solo si no está el modal abierto
-                    if (!modal.classList.contains('show')) {
-                        // NAVEGACIÓN ← → entre ejercicios
-                        if (data.left && !lastButtonStates.left) {
-                            if (selectedExerciseIndex > 0) {
-                                selectedExerciseIndex--;
-                                highlightExercise(selectedExerciseIndex);
-                            }
-                        }
-                        
-                        if (data.right && !lastButtonStates.right) {
-                            if (selectedExerciseIndex < exerciseWrappers.length - 1) {
-                                selectedExerciseIndex++;
-                                highlightExercise(selectedExerciseIndex);
-                            }
-                        }
-                        
-                        // SCROLL CON ↑ ↓
-                       if (data.up && !lastButtonStates.up) {
-                            window.scrollBy(0, -200);
-                        }
-                        if (data.down && !lastButtonStates.down) {
-                            window.scrollBy(0, 200);
-                        }
-                    } else {
-                        // Cuando el modal está abierto, usar ↑ ↓ para desplazar dentro del modal
-                        if (data.up && !lastButtonStates.up) {
-                            modalContent.scrollBy(0, -150);
-                        }
-                        if (data.down && !lastButtonStates.down) {
-                            modalContent.scrollBy(0, 150);
-                        }
-                    }
-                    
-                    lastButtonStates = { 
-                        Y: data.Y, 
-                        A: data.A, 
-                        left: data.left || false,
-                        right: data.right || false,
-                        up: data.up || false,
-                        down: data.down || false
-                    };
+
+    // Gamepad API
+    window.addEventListener('gamepadconnected', (e) => {
+        gamepadIndex = e.gamepad.index;
+        console.log('🎮 Mando conectado (ejercicios):', e.gamepad.id);
+        requestAnimationFrame(pollGamepad);
+    });
+
+    window.addEventListener('gamepaddisconnected', () => {
+        console.log('🎮 Mando desconectado (ejercicios)');
+        gamepadIndex = null;
+    });
+
+    function pollGamepad() {
+        if (gamepadIndex === null) return;
+
+        const pads = navigator.getGamepads();
+        const gp = pads[gamepadIndex];
+        if (!gp) {
+            requestAnimationFrame(pollGamepad);
+            return;
+        }
+
+        // Mapping estándar: 0=A, 1=B, 2=X, 3=Y
+        const btnA = gp.buttons[0]?.pressed || false;
+        const btnB = gp.buttons[1]?.pressed || false; // no usado aquí
+        const btnX = gp.buttons[2]?.pressed || false; // no usado aquí
+        const btnY = gp.buttons[3]?.pressed || false;
+
+        const axisX = gp.axes[0] || 0;
+        const axisY = gp.axes[1] || 0;
+
+        const left  = axisX < -0.5;
+        const right = axisX >  0.5;
+        const up    = axisY < -0.5;
+        const down  = axisY >  0.5;
+
+        const states = { Y: btnY, A: btnA, left, right, up, down };
+
+        // Botón Y - Volver (funciona siempre)
+        if (states.Y && !lastButtonStates.Y) {
+            if (modal.classList.contains('show')) {
+                cerrarEjercicioGrande();
+            } else {
+                backBtn.click();
+            }
+        }
+
+        // Botón A - Mostrar ejercicio en grande (solo si no está el modal abierto)
+        if (states.A && !lastButtonStates.A && !modal.classList.contains('show')) {
+            mostrarEjercicioGrande();
+        }
+
+        if (!modal.classList.contains('show')) {
+            // NAVEGACIÓN ← → entre ejercicios
+            if (states.left && !lastButtonStates.left) {
+                if (selectedExerciseIndex > 0) {
+                    selectedExerciseIndex--;
+                    highlightExercise(selectedExerciseIndex);
                 }
-            })
-            .catch(err => {
-                console.log('Controller fetch error:', err);
-            });
-        
-        setTimeout(monitorController, 100);
+            }
+            
+            if (states.right && !lastButtonStates.right) {
+                if (selectedExerciseIndex < exerciseWrappers.length - 1) {
+                    selectedExerciseIndex++;
+                    highlightExercise(selectedExerciseIndex);
+                }
+            }
+            
+            // SCROLL CON ↑ ↓
+            if (states.up && !lastButtonStates.up) {
+                window.scrollBy(0, -200);
+            }
+            if (states.down && !lastButtonStates.down) {
+                window.scrollBy(0, 200);
+            }
+        } else {
+            // Cuando el modal está abierto, usar ↑ ↓ para desplazar dentro del modal
+            if (states.up && !lastButtonStates.up) {
+                modalContent.scrollBy(0, -150);
+            }
+            if (states.down && !lastButtonStates.down) {
+                modalContent.scrollBy(0, 150);
+            }
+        }
+
+        lastButtonStates = states;
+        requestAnimationFrame(pollGamepad);
     }
     
-    // Inicializar
+    // Inicializar selección
     if (exerciseWrappers.length > 0) {
         highlightExercise(selectedExerciseIndex);
     }
-    
-    monitorController();
 });
 </script>
+{% endblock %}
 {% endblock %}

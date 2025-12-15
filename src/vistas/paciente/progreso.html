@@ -269,20 +269,20 @@
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const backBtn = document.getElementById('btn-back');
     
     let selectedCardIndex = 0;
+    let gamepadIndex = null;
     let lastButtonStates = { Y: false, left: false, right: false, up: false, down: false };
     
     // Crear gráfico si hay datos
     {% if stats.total_evaluaciones > 0 %}
     const ctx = document.getElementById('progressChart').getContext('2d');
-    // Usar la media por sesión (como en el profesional)
     const evalSesion = {{ evaluaciones_sesion_json|tojson }};
 
-    // Tomar como máximo las últimas 8 sesiones
     const ultimasSesiones = evalSesion;
 
     const fechas = ultimasSesiones.map(e =>
@@ -292,7 +292,6 @@ document.addEventListener('DOMContentLoaded', function() {
     );
     const puntuaciones = ultimasSesiones.map(e => e.Media_Puntuacion);
 
-    
     new Chart(ctx, {
         type: 'line',
         data: {
@@ -354,64 +353,82 @@ document.addEventListener('DOMContentLoaded', function() {
             cards[index].scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
     }
-    
-    
-    function monitorController() {
-        fetch('/paciente/get_controller_state')
-            .then(response => response.json())
-            .then(data => {
-                if (!data.error) {
-                    // Botón Y - Volver
-                    if (data.Y && !lastButtonStates.Y) {
-                        backBtn.click();
-                    }
-                    
-                    // NAVEGACIÓN ← → entre tarjetas
-                    if (data.left && !lastButtonStates.left) {
-                        const cards = document.querySelectorAll('.evaluacion-card');
-                        if (selectedCardIndex > 0) {
-                            selectedCardIndex--;
-                            highlightCard(selectedCardIndex);
-                        }
-                    }
 
-                    if (data.right && !lastButtonStates.right) {
-                        const cards = document.querySelectorAll('.evaluacion-card');
-                        if (selectedCardIndex < cards.length - 1) {
-                            selectedCardIndex++;
-                            highlightCard(selectedCardIndex);
-                        }
-                    }
+    // Gamepad API
+    window.addEventListener('gamepadconnected', (e) => {
+        gamepadIndex = e.gamepad.index;
+        console.log('🎮 Mando conectado (progreso):', e.gamepad.id);
+        requestAnimationFrame(pollGamepad);
+    });
 
-                    
-                    // SCROLL CON ↑ ↓
-                    if (data.up && !lastButtonStates.up) {
-                        window.scrollBy(0, -200);
-                    }
-                    
-                    if (data.down && !lastButtonStates.down) {
-                        window.scrollBy(0, 200);
-                    }
-                    
-                    lastButtonStates = { 
-                        Y: data.Y, 
-                        left: data.left || false,
-                        right: data.right || false,
-                        up: data.up || false,
-                        down: data.down || false
-                    };
-                }
-            })
-            .catch(() => {});
+    window.addEventListener('gamepaddisconnected', () => {
+        console.log('🎮 Mando desconectado (progreso)');
+        gamepadIndex = null;
+    });
+
+    function pollGamepad() {
+        if (gamepadIndex === null) return;
+
+        const pads = navigator.getGamepads();
+        const gp = pads[gamepadIndex];
+        if (!gp) {
+            requestAnimationFrame(pollGamepad);
+            return;
+        }
+
+        // Mapping estándar: 0=A, 1=B, 2=X, 3=Y
+        const btnY = gp.buttons[3]?.pressed || false;
+
+        const axisX = gp.axes[0] || 0;
+        const axisY = gp.axes[1] || 0;
+
+        const left  = axisX < -0.5;
+        const right = axisX >  0.5;
+        const up    = axisY < -0.5;
+        const down  = axisY >  0.5;
+
+        const states = { Y: btnY, left, right, up, down };
+
+        // Botón Y - Volver
+        if (states.Y && !lastButtonStates.Y) {
+            backBtn.click();
+        }
         
-        setTimeout(monitorController, 120);
+        // NAVEGACIÓN ← → entre tarjetas
+        const cards = document.querySelectorAll('.evaluacion-card');
+
+        if (states.left && !lastButtonStates.left) {
+            if (selectedCardIndex > 0) {
+                selectedCardIndex--;
+                highlightCard(selectedCardIndex);
+            }
+        }
+
+        if (states.right && !lastButtonStates.right) {
+            if (selectedCardIndex < cards.length - 1) {
+                selectedCardIndex++;
+                highlightCard(selectedCardIndex);
+            }
+        }
+        
+        // SCROLL CON ↑ ↓
+        if (states.up && !lastButtonStates.up) {
+            window.scrollBy(0, -200);
+        }
+        
+        if (states.down && !lastButtonStates.down) {
+            window.scrollBy(0, 200);
+        }
+        
+        lastButtonStates = states;
+        requestAnimationFrame(pollGamepad);
     }
     
     // Inicializar
     if (document.querySelectorAll('.evaluacion-card').length > 0) {
         highlightCard(selectedCardIndex);
     }
-    monitorController();
 });
 </script>
+{% endblock %}
 {% endblock %}

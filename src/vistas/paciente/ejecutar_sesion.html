@@ -128,6 +128,7 @@
     }
 </style>
 
+{% block scripts %}
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     // Elementos DOM
@@ -139,6 +140,14 @@ document.addEventListener("DOMContentLoaded", function() {
     const timerDisplay = document.getElementById('timerDisplay');
     const timer = document.getElementById('timer');
     const waitingOverlay = document.getElementById('waitingOverlay');
+
+    // Mini mando visual
+    const miniButtons = {
+        'Y': document.getElementById('mini-y'),
+        'X': document.getElementById('mini-x'),
+        'B': document.getElementById('mini-b'),
+        'A': document.getElementById('mini-a')
+    };
 
     // Datos de ejercicios y sesión
     const ejercicios = {{ ejercicios_json|tojson }};
@@ -158,18 +167,21 @@ document.addEventListener("DOMContentLoaded", function() {
     let ultimoEjercicioRecibido = null;
     let cambioEnProceso = false;
 
-    // NUEVAS variables para estabilizar el id del ejercicio
+    // Estabilidad del id enviado por el profesional
     let lastChangeTime = 0;
-    const MIN_CHANGE_INTERVAL = 8000;      // 8 s entre cambios aceptados
-    const REQUIRED_STABLE_POLLS = 2;   // nº de polls seguidos con el mismo id
+    const MIN_CHANGE_INTERVAL = 8000;   // 8 s entre cambios aceptados
+    const REQUIRED_STABLE_POLLS = 2;    // nº de polls seguidos con el mismo id
     let ultimoIdVisto = null;
     let pollsMismoId = 0;
 
+    // Estado del gamepad
+    let gamepadIndex = null;
+    let lastButtonStates = { Y: false, X: false, B: false, A: false };
 
     // Inicializar cámara automáticamente
     initCamera();
-    // Monitorear mando SNES
-    monitorController();
+    // Monitorear mando (solo indicador + volver antes de sesión)
+    initGamepad();
     // Escuchar al profesional
     startPollingEstadoSesion();
 
@@ -187,43 +199,55 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    function monitorController() {
-        const miniButtons = {
-            'Y': document.getElementById('mini-y'),
-            'X': document.getElementById('mini-x'),
-            'B': document.getElementById('mini-b'),
-            'A': document.getElementById('mini-a')
-        };
+    // Gamepad: solo indicador visual y Y para volver mientras no hay sesión activa
+    function initGamepad() {
+        window.addEventListener('gamepadconnected', (e) => {
+            gamepadIndex = e.gamepad.index;
+            console.log('🎮 Mando conectado (ejecutar_sesion):', e.gamepad.id);
+            requestAnimationFrame(pollGamepad);
+        });
 
-        function updateMiniController() {
-            fetch('/paciente/get_controller_state')
-                .then(response => {
-                    if (!response.ok) {
-                        // En Heroku: parar el bucle si el endpoint no existe
-                        throw new Error('controller_unavailable');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (!data.error) {
-                        Object.keys(miniButtons).forEach(btn => {
-                            if (data[btn]) miniButtons[btn].classList.add('active');
-                            else miniButtons[btn].classList.remove('active');
-                        });
-                        if (!isSessionActive && data.Y) {
-                            window.location.href = "{{ url_for('paciente.mis_sesiones') }}";
-                            return;
-                        }
-                    }
-                    setTimeout(updateMiniController, 100);
-                })
-                .catch(err => {
-                    console.warn('Mando no disponible, se desactiva el polling.');
-                    // NO volvemos a llamar a updateMiniController aquí
-                });
+        window.addEventListener('gamepaddisconnected', () => {
+            console.log('🎮 Mando desconectado (ejecutar_sesion)');
+            gamepadIndex = null;
+            Object.values(miniButtons).forEach(btn => btn && btn.classList.remove('active'));
+        });
+    }
+
+    function pollGamepad() {
+        if (gamepadIndex === null) return;
+
+        const pads = navigator.getGamepads();
+        const gp = pads[gamepadIndex];
+        if (!gp) {
+            requestAnimationFrame(pollGamepad);
+            return;
         }
 
-        updateMiniController();
+        // Mapping estándar: 0=A, 1=B, 2=X, 3=Y
+        const btnA = gp.buttons[0]?.pressed || false;
+        const btnB = gp.buttons[1]?.pressed || false;
+        const btnX = gp.buttons[2]?.pressed || false;
+        const btnY = gp.buttons[3]?.pressed || false;
+
+        const states = { A: btnA, B: btnB, X: btnX, Y: btnY };
+
+        // Actualizar mini-mando visual
+        Object.keys(miniButtons).forEach(letter => {
+            const el = miniButtons[letter];
+            if (!el) return;
+            if (states[letter]) el.classList.add('active');
+            else el.classList.remove('active');
+        });
+
+        // Mientras la sesión no está activa, permitir volver con Y
+        if (!isSessionActive && states.Y && !lastButtonStates.Y) {
+            window.location.href = "{{ url_for('paciente.mis_sesiones') }}";
+            return;
+        }
+
+        lastButtonStates = states;
+        requestAnimationFrame(pollGamepad);
     }
 
     // SINCRONIZACIÓN CON PROFESIONAL
@@ -266,7 +290,7 @@ document.addEventListener("DOMContentLoaded", function() {
             }
 
             const ejercicioActivoId = data.ejercicio_activo_id;
-            const now = Date.now();  // ← AQUÍ defines 'now' una vez
+            const now = Date.now();
 
             // Si ya tengo un ejercicio y el servidor devuelve null, lo ignoro
             if ((ejercicioActivoId === null || ejercicioActivoId === undefined) && ultimoEjercicioRecibido !== null) {
@@ -345,7 +369,6 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-
     // LÓGICA DE EJERCICIOS
     async function loadExercise(index) {
         if (index >= totalExercises) {
@@ -366,7 +389,7 @@ document.addEventListener("DOMContentLoaded", function() {
         console.log('🧹 Limpiando video anterior...');
         demoVideo.pause();
         demoVideo.removeAttribute('src');
-        demoVideo.load(); // Resetear completamente el elemento video
+        demoVideo.load();
         
         // Esperar a que se limpie el estado
         await new Promise(resolve => setTimeout(resolve, 300));
@@ -403,7 +426,6 @@ document.addEventListener("DOMContentLoaded", function() {
                     resolve();
                 } catch (err) {
                     console.error('❌ Error reproduciendo video:', err);
-                    // Intentar iniciar grabación de todos modos
                     startRecording();
                     resolve();
                 }
@@ -507,6 +529,5 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 });
 </script>
-
-
+{% endblock %}
 {% endblock %}
