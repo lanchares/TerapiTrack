@@ -337,7 +337,7 @@ document.addEventListener("DOMContentLoaded", function() {
             if (currentCard) {
                 setTimeout(async () => {
                     markExerciseAsCompleted(currentCard);
-                    await resetEjercicioActivo();      // 🔹 reset en el servidor
+                    await resetEjercicioActivo();      // reset en el servidor
                     showMessage("Último ejercicio completado", "success");
                 }, 500);
             }
@@ -354,6 +354,12 @@ document.addEventListener("DOMContentLoaded", function() {
     // Seleccionar ejercicio
     exerciseCards.forEach((card, index) => {
         card.addEventListener('click', async () => {
+            // No permitir cambiar de ejercicio mientras grabas
+            if (isRecording) {
+                showMessage('Primero termina el ejercicio actual antes de cambiar a otro.', 'warning');
+                return;
+            }
+
             if (card.classList.contains('completed')) {
                 showMessage('Este ejercicio ya ha sido completado', 'info');
                 return;
@@ -366,17 +372,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
             if (!cameraAvailable) {
                 showMessage('No hay cámara disponible en este equipo. Solo se muestra el vídeo demo.', 'warning');
-            }
-
-            // Si había uno grabando, finalizarlo correctamente
-            if (cameraAvailable && isRecording) {
-                stopRecording();
-                const prevSelected = document.querySelector('.exercise-card.selected');
-                if (prevSelected && !prevSelected.classList.contains('completed')) {
-                    markExerciseAsCompleted(prevSelected);
-                }
-                await resetEjercicioActivo();     // 🔹 al cambiar de ejercicio, resetea primero
-                await new Promise(resolve => setTimeout(resolve, 800));
             }
 
             // Limpiar selecciones previas
@@ -512,7 +507,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 markExerciseAsCompleted(currentCard);
             }
         }
-        await resetEjercicioActivo();    // 🔹 al finalizar sesión, deja al paciente sin ejercicio activo
+        await resetEjercicioActivo();    // al finalizar sesión, deja al paciente sin ejercicio activo
         showFinalizeConfirmation();
     });
 
@@ -549,7 +544,7 @@ async function notificarEjercicioActivo(ejercicioId) {
     }
 }
 
-// 🔹 NUEVO: resetear ejercicio activo a null
+// Resetear ejercicio activo a null
 async function resetEjercicioActivo() {
     console.log("🔔 Reseteando ejercicio activo (null)");
     try {
@@ -570,5 +565,6 @@ async function resetEjercicioActivo() {
     }
 }
 </script>
+
 
 {% endblock %}

@@ -23,6 +23,9 @@ cloudinary.config(
     api_secret=os.environ.get('CLOUDINARY_API_SECRET')
 )
 
+# ---------------------------
+# Estado en tiempo real sesión
+# ---------------------------
 
 # Estado de sesiones en memoria: { sesion_id: ejercicio_activo_id }
 estado_sesiones_tiempo_real = {}
@@ -450,7 +453,7 @@ def actualizar_estado_sesion(sesion_id):
     anterior = estado_sesiones_tiempo_real.get(sesion_id)
     ultimo = ultimo_cambio_sesion.get(sesion_id)
 
-    # 🔹 RESET: permitir null para “ningún ejercicio activo”
+    # RESET: permitir null para “ningún ejercicio activo”
     if ejercicio_activo_id is None:
         estado_sesiones_tiempo_real[sesion_id] = None
         ultimo_cambio_sesion[sesion_id] = ahora
@@ -462,7 +465,7 @@ def actualizar_estado_sesion(sesion_id):
             "ejercicio_activo_id": None
         })
 
-    # 🔹 A partir de aquí, lógica actual de cambio con intervalo mínimo
+    # Cambio normal con intervalo mínimo
     if (anterior is not None and
         ejercicio_activo_id != anterior and
         ultimo is not None and
@@ -484,7 +487,6 @@ def actualizar_estado_sesion(sesion_id):
         "sesion_id": sesion_id,
         "ejercicio_activo_id": ejercicio_activo_id
     })
-
 # ---------------------------
 # Evaluación de ejercicios
 # ---------------------------
