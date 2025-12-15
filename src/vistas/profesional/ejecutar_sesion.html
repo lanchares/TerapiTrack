@@ -352,14 +352,9 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     // Seleccionar ejercicio
+    // Seleccionar ejercicio
     exerciseCards.forEach((card, index) => {
         card.addEventListener('click', async () => {
-            // No permitir cambiar de ejercicio mientras grabas
-            if (isRecording) {
-                showMessage('Primero termina el ejercicio actual antes de cambiar a otro.', 'warning');
-                return;
-            }
-
             if (card.classList.contains('completed')) {
                 showMessage('Este ejercicio ya ha sido completado', 'info');
                 return;
@@ -372,6 +367,24 @@ document.addEventListener("DOMContentLoaded", function() {
 
             if (!cameraAvailable) {
                 showMessage('No hay cámara disponible en este equipo. Solo se muestra el vídeo demo.', 'warning');
+            }
+
+            // ⚠️ Si había uno grabando, cerrarlo BIEN antes de cambiar
+            if (cameraAvailable && isRecording) {
+                // 1) Parar grabación
+                stopRecording();
+
+                // 2) Marcar como completado el que estaba seleccionado
+                const prevSelected = document.querySelector('.exercise-card.selected');
+                if (prevSelected && !prevSelected.classList.contains('completed')) {
+                    markExerciseAsCompleted(prevSelected);
+                }
+
+                // 3) Resetear estado en el servidor (null)
+                await resetEjercicioActivo();
+
+                // 4) Pequeña espera para que el paciente procese el null
+                await new Promise(resolve => setTimeout(resolve, 800));
             }
 
             // Limpiar selecciones previas
@@ -445,6 +458,7 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
     });
+
 
     // Subir vídeo
     async function uploadVideo(blob, ejercicioSesionId) {
