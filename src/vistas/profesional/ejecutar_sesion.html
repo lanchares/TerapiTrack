@@ -186,6 +186,194 @@
     }
 </style>
 
+{% extends "base.html" %}
+
+{% block title %}Ejecutar Sesión - TerapiTrack{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>
+        <i class="bi bi-camera-video me-2"></i>Sesión con {{ sesion.paciente.usuario.Nombre }}
+        <span class="badge bg-primary">En progreso</span>
+    </h2>
+    <div>
+        <button id="btnFinalizar" class="btn btn-success">
+            <i class="bi bi-check-circle me-1"></i>Finalizar Sesión
+        </button>
+    </div>
+</div>
+
+<!-- Pantalla dividida optimizada -->
+<div class="container-fluid p-0">
+    <div class="row g-0" style="height: 85vh;">
+        <!-- Cámara del paciente (75% de ancho) -->
+        <div class="col-md-9 border-end position-relative" style="background-color: #000;">
+            <video id="cameraPreview" autoplay playsinline class="w-100 h-100" muted style="object-fit: cover;"></video>
+            
+            <!-- Indicador de grabación -->
+            <div class="position-absolute top-0 start-0 w-100 p-3 bg-dark bg-opacity-75">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="text-white mb-0" id="ejercicioActualNombre">Selecciona un ejercicio para comenzar</h4>
+                        <small class="text-warning" id="ejercicioTipo"></small>
+                    </div>
+                    <div id="recordingIndicator" class="d-none">
+                        <span class="recording-dot"></span>
+                        <span class="text-danger fw-bold">GRABANDO</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contador de tiempo -->
+            <div class="position-absolute bottom-0 start-0 w-100 p-3 bg-dark bg-opacity-75">
+                <div class="text-center">
+                    <div id="timer" class="text-white fs-2 fw-bold">00:00</div>
+                    <small class="text-muted">Tiempo de grabación</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel lateral más pequeño (25% de ancho) -->
+        <div class="col-md-3 d-flex flex-column h-100 bg-light">
+            <!-- Video de ejemplo más pequeño -->
+            <div class="border-bottom" style="height: 35%;">
+                <div class="p-2 bg-primary text-white text-center">
+                    <small class="fw-bold">VIDEO DEMO</small>
+                </div>
+                <div class="position-relative h-100">
+                    <video id="demoVideo" controls autoplay muted class="w-100 h-100" style="display: none; object-fit: cover;">
+                        <source src="" type="video/mp4">
+                        Tu navegador no soporta videos.
+                    </video>
+                    <div id="noVideoSelected" class="d-flex align-items-center justify-content-center h-100 text-muted">
+                        <div class="text-center">
+                            <i class="bi bi-play-circle fs-3"></i>
+                            <p class="mt-1 small">Selecciona ejercicio</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de ejercicios (65% del panel) -->
+            <div class="flex-grow-1 p-2">
+                <h6 class="fw-bold mb-2 text-center">Ejercicios ({{ ejercicios|length }})</h6>
+                <div class="exercise-list" style="max-height: 100%; overflow-y: auto;">
+                    {% for ejercicio in ejercicios %}
+                    <div class="exercise-card card mb-2" 
+                         data-ejercicio-sesion-id="{{ ejercicio.Id }}"
+                         data-ejercicio-id="{{ ejercicio.EjercicioId }}"
+                         data-video="{{ ejercicio.ejercicio.Video }}"
+                         data-nombre="{{ ejercicio.ejercicio.Nombre }}"
+                         data-tipo="{{ ejercicio.ejercicio.Tipo }}"
+                         data-descripcion="{{ ejercicio.ejercicio.Descripcion }}"
+                         data-index="{{ loop.index0 }}"
+                         style="cursor: pointer; transition: all 0.3s ease;">
+                        <div class="card-body p-2">
+                            <h6 class="card-title mb-1 small">{{ ejercicio.ejercicio.Nombre }}</h6>
+                            <p class="card-text small text-muted mb-1">{{ ejercicio.ejercicio.Tipo }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">{{ ejercicio.ejercicio.Duracion }}s</small>
+                                <span class="badge bg-secondary status-badge">Pendiente</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Progreso de sesión con botón para último ejercicio -->
+                <div class="mt-3 p-2 bg-white rounded border">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <small class="fw-bold">Progreso</small>
+                        <span id="progressText" class="small text-muted">0/{{ ejercicios|length }}</span>
+                    </div>
+                    <div class="progress" style="height: 8px;">
+                        <div id="progressBar" class="progress-bar bg-success" style="width: 0%;"></div>
+                    </div>
+                    <!-- Botón para finalizar último ejercicio -->
+                    <button id="finishLastExerciseBtn" class="btn btn-success btn-sm w-100 mt-2 d-none">
+                        <i class="bi bi-check-circle me-1"></i>Finalizar Ejercicio
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast para mensajes -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="liveToast" class="toast" role="alert">
+        <div class="toast-header">
+            <strong class="me-auto">TerapiTrack</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body" id="toastMessage">
+            Mensaje
+        </div>
+    </div>
+</div>
+
+<style>
+    .exercise-card {
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .exercise-card:hover:not(.completed):not(.disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    
+    .exercise-card.selected {
+        border: 2px solid #0d6efd !important;
+        background-color: #e7f3ff;
+        transform: scale(1.02);
+    }
+    
+    .exercise-card.completed {
+        border: 2px solid #198754 !important;
+        background-color: #d1eddd;
+        cursor: not-allowed;
+    }
+    
+    .exercise-card.disabled {
+        opacity: 0.6;
+        pointer-events: none;
+    }
+    
+    .recording-dot {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        background-color: #dc3545;
+        border-radius: 50%;
+        margin-right: 8px;
+        animation: blink 1s infinite;
+    }
+    
+    @keyframes blink {
+        0%, 50% { opacity: 1; }
+        51%, 100% { opacity: 0.3; }
+    }
+
+    /* Asegurar que el botón sea clickeable */
+    #finishLastExerciseBtn {
+        position: relative;
+        z-index: 10;
+        pointer-events: auto !important;
+    }
+
+    /* Evitar que el scroll tape el botón */
+    .exercise-list {
+        padding-bottom: 10px; /* Espacio para no tapar el botón */
+    }
+
+    /* Contenedor del progreso */
+    .mt-3.p-2.bg-white.rounded.border {
+        position: relative;
+        z-index: 5;
+    }
+</style>
+
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     // Elementos DOM
@@ -204,44 +392,23 @@ document.addEventListener("DOMContentLoaded", function() {
     const progressText = document.getElementById('progressText');
 
     // Variables de estado
-    let currentEjercicioSesionId = null;
-    let mediaRecorder;
-    let recordedChunks = [];
-    let isRecording = false;
-    let startTime;
-    let timerInterval;
     let completedExercises = 0;
     let totalExercises = {{ ejercicios|length }};
     let currentExerciseIndex = -1;
-    let cameraAvailable = false; 
+    let cameraAvailable = false;
+    let startTime;
+    let timerInterval;
 
-    // Inicializar cámara
+    // Inicializar cámara SOLO como preview (sin grabar ni subir)
     async function initCamera() {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ 
                 video: { facingMode: "user", width: 1280, height: 720 }, 
-                audio: true 
+                audio: false
             });
             cameraPreview.srcObject = stream;
-
-            mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp9' });
-
-            mediaRecorder.ondataavailable = (event) => {
-                if (event.data.size > 0) {
-                    recordedChunks.push(event.data);
-                }
-            };
-
-            mediaRecorder.onstop = async () => {
-                if (recordedChunks.length > 0 && currentEjercicioSesionId) {
-                    const blob = new Blob(recordedChunks, { type: 'video/webm' });
-                    await uploadVideo(blob, currentEjercicioSesionId);
-                    recordedChunks = [];
-                }
-            };
-
             cameraAvailable = true;
-            showMessage("Cámara activada. Selecciona un ejercicio para comenzar.", "success");
+            showMessage("Cámara activada.", "success");
         } catch (err) {
             console.error("Error al acceder a la cámara:", err);
             cameraAvailable = false;
@@ -268,44 +435,9 @@ document.addEventListener("DOMContentLoaded", function() {
         toast.show();
     }
 
-    // Iniciar grabación
-    function startRecording(ejercicioSesionId) {
-        if (!mediaRecorder || mediaRecorder.state === "recording") return;
-        
-        currentEjercicioSesionId = ejercicioSesionId;
-        recordedChunks = [];
-        mediaRecorder.start();
-        isRecording = true;
-
-        recordingIndicator.classList.remove('d-none');
-        updateFinishLastExerciseButton();
-
-        startTime = Date.now();
-        timerInterval = setInterval(updateTimer, 1000);
-
-        showMessage("Grabación iniciada automáticamente", "success");
-    }
-
-    // Detener grabación
-    function stopRecording() {
-        if (!isRecording || !mediaRecorder) return;
-        
-        mediaRecorder.stop();
-        isRecording = false;
-
-        recordingIndicator.classList.add('d-none');
-        finishLastExerciseBtn.classList.add('d-none');
-
-        clearInterval(timerInterval);
-        timer.textContent = "00:00";
-
-        showMessage('Grabación finalizada y guardada', 'success');
-    }
-
-    // Botón de último ejercicio
     function updateFinishLastExerciseButton() {
         const totalRemaining = totalExercises - completedExercises;
-        if (isRecording && totalRemaining === 1) {
+        if (totalRemaining === 1) {
             finishLastExerciseBtn.classList.remove('d-none');
         } else {
             finishLastExerciseBtn.classList.add('d-none');
@@ -331,17 +463,24 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     async function finishLastExercise() {
-        if (isRecording) {
-            stopRecording();
-            const currentCard = document.querySelector('.exercise-card.selected');
-            if (currentCard) {
-                setTimeout(async () => {
-                    markExerciseAsCompleted(currentCard);
-                    await resetEjercicioActivo();      // reset en el servidor
-                    showMessage("Último ejercicio completado", "success");
-                }, 500);
-            }
+        const currentCard = document.querySelector('.exercise-card.selected');
+        if (currentCard) {
+            markExerciseAsCompleted(currentCard);
+            await resetEjercicioActivo();
+            showMessage("Último ejercicio completado", "success");
         }
+    }
+
+    function startTimer() {
+        startTime = Date.now();
+        timerInterval = setInterval(updateTimer, 1000);
+        recordingIndicator.classList.remove('d-none');
+    }
+
+    function stopTimer() {
+        clearInterval(timerInterval);
+        timer.textContent = "00:00";
+        recordingIndicator.classList.add('d-none');
     }
 
     function updateTimer() {
@@ -351,7 +490,6 @@ document.addEventListener("DOMContentLoaded", function() {
         timer.textContent = `${minutes}:${seconds}`;
     }
 
-    // Seleccionar ejercicio
     // Seleccionar ejercicio
     exerciseCards.forEach((card, index) => {
         card.addEventListener('click', async () => {
@@ -369,21 +507,11 @@ document.addEventListener("DOMContentLoaded", function() {
                 showMessage('No hay cámara disponible en este equipo. Solo se muestra el vídeo demo.', 'warning');
             }
 
-            // ⚠️ Si había uno grabando, cerrarlo BIEN antes de cambiar
-            if (cameraAvailable && isRecording) {
-                // 1) Parar grabación
-                stopRecording();
-
-                // 2) Marcar como completado el que estaba seleccionado
-                const prevSelected = document.querySelector('.exercise-card.selected');
-                if (prevSelected && !prevSelected.classList.contains('completed')) {
-                    markExerciseAsCompleted(prevSelected);
-                }
-
-                // 3) Resetear estado en el servidor (null)
+            // Antes de cambiar, si había uno seleccionado, lo marcas como completado opcionalmente
+            const prevSelected = document.querySelector('.exercise-card.selected');
+            if (prevSelected && !prevSelected.classList.contains('completed')) {
+                markExerciseAsCompleted(prevSelected);
                 await resetEjercicioActivo();
-
-                // 4) Pequeña espera para que el paciente procese el null
                 await new Promise(resolve => setTimeout(resolve, 800));
             }
 
@@ -438,18 +566,17 @@ document.addEventListener("DOMContentLoaded", function() {
                 await demoVideo.play();
                 console.log('✅ Video demo cargado y reproduciendo');
                 
-                statusBadge.textContent = 'Grabando';
+                statusBadge.textContent = 'En curso';
                 statusBadge.className = 'badge bg-warning status-badge';
 
                 // Notificar al paciente el nuevo ejercicio activo
                 await notificarEjercicioActivo(parseInt(ejercicioSesionId));
                 console.log('✅ Paciente notificado');
 
-                if (cameraAvailable) {
-                    await new Promise(resolve => setTimeout(resolve, 500));
-                    startRecording(ejercicioSesionId);
-                    updateFinishLastExerciseButton();
-                }
+                // Iniciar contador local (solo UI)
+                stopTimer();
+                startTimer();
+
             } catch (err) {
                 console.error('❌ Error al cargar video:', err);
                 statusBadge.textContent = 'Error';
@@ -458,36 +585,6 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
     });
-
-
-    // Subir vídeo
-    async function uploadVideo(blob, ejercicioSesionId) {
-        const formData = new FormData();
-        formData.append('video', blob, `respuesta_${ejercicioSesionId}.webm`);
-
-        try {
-            const response = await fetch(`/profesional/guardar_video/${ejercicioSesionId}`, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-CSRFToken': document.querySelector('meta[name=csrf-token]').getAttribute('content')
-                }
-            });
-
-            const result = await response.json();
-            if (result.success) {
-                console.log('Video subido correctamente');
-                return true;
-            } else {
-                showMessage('Error al subir el video', 'danger');
-                return false;
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            showMessage('Error al subir el video', 'danger');
-            return false;
-        }
-    }
 
     finishLastExerciseBtn.addEventListener('click', finishLastExercise);
 
@@ -514,14 +611,12 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     btnFinalizar.addEventListener('click', async () => {
-        if (isRecording) {
-            stopRecording();
-            const currentCard = document.querySelector('.exercise-card.selected');
-            if (currentCard) {
-                markExerciseAsCompleted(currentCard);
-            }
+        const currentCard = document.querySelector('.exercise-card.selected');
+        if (currentCard) {
+            markExerciseAsCompleted(currentCard);
         }
-        await resetEjercicioActivo();    // al finalizar sesión, deja al paciente sin ejercicio activo
+        await resetEjercicioActivo();
+        stopTimer();
         showFinalizeConfirmation();
     });
 

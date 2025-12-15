@@ -162,17 +162,18 @@ document.addEventListener("DOMContentLoaded", function() {
     let recordedChunks = [];
     let startTime;
     let timerInterval;
-    let currentExercise = -1;
+    let currentExercise = -1;       // índice en el array
+    let currentExerciseId = null;   // Id de Ejercicio_Sesion que marca el profesional
     let totalExercises = ejercicios.length;
 
     // Estabilidad del id enviado por el profesional
     let ultimoEjercicioRecibido = null;   // último id ya aceptado
     let candidatoId = null;               // id que se está estabilizando
     let pollsMismoId = 0;                 // nº de polls seguidos viendo candidatoId
-    const REQUIRED_STABLE_POLLS = 3;      // sube/baja si quieres más/menos estabilidad
+    const REQUIRED_STABLE_POLLS = 3;
     const MIN_CHANGE_INTERVAL = 8000;     // 8 s entre cambios aceptados
     let lastChangeTime = 0;
-    let cambioEnProceso = false;          // FLAG que faltaba
+    let cambioEnProceso = false;
 
     // Estado del gamepad
     let gamepadIndex = null;
@@ -300,7 +301,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
             // Si es el mismo que el último ya aceptado: nada que hacer
             if (ejercicioActivoId === ultimoEjercicioRecibido) {
-                // seguimos en el mismo ejercicio, sin incrementar contadores
                 return;
             }
 
@@ -346,7 +346,10 @@ document.addEventListener("DOMContentLoaded", function() {
                 await new Promise(resolve => setTimeout(resolve, 500));
             }
 
+            // Guardar id real que ha marcado el profesional
             ultimoEjercicioRecibido = candidatoId;
+            currentExerciseId = candidatoId;
+
             console.log(`🎯 Cambiando a ejercicio con Id ${candidatoId}`);
             await loadExercise(index);
             cambioEnProceso = false;
@@ -481,9 +484,9 @@ document.addEventListener("DOMContentLoaded", function() {
     async function uploadVideo() {
         if (recordedChunks.length === 0) return;
 
-        console.log("⏫ Subiendo vídeo de ejercicio", currentExercise);
+        console.log("⏫ Subiendo vídeo de ejercicio", currentExerciseId);
 
-        const ejercicioSesionId = ejercicios[currentExercise].Id;
+        const ejercicioSesionId = currentExerciseId;
         const blob = new Blob(recordedChunks, { type: 'video/webm' });
         const formData = new FormData();
         formData.append('video', blob, `respuesta_${ejercicioSesionId}.webm`);
@@ -520,5 +523,6 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 </script>
 {% endblock %}
+
 
 {% endblock %}
