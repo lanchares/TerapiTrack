@@ -250,7 +250,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
             const data = await resp.json();
             console.log("Estado recibido:", data);
-            
+
             // Verificar si la sesión terminó
             if (data.terminada) {
                 isSessionActive = false;
@@ -266,6 +266,7 @@ document.addEventListener("DOMContentLoaded", function() {
             }
 
             const ejercicioActivoId = data.ejercicio_activo_id;
+            const now = Date.now();  // ← AQUÍ defines 'now' una vez
 
             // Si ya tengo un ejercicio y el servidor devuelve null, lo ignoro
             if ((ejercicioActivoId === null || ejercicioActivoId === undefined) && ultimoEjercicioRecibido !== null) {
@@ -343,6 +344,7 @@ document.addEventListener("DOMContentLoaded", function() {
             cambioEnProceso = false;
         }
     }
+
 
     // LÓGICA DE EJERCICIOS
     async function loadExercise(index) {
