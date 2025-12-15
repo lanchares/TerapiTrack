@@ -161,9 +161,10 @@ document.addEventListener("DOMContentLoaded", function() {
     // NUEVAS variables para estabilizar el id del ejercicio
     let lastChangeTime = 0;
     const MIN_CHANGE_INTERVAL = 8000;      // 8 s entre cambios aceptados
-    const REQUIRED_STABLE_TIME = 3000;     // 3 s que el id debe mantenerse igual
+    const REQUIRED_STABLE_POLLS = 3;   // nº de polls seguidos con el mismo id
     let ultimoIdVisto = null;
-    let ultimoIdCambioTimestamp = 0;
+    let pollsMismoId = 0;
+
 
     // Inicializar cámara automáticamente
     initCamera();
@@ -278,18 +279,19 @@ document.addEventListener("DOMContentLoaded", function() {
                 return;
             }
 
-            // Control de estabilidad del id que viene del servidor
-            const now = Date.now();
+            // Control de estabilidad del id que viene del servidor (por nº de polls)
             if (ejercicioActivoId !== ultimoIdVisto) {
                 ultimoIdVisto = ejercicioActivoId;
-                ultimoIdCambioTimestamp = now;
-                console.log("🔍 Nuevo id visto, esperando estabilidad:", ejercicioActivoId);
-                return;  // esperamos a que se mantenga
-            }
-
-            if (now - ultimoIdCambioTimestamp < REQUIRED_STABLE_TIME) {
-                console.log("⏳ Id todavía no estable:", ejercicioActivoId);
+                pollsMismoId = 1;
+                console.log("🔍 Nuevo id visto, empezando conteo de estabilidad:", ejercicioActivoId);
                 return;
+            } else {
+                pollsMismoId += 1;
+                console.log(`⏳ Id ${ejercicioActivoId} visto ${pollsMismoId} veces seguidas`);
+                if (pollsMismoId < REQUIRED_STABLE_POLLS) {
+                    return;
+                }
+                // A partir de aquí consideramos el id estable
             }
 
             // Encontrar el índice del ejercicio
