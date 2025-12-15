@@ -164,15 +164,13 @@ document.addEventListener("DOMContentLoaded", function() {
     let timerInterval;
     let currentExercise = -1;
     let totalExercises = ejercicios.length;
-    let ultimoEjercicioRecibido = null;
-    let cambioEnProceso = false;
 
     // Estabilidad del id enviado por el profesional
+    let ultimoEjercicioRecibido = null;   // último id aceptado
+    let pollsMismoId = 0;                 // nº de polls seguidos viendo el mismo id distinto al último aceptado
+    const REQUIRED_STABLE_POLLS = 3;      // sube/baja si quieres más/menos estabilidad
+    const MIN_CHANGE_INTERVAL = 8000;     // 8 s entre cambios aceptados
     let lastChangeTime = 0;
-    const MIN_CHANGE_INTERVAL = 8000;   // 8 s entre cambios aceptados
-    const REQUIRED_STABLE_POLLS = 2;    // nº de polls seguidos con el mismo id
-    let ultimoIdVisto = null;
-    let pollsMismoId = 0;
 
     // Estado del gamepad
     let gamepadIndex = null;
@@ -224,7 +222,7 @@ document.addEventListener("DOMContentLoaded", function() {
             return;
         }
 
-        // Mapping estándar: 0=X, 1=A, 2=B, 3=Y
+        // Mapping adaptado a tu mando: 0=X, 1=A, 2=B, 3=Y (físicos)
         const btnX = gp.buttons[0]?.pressed || false;
         const btnA = gp.buttons[1]?.pressed || false;
         const btnB = gp.buttons[2]?.pressed || false;
@@ -258,15 +256,8 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     async function comprobarEstadoSesion() {
-        // Evitar cambios simultáneos
-        if (cambioEnProceso) {
-            console.log('⏸️ Cambio en proceso, saltando polling...');
-            return;
-        }
-
         try {
             const resp = await fetch(`/profesional/api/sesion/${sesionId}/estado`);
-            
             if (!resp.ok) {
                 console.warn("⚠️ Error:", resp.status);
                 return;
@@ -292,75 +283,62 @@ document.addEventListener("DOMContentLoaded", function() {
             const ejercicioActivoId = data.ejercicio_activo_id;
             const now = Date.now();
 
-            // Si ya tengo un ejercicio y el servidor devuelve null, lo ignoro
-            if ((ejercicioActivoId === null || ejercicioActivoId === undefined) && ultimoEjercicioRecibido !== null) {
-                console.log("🔁 Estado volvió a null, lo ignoro y mantengo", ultimoEjercicioRecibido);
+            // 1. Si no hay ejercicio activo aún
+            if (ejercicioActivoId == null) {
+                console.log("⏳ Sin ejercicio activo");
+                // no tocamos ultimoEjercicioRecibido; solo reseteamos la estabilidad
+                pollsMismoId = 0;
                 return;
             }
 
-            // Aún no hay ejercicio activo
-            if (ejercicioActivoId === null || ejercicioActivoId === undefined) {
-                console.log("⏳ Esperando que el profesional inicie...");
-                return;
-            }
-
-            // Control de estabilidad del id que viene del servidor (por nº de polls)
-            if (ejercicioActivoId !== ultimoIdVisto) {
-                ultimoIdVisto = ejercicioActivoId;
-                pollsMismoId = 1;
-                console.log("🔍 Nuevo id visto, empezando conteo de estabilidad:", ejercicioActivoId);
-                return;
-            } else {
+            // 2. Si el id recibido es distinto del último aceptado, empezamos/continuamos conteo de estabilidad
+            if (ejercicioActivoId !== ultimoEjercicioRecibido) {
                 pollsMismoId += 1;
-                console.log(`⏳ Id ${ejercicioActivoId} visto ${pollsMismoId} veces seguidas`);
+                console.log(`🔍 Visto nuevo id ${ejercicioActivoId} (${pollsMismoId} veces seguidas)`);
+
                 if (pollsMismoId < REQUIRED_STABLE_POLLS) {
+                    // aún no consideramos este id como estable
                     return;
                 }
-                // A partir de aquí consideramos el id estable
-            }
 
-            // Encontrar el índice del ejercicio
-            const index = ejercicios.findIndex(ej => ej.Id === ejercicioActivoId);
-
-            if (index === -1) {
-                console.error(`❌ Ejercicio ${ejercicioActivoId} no encontrado en la lista`);
-                return;
-            }
-
-            // Si ya estoy mostrando este ejercicio, no vuelvo a cargarlo
-            if (index === currentExercise) {
-                return;
-            }
-
-            // Primera vez que se activa la sesión
-            if (!isSessionActive) {
-                console.log("🎬 Iniciando sesión por primera vez...");
-                isSessionActive = true;
-                waitingOverlay.classList.add('d-none');
-                document.getElementById('exitButton').style.display = 'none';
-                ultimoEjercicioRecibido = ejercicioActivoId;
-                cambioEnProceso = true;
-                await loadExercise(index);
-                cambioEnProceso = false;
-                return;
-            }
-
-            // A partir de aquí, id estable y diferente al actual → cambio de verdad
-            if (ejercicioActivoId !== ultimoEjercicioRecibido) {
-                if (now - lastChangeTime < MIN_CHANGE_INTERVAL) {
+                // id estable suficiente tiempo, aplicar intervalo mínimo si ya había un ejercicio
+                if (ultimoEjercicioRecibido !== null && (now - lastChangeTime) < MIN_CHANGE_INTERVAL) {
                     console.log("Cambio ignorado por intervalo mínimo:", ejercicioActivoId);
                     return;
                 }
+
+                // buscar el ejercicio
+                const index = ejercicios.findIndex(ej => ej.Id === ejercicioActivoId);
+                if (index === -1) {
+                    console.error(`❌ Ejercicio ${ejercicioActivoId} no encontrado en la lista`);
+                    return;
+                }
+
+                // ya no necesitamos seguir contando este id
+                pollsMismoId = 0;
                 lastChangeTime = now;
 
-                console.log(`🔄 Cambio detectado: ${ultimoEjercicioRecibido} → ${ejercicioActivoId}`);
-                ultimoEjercicioRecibido = ejercicioActivoId;
+                // marcar que estamos cambiando para evitar solapes
                 cambioEnProceso = true;
 
-                stopRecording();
-                await new Promise(resolve => setTimeout(resolve, 500));
+                // primera vez que se activa la sesión
+                if (!isSessionActive) {
+                    console.log("🎬 Iniciando sesión por primera vez...");
+                    isSessionActive = true;
+                    waitingOverlay.classList.add('d-none');
+                    document.getElementById('exitButton').style.display = 'none';
+                } else {
+                    // cambio de ejercicio: parar grabación anterior
+                    stopRecording();
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                }
+
+                ultimoEjercicioRecibido = ejercicioActivoId;
+                console.log(`🎯 Cambiando a ejercicio con Id ${ejercicioActivoId}`);
                 await loadExercise(index);
                 cambioEnProceso = false;
+            } else {
+                // mismo id que el último aceptado → no hacemos nada
             }
 
         } catch (e) {
