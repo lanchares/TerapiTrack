@@ -417,7 +417,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Mapping estándar: 0=A, 1=B, 2=X, 3=Y
+        // Mapping estándar: 0=B, 1=X, 2=A, 3=Y
         const btnY = gp.buttons[3]?.pressed || false;
         const up   = (gp.axes[1] || 0) < -0.5;
         const down = (gp.axes[1] || 0) >  0.5;
