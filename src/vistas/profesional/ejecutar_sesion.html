@@ -240,15 +240,14 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             };
 
-            cameraAvailable = true;  // ← NUEVO
+            cameraAvailable = true;
             showMessage("Cámara activada. Selecciona un ejercicio para comenzar.", "success");
         } catch (err) {
             console.error("Error al acceder a la cámara:", err);
-            cameraAvailable = false; // ← NUEVO
+            cameraAvailable = false;
             showMessage("No se ha podido usar la cámara en este equipo. Solo se mostrará el vídeo demo.", "danger");
         }
     }
-
 
     // Actualizar barra de progreso
     function updateProgress() {
@@ -331,13 +330,14 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    function finishLastExercise() {
+    async function finishLastExercise() {
         if (isRecording) {
             stopRecording();
             const currentCard = document.querySelector('.exercise-card.selected');
             if (currentCard) {
-                setTimeout(() => {
+                setTimeout(async () => {
                     markExerciseAsCompleted(currentCard);
+                    await resetEjercicioActivo();      // 🔹 reset en el servidor
                     showMessage("Último ejercicio completado", "success");
                 }, 500);
             }
@@ -375,7 +375,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 if (prevSelected && !prevSelected.classList.contains('completed')) {
                     markExerciseAsCompleted(prevSelected);
                 }
-                // Esperar a que termine la subida
+                await resetEjercicioActivo();     // 🔹 al cambiar de ejercicio, resetea primero
                 await new Promise(resolve => setTimeout(resolve, 800));
             }
 
@@ -402,10 +402,10 @@ document.addEventListener("DOMContentLoaded", function() {
             statusBadge.textContent = 'Cargando...';
             statusBadge.className = 'badge bg-info status-badge';
 
-            // CRUCIAL: Limpiar completamente el video anterior
+            // Limpiar completamente el video anterior
             demoVideo.pause();
             demoVideo.removeAttribute('src');
-            demoVideo.load(); // Resetear el elemento video
+            demoVideo.load();
             demoVideo.style.display = 'none';
             noVideoSelected.style.display = 'flex';
 
@@ -419,29 +419,24 @@ document.addEventListener("DOMContentLoaded", function() {
 
             console.log(`📹 Cargando nuevo video: ${videoSrc}`);
 
-            // Esperar un momento para que se limpie el estado
             await new Promise(resolve => setTimeout(resolve, 200));
 
-            // Cargar el nuevo video
             demoVideo.src = videoSrc;
             demoVideo.load();
             demoVideo.style.display = 'block';
             noVideoSelected.style.display = 'none';
 
-            // Reproducir el video y esperar confirmación
             try {
                 await demoVideo.play();
                 console.log('✅ Video demo cargado y reproduciendo');
                 
-                // Video cargado exitosamente
                 statusBadge.textContent = 'Grabando';
                 statusBadge.className = 'badge bg-warning status-badge';
 
-                // Notificar al paciente
+                // Notificar al paciente el nuevo ejercicio activo
                 await notificarEjercicioActivo(parseInt(ejercicioSesionId));
                 console.log('✅ Paciente notificado');
 
-                // Iniciar grabación si hay cámara
                 if (cameraAvailable) {
                     await new Promise(resolve => setTimeout(resolve, 500));
                     startRecording(ejercicioSesionId);
@@ -455,8 +450,6 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
     });
-
-
 
     // Subir vídeo
     async function uploadVideo(blob, ejercicioSesionId) {
@@ -511,7 +504,7 @@ document.addEventListener("DOMContentLoaded", function() {
         .catch(() => showMessage('Error al finalizar la sesión', 'danger'));
     }
 
-    btnFinalizar.addEventListener('click', () => {
+    btnFinalizar.addEventListener('click', async () => {
         if (isRecording) {
             stopRecording();
             const currentCard = document.querySelector('.exercise-card.selected');
@@ -519,6 +512,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 markExerciseAsCompleted(currentCard);
             }
         }
+        await resetEjercicioActivo();    // 🔹 al finalizar sesión, deja al paciente sin ejercicio activo
         showFinalizeConfirmation();
     });
 
@@ -528,7 +522,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 <script>
 const sesionId = {{ sesion.Id }};
-let ultimoEjercicioNotificado = null;  // ← AÑADIR ESTO
+let ultimoEjercicioNotificado = null;
 
 async function notificarEjercicioActivo(ejercicioId) {
     if (ejercicioId === ultimoEjercicioNotificado) {
@@ -554,7 +548,27 @@ async function notificarEjercicioActivo(ejercicioId) {
         console.error("❌ Error:", e);
     }
 }
-</script>
 
+// 🔹 NUEVO: resetear ejercicio activo a null
+async function resetEjercicioActivo() {
+    console.log("🔔 Reseteando ejercicio activo (null)");
+    try {
+        const csrfToken = document.querySelector('meta[name=csrf-token]').getAttribute('content');
+        const resp = await fetch(`/profesional/api/sesion/${sesionId}/estado`, {
+            method: "POST",
+            headers: { 
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrfToken
+            },
+            body: JSON.stringify({ ejercicio_activo_id: null })
+        });
+        const data = await resp.json();
+        console.log("✅ Reset respuesta:", data);
+        ultimoEjercicioNotificado = null;
+    } catch (e) {
+        console.error("❌ Error al resetear:", e);
+    }
+}
+</script>
 
 {% endblock %}

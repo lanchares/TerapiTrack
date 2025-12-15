@@ -445,14 +445,24 @@ def actualizar_estado_sesion(sesion_id):
 
     data = request.get_json() or {}
     ejercicio_activo_id = data.get('ejercicio_activo_id')
-    if ejercicio_activo_id is None:
-        return jsonify({"error": "Falta ejercicio_activo_id"}), 400
 
     ahora = time.time()
     anterior = estado_sesiones_tiempo_real.get(sesion_id)
     ultimo = ultimo_cambio_sesion.get(sesion_id)
 
-    # Bloquear cambio distinto demasiado rápido
+    # 🔹 RESET: permitir null para “ningún ejercicio activo”
+    if ejercicio_activo_id is None:
+        estado_sesiones_tiempo_real[sesion_id] = None
+        ultimo_cambio_sesion[sesion_id] = ahora
+        if sesion_id in estado_sesion_terminada:
+            estado_sesion_terminada.discard(sesion_id)
+        return jsonify({
+            "ok": True,
+            "sesion_id": sesion_id,
+            "ejercicio_activo_id": None
+        })
+
+    # 🔹 A partir de aquí, lógica actual de cambio con intervalo mínimo
     if (anterior is not None and
         ejercicio_activo_id != anterior and
         ultimo is not None and
