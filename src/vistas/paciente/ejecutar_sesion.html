@@ -157,7 +157,13 @@ document.addEventListener("DOMContentLoaded", function() {
     let totalExercises = ejercicios.length;
     let ultimoEjercicioRecibido = null;
     let cambioEnProceso = false;
-   
+
+    // NUEVAS variables para estabilizar el id del ejercicio
+    let lastChangeTime = 0;
+    const MIN_CHANGE_INTERVAL = 8000;      // 8 s entre cambios aceptados
+    const REQUIRED_STABLE_TIME = 3000;     // 3 s que el id debe mantenerse igual
+    let ultimoIdVisto = null;
+    let ultimoIdCambioTimestamp = 0;
 
     // Inicializar cámara automáticamente
     initCamera();
@@ -266,10 +272,23 @@ document.addEventListener("DOMContentLoaded", function() {
                 return;
             }
 
-
             // Aún no hay ejercicio activo
             if (ejercicioActivoId === null || ejercicioActivoId === undefined) {
                 console.log("⏳ Esperando que el profesional inicie...");
+                return;
+            }
+
+            // Control de estabilidad del id que viene del servidor
+            const now = Date.now();
+            if (ejercicioActivoId !== ultimoIdVisto) {
+                ultimoIdVisto = ejercicioActivoId;
+                ultimoIdCambioTimestamp = now;
+                console.log("🔍 Nuevo id visto, esperando estabilidad:", ejercicioActivoId);
+                return;  // esperamos a que se mantenga
+            }
+
+            if (now - ultimoIdCambioTimestamp < REQUIRED_STABLE_TIME) {
+                console.log("⏳ Id todavía no estable:", ejercicioActivoId);
                 return;
             }
 
@@ -281,8 +300,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 return;
             }
 
+            // Si ya estoy mostrando este ejercicio, no vuelvo a cargarlo
             if (index === currentExercise) {
-                // Ya estoy mostrando este ejercicio, no vuelvo a cargarlo
                 return;
             }
 
@@ -299,9 +318,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 return;
             }
 
-            // Detectar cambio de ejercicio
+            // A partir de aquí, id estable y diferente al actual → cambio de verdad
             if (ejercicioActivoId !== ultimoEjercicioRecibido) {
-                const now = Date.now();
                 if (now - lastChangeTime < MIN_CHANGE_INTERVAL) {
                     console.log("Cambio ignorado por intervalo mínimo:", ejercicioActivoId);
                     return;
@@ -324,7 +342,6 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-
     // LÓGICA DE EJERCICIOS
     async function loadExercise(index) {
         if (index >= totalExercises) {
@@ -341,7 +358,7 @@ document.addEventListener("DOMContentLoaded", function() {
         ejercicioNombre.textContent = ejercicio.ejercicio.Nombre;
         ejercicioTipo.textContent = ejercicio.ejercicio.Tipo;
 
-        // CRUCIAL: Limpiar completamente el video anterior
+        // Limpiar completamente el video anterior
         console.log('🧹 Limpiando video anterior...');
         demoVideo.pause();
         demoVideo.removeAttribute('src');
@@ -486,5 +503,6 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 });
 </script>
+
 
 {% endblock %}
