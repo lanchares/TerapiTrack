@@ -40,16 +40,11 @@
         <h1 class="display-4 fw-bold text-white mb-3">¡Hola, {{ current_user.Nombre }}!</h1>
         <p class="lead text-white">Bienvenido a tu espacio de terapia</p>
         
-        <!-- Estado del mando -->
-        <div class="alert alert-light d-inline-block">
+        <!-- Estado del mando (solo visual, se actualiza desde JS) -->
+        <div class="alert alert-light d-inline-block" id="gamepad-status">
             <i class="bi bi-controller me-2"></i>
             Mando SNES: 
-            {% if stats.mando_conectado %}
-            <span class="badge bg-success">Conectado</span>
-            {% else %}
-            <span class="badge bg-danger">Desconectado</span>
-            <button onclick="reconectarMando()" class="btn btn-sm btn-primary ms-2">Reconectar</button>
-            {% endif %}
+            <span class="badge bg-secondary">Buscando...</span>
         </div>
     </div>
 
@@ -232,104 +227,108 @@
 }
 </style>
 
+{% block scripts %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', () => {
     const buttons = {
         'X': document.getElementById('btn-ejercicios'),
-        'Y': document.getElementById('btn-sesiones'), 
+        'Y': document.getElementById('btn-sesiones'),
         'A': document.getElementById('btn-progreso'),
         'B': document.getElementById('btn-ayuda')
     };
-    
+
+    const gamepadStatus = document.getElementById('gamepad-status');
+    let gamepadIndex = null;
     let lastButtonStates = { X: false, Y: false, A: false, B: false, up: false, down: false };
-    
-    // Monitorear estado del mando
-    function monitorControllerButtons() {
-        fetch('/paciente/get_controller_state')
-            .then(response => response.json())
-            .then(data => {
-                if (!data.error) {
-                    // AÑADIDO: SCROLL CON ↑ ↓
-                    if (data.up && !lastButtonStates.up) {
-                        window.scrollBy(0, -200);
-                    }
-                    
-                    if (data.down && !lastButtonStates.down) {
-                        window.scrollBy(0, 200);
-                    }
-                    
-                    // Navegación con botones (mantenido igual)
-                    Object.keys(buttons).forEach(btn => {
-                        const isPressed = data[btn];
-                        const wasPressed = lastButtonStates[btn];
-                        
-                        // Efectos visuales de presión
-                        if (isPressed) {
-                            buttons[btn].classList.add('controller-active');
-                        } else {
-                            buttons[btn].classList.remove('controller-active');
-                        }
-                        
-                        // ✅ Navegación solo en transición false → true
-                        if (isPressed && !wasPressed) {
-                            navigateWithController(btn);
-                        }
-                        
-                        lastButtonStates[btn] = isPressed;
-                    });
-                    
-                    // Actualizar estados de scroll
-                    lastButtonStates.up = data.up || false;
-                    lastButtonStates.down = data.down || false;
-                }
-            })
-            .catch(() => {
-                // Mando no disponible, continuar sin errores
-            });
-        
-        setTimeout(monitorControllerButtons, 50);
+
+    function setStatus(text, klass) {
+        if (!gamepadStatus) return;
+        const badge = gamepadStatus.querySelector('span.badge');
+        badge.textContent = text;
+        badge.className = 'badge ' + klass;
     }
-    
-    // ✅ Función de navegación con mando (no incluye logout)
+
+    window.addEventListener('gamepadconnected', (e) => {
+        gamepadIndex = e.gamepad.index;
+        setStatus('Conectado', 'bg-success');
+        console.log('🎮 Mando conectado:', e.gamepad.id);
+        requestAnimationFrame(pollGamepad);
+    });
+
+    window.addEventListener('gamepaddisconnected', () => {
+        console.log('🎮 Mando desconectado');
+        gamepadIndex = null;
+        setStatus('Desconectado', 'bg-danger');
+        // quitar efectos visuales
+        Object.values(buttons).forEach(btn => btn && btn.classList.remove('controller-active'));
+    });
+
     function navigateWithController(button) {
-        // Solo permitir navegación a las 4 funciones principales
-        const allowedButtons = ['X', 'Y', 'A', 'B'];
-        if (!allowedButtons.includes(button)) return;
-        
         const targetButton = buttons[button];
-        if (targetButton) {
-            // Efecto visual de selección
-            targetButton.classList.add('mando-selected');
-            setTimeout(() => {
-                targetButton.classList.remove('mando-selected');
-            }, 500);
-            
-            // Navegación después de 300ms
-            setTimeout(() => {
-                window.location.href = targetButton.href;
-            }, 300);
+        if (!targetButton) return;
+
+        targetButton.classList.add('mando-selected');
+        setTimeout(() => targetButton.classList.remove('mando-selected'), 500);
+
+        setTimeout(() => {
+            window.location.href = targetButton.href;
+        }, 300);
+    }
+
+    function pollGamepad() {
+        if (gamepadIndex === null) return;
+
+        const gamepads = navigator.getGamepads();
+        const gp = gamepads[gamepadIndex];
+        if (!gp) {
+            requestAnimationFrame(pollGamepad);
+            return;
         }
+
+        // Mapping típico: 0=A, 1=B, 2=X, 3=Y en mandos tipo Xbox.
+        // Lo adaptamos a tus letras SNES:
+        const btnA = gp.buttons[0]?.pressed || false; // A rojo
+        const btnB = gp.buttons[1]?.pressed || false; // B amarillo
+        const btnX = gp.buttons[2]?.pressed || false; // X azul
+        const btnY = gp.buttons[3]?.pressed || false; // Y verde
+
+        const up    = (gp.axes[1] || 0) < -0.5;
+        const down  = (gp.axes[1] || 0) >  0.5;
+
+        const states = { X: btnX, Y: btnY, A: btnA, B: btnB, up, down };
+
+        // Efectos visuales
+        Object.keys(buttons).forEach(letter => {
+            const btnEl = buttons[letter];
+            if (!btnEl) return;
+            if (states[letter]) btnEl.classList.add('controller-active');
+            else btnEl.classList.remove('controller-active');
+        });
+
+        // Scroll con ↑ ↓ (flanco de subida)
+        if (states.up && !lastButtonStates.up) {
+            window.scrollBy(0, -200);
+        }
+        if (states.down && !lastButtonStates.down) {
+            window.scrollBy(0, 200);
+        }
+
+        // Navegación por botones (flanco de subida)
+        ['X','Y','A','B'].forEach(letter => {
+            if (states[letter] && !lastButtonStates[letter]) {
+                navigateWithController(letter);
+            }
+        });
+
+        lastButtonStates = states;
+        requestAnimationFrame(pollGamepad);
     }
-    
-    function reconectarMando() {
-        fetch('/paciente/reconectar_mando')
-            .then(response => response.json())
-            .then(data => {
-                if (data.conectado) {
-                    location.reload();
-                } else {
-                    alert('No se pudo conectar el mando. Verifica la conexión USB.');
-                }
-            });
-    }
-    
-    // Hacer función global
-    window.reconectarMando = reconectarMando;
-    
-    // Iniciar monitoreo
-    {% if stats.mando_conectado %}
-    monitorControllerButtons();
-    {% endif %}
+
+    // Si el usuario conecta el mando después de cargar la página,
+    // el evento gamepadconnected disparará pollGamepad.
+    // Si ya estaba conectado, algunos navegadores requieren una tecla/botón
+    // para disparar el evento, así que dejamos el estado como "Buscando...".
 });
 </script>
+{% endblock %}
 {% endblock %}
