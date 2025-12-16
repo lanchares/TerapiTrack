@@ -8,7 +8,12 @@
         <i class="bi bi-camera-video me-2"></i>Sesión con {{ sesion.paciente.usuario.Nombre }}
         <span class="badge bg-primary">En progreso</span>
     </h2>
-    <div>
+    <div class="d-flex gap-2">
+        <!-- Botón finalizar ejercicio actual (corte de vídeo) -->
+        <button id="finishLastExerciseBtn" class="btn btn-warning">
+            <i class="bi bi-stop-circle me-1"></i>Finalizar ejercicio
+        </button>
+        <!-- Botón finalizar sesión completa -->
         <button id="btnFinalizar" class="btn btn-success">
             <i class="bi bi-check-circle me-1"></i>Finalizar Sesión
         </button>
@@ -101,9 +106,6 @@
                     <div class="progress" style="height: 8px;">
                         <div id="progressBar" class="progress-bar bg-success" style="width: 0%;"></div>
                     </div>
-                    <button id="finishLastExerciseBtn" class="btn btn-success btn-sm w-100 mt-2 d-none">
-                        <i class="bi bi-check-circle me-1"></i>Finalizar Ejercicio
-                    </button>
                 </div>
             </div>
         </div>
@@ -164,12 +166,6 @@
     @keyframes blink {
         0%, 50% { opacity: 1; }
         51%, 100% { opacity: 0.3; }
-    }
-
-    #finishLastExerciseBtn {
-        position: relative;
-        z-index: 10;
-        pointer-events: auto !important;
     }
 
     .exercise-list {
@@ -241,17 +237,9 @@ document.addEventListener("DOMContentLoaded", function() {
         toast.show();
     }
 
-    function updateFinishLastExerciseButton() {
-        const totalRemaining = totalExercises - completedExercises;
-        if (totalRemaining === 1) {
-            finishLastExerciseBtn.classList.remove('d-none');
-        } else {
-            finishLastExerciseBtn.classList.add('d-none');
-        }
-    }
-
     function updateCompletedCount() {
         completedExercises = document.querySelectorAll('.exercise-card.completed').length;
+        updateProgress();
     }
 
     function markExerciseAsCompleted(card) {
@@ -261,19 +249,7 @@ document.addEventListener("DOMContentLoaded", function() {
             statusBadge.className = 'badge bg-success status-badge';
             card.classList.remove('selected');
             card.classList.add('completed');
-
             updateCompletedCount();
-            updateProgress();
-            updateFinishLastExerciseButton();
-        }
-    }
-
-    async function finishLastExercise() {
-        const currentCard = document.querySelector('.exercise-card.selected');
-        if (currentCard) {
-            markExerciseAsCompleted(currentCard);
-            await resetEjercicioActivo();
-            showMessage("Último ejercicio completado", "success");
         }
     }
 
@@ -296,7 +272,7 @@ document.addEventListener("DOMContentLoaded", function() {
         timer.textContent = `${minutes}:${seconds}`;
     }
 
-    // Selección de ejercicio
+    // Selección de ejercicio: SOLO selecciona y manda id, no completa ni resetea
     exerciseCards.forEach((card, index) => {
         card.addEventListener('click', async () => {
             if (card.classList.contains('completed')) {
@@ -313,19 +289,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 showMessage('No hay cámara disponible en este equipo. Solo se muestra el vídeo demo.', 'warning');
             }
 
-            // Si había uno seleccionado, marcarlo como completado y resetear estado
-            const prevSelected = document.querySelector('.exercise-card.selected');
-            if (prevSelected && !prevSelected.classList.contains('completed')) {
-                markExerciseAsCompleted(prevSelected);
-                await resetEjercicioActivo();
-                await new Promise(resolve => setTimeout(resolve, 800));
-            }
-
             exerciseCards.forEach(c => c.classList.remove('selected'));
-            updateCompletedCount();
-            updateProgress();
-            updateFinishLastExerciseButton();
-
             card.classList.add('selected');
             currentExerciseIndex = index;
 
@@ -387,7 +351,19 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 
-    finishLastExerciseBtn.addEventListener('click', finishLastExercise);
+    // Botón FINALIZAR EJERCICIO: marca como completado y manda null
+    finishLastExerciseBtn.addEventListener('click', async () => {
+        const currentCard = document.querySelector('.exercise-card.selected');
+        if (!currentCard) {
+            showMessage("No hay ejercicio seleccionado para finalizar", "warning");
+            return;
+        }
+
+        markExerciseAsCompleted(currentCard);
+        stopTimer();
+        await resetEjercicioActivo();
+        showMessage("Ejercicio finalizado", "success");
+    });
 
     function showFinalizeConfirmation() {
         fetch(`/profesional/sesion/finalizar/{{ sesion.Id }}`, {
@@ -412,7 +388,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     btnFinalizar.addEventListener('click', () => {
-        // No tocar estado de ejercicio aquí: se supone que ya se ha finalizado
+        // Se supone que ya has ido finalizando ejercicios con el botón correspondiente
         stopTimer();
         showFinalizeConfirmation();
     });
@@ -425,6 +401,7 @@ document.addEventListener("DOMContentLoaded", function() {
 const sesionId = {{ sesion.Id }};
 let ultimoEjercicioNotificado = null;
 
+// Notificar inicio/cambio de ejercicio (id)
 async function notificarEjercicioActivo(ejercicioId) {
     if (ejercicioId === ultimoEjercicioNotificado) {
         console.log("🔁 Mismo ejercicio, no notifico:", ejercicioId);
@@ -450,6 +427,7 @@ async function notificarEjercicioActivo(ejercicioId) {
     }
 }
 
+// Notificar fin de ejercicio actual (null)
 async function resetEjercicioActivo() {
     console.log("🔔 Reseteando ejercicio activo (null)");
     try {
