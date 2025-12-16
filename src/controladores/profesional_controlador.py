@@ -65,8 +65,17 @@ def estado_sesion(sesion_id):
 
     # 1) Actualizar ejercicio activo si la clave viene en el JSON
     if 'ejercicio_activo_id' in data:
-        # Permitir poner None explícito (no hay ejercicio activo)
+        # Si el id es exactamente el mismo que ya teníamos, no hacer nada
+        if ejercicio_activo_id == anterior:
+            return jsonify({
+                "ok": True,
+                "sesion_id": sesion_id,
+                "ejercicio_activo_id": anterior,
+                "terminada": sesion_id in estado_sesion_terminada
+            })
+
         if ejercicio_activo_id is None:
+            # Permitir poner None explícito (no hay ejercicio activo)
             estado_sesiones_tiempo_real[sesion_id] = None
             ultimo_cambio_sesion[sesion_id] = ahora
         else:
@@ -78,7 +87,8 @@ def estado_sesion(sesion_id):
                 return jsonify({
                     "ok": False,
                     "sesion_id": sesion_id,
-                    "ejercicio_activo_id": anterior
+                    "ejercicio_activo_id": anterior,
+                    "terminada": sesion_id in estado_sesion_terminada
                 })
 
             estado_sesiones_tiempo_real[sesion_id] = ejercicio_activo_id
@@ -87,6 +97,16 @@ def estado_sesion(sesion_id):
     # 2) Marcar / desmarcar sesión terminada
     if terminada_flag is not None:
         terminada_bool = bool(terminada_flag)
+
+        # Si ya está terminada y vuelven a mandar terminada=true, no hacer nada extra
+        if terminada_bool and (sesion_id in estado_sesion_terminada):
+            return jsonify({
+                "ok": True,
+                "sesion_id": sesion_id,
+                "ejercicio_activo_id": estado_sesiones_tiempo_real.get(sesion_id),
+                "terminada": True
+            })
+
         if terminada_bool:
             estado_sesion_terminada.add(sesion_id)
         else:
@@ -98,6 +118,7 @@ def estado_sesion(sesion_id):
         "ejercicio_activo_id": estado_sesiones_tiempo_real.get(sesion_id),
         "terminada": sesion_id in estado_sesion_terminada
     })
+
 
 # ---------------------------
 # Dashboard profesional
