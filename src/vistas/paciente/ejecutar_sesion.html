@@ -178,6 +178,9 @@ document.addEventListener("DOMContentLoaded", function() {
     // Evitar subidas duplicadas
     let isUploading = false;
 
+    // Ejercicios ya completados (vídeo subido)
+    let ejerciciosCompletados = new Set();
+
     // Estado del gamepad
     let gamepadIndex = null;
     let lastButtonStates = { Y: false, X: false, B: false, A: false };
@@ -284,7 +287,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 ejercicioNombre.textContent = 'Sesión finalizada por tu terapeuta';
                 ejercicioTipo.textContent = '';
                 demoVideo.pause();
-                // No cortamos aquí, el último vídeo se debe haber cerrado con ejercicio_activo_id = null
+                // El último ejercicio debe haberse cerrado con ejercicio_activo_id = null
                 setTimeout(() => {
                     window.location.href = "{{ url_for('paciente.dashboard') }}";
                 }, 2000);
@@ -294,12 +297,19 @@ document.addEventListener("DOMContentLoaded", function() {
             const ejercicioActivoId = data.ejercicio_activo_id;
             const now = Date.now();
 
-            // Sin ejercicio activo: resetea solo el candidato
+            // Si el backend manda un id de un ejercicio ya completado, lo ignoramos
+            if (ejercicioActivoId != null && ejerciciosCompletados.has(ejercicioActivoId)) {
+                console.log("🔁 Id ya completado, se ignora:", ejercicioActivoId);
+                return;
+            }
+
+            // Sin ejercicio activo: fin del ejercicio actual (si lo había)
             if (ejercicioActivoId == null) {
                 console.log("⏳ Sin ejercicio activo");
 
-                // Solo cortar si veníamos de un ejercicio aceptado y realmente está grabando
-                if (ultimoEjercicioRecibido !== null && mediaRecorder && mediaRecorder.state === 'recording') {
+                if (ultimoEjercicioRecibido !== null &&
+                    mediaRecorder &&
+                    mediaRecorder.state === 'recording') {
                     stopRecording();
                 }
 
@@ -313,7 +323,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 return;
             }
 
-            // Aquí el id es distinto del último aceptado → candidato a cambio
+            // Estabilización del nuevo id
             if (candidatoId === ejercicioActivoId) {
                 pollsMismoId += 1;
             } else {
@@ -327,13 +337,14 @@ document.addEventListener("DOMContentLoaded", function() {
                 return;
             }
 
-            // Estable, aplicar intervalo mínimo si ya había ejercicio antes
-            if (ultimoEjercicioRecibido !== null && (now - lastChangeTime) < MIN_CHANGE_INTERVAL) {
+            // Intervalo mínimo entre cambios reales
+            if (ultimoEjercicioRecibido !== null &&
+                (now - lastChangeTime) < MIN_CHANGE_INTERVAL) {
                 console.log("Cambio ignorado por intervalo mínimo:", candidatoId);
                 return;
             }
 
-            // Si el id es null por seguridad, no cambiamos
+            // id inválido por seguridad
             if (candidatoId == null) {
                 console.log("❌ candidatoId es null, se ignora cambio");
                 return;
@@ -528,6 +539,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
             if (response.ok) {
                 console.log('Video subido correctamente');
+                // A partir de aquí, este ejercicio queda “cerrado” en el paciente
+                ejerciciosCompletados.add(ejercicioSesionId);
             } else {
                 const txt = await response.text();
                 console.warn('Error HTTP al subir video:', response.status, txt);
