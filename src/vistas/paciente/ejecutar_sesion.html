@@ -1,8 +1,6 @@
 {% extends "base.html" %}
 
-
 {% block title %}Sesión en Curso - TerapiTrack{% endblock %}
-
 
 {% block content %}
 <div class="container-fluid p-0" style="height: 100vh; background: #000;">
@@ -16,7 +14,6 @@
                     <small id="ejercicioTipo" class="text-light"></small>
                 </div>
 
-
                 <!-- Video demostrativo -->
                 <div class="flex-grow-1 position-relative" style="min-height:0;">
                     <video id="demoVideo" controls autoplay muted loop
@@ -25,7 +22,6 @@
                         <source src="" type="video/mp4">
                         Tu navegador no soporta videos.
                     </video>
-
 
                     <!-- Overlay cuando no hay video -->
                     <div id="waitingOverlay" class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-dark bg-opacity-75">
@@ -41,7 +37,6 @@
             </div>
         </div>
 
-
         <!-- Cámara del paciente (50% - derecha) -->
         <div class="col-md-6 h-100 position-relative">
             <div class="h-100 d-flex flex-column">
@@ -54,13 +49,11 @@
                     </div>
                 </div>
 
-
                 <!-- Cámara del paciente -->
                 <div class="flex-grow-1 position-relative">
                     <video id="cameraPreview" autoplay playsinline muted
                            class="w-100 h-100"
                            style="object-fit: cover; background: #1a1a1a;"></video>
-
 
                     <!-- Timer de grabación -->
                     <div id="timerDisplay" class="position-absolute top-0 end-0 bg-dark bg-opacity-75 text-white p-2 rounded-bottom-start d-none">
@@ -68,7 +61,6 @@
                         <span id="timer">00:00</span>
                     </div>
                 </div>
-
 
                 <!-- Estado del mando -->
                 <div class="bg-dark text-white p-2">
@@ -86,7 +78,6 @@
         </div>
     </div>
 
-
     <!-- Botón de salida (solo visible si no está en sesión activa) -->
     <div class="position-absolute top-0 end-0 p-3" id="exitButton">
         <a href="{{ url_for('paciente.dashboard') }}" class="btn btn-outline-light">
@@ -94,7 +85,6 @@
         </a>
     </div>
 </div>
-
 
 <style>
     .recording-dot {
@@ -137,7 +127,6 @@
         transform: scale(1.2);
     }
 </style>
-
 
 {% block scripts %}
 <script>
@@ -192,11 +181,14 @@ document.addEventListener("DOMContentLoaded", function() {
     // Ejercicios ya completados (vídeo subido)
     let ejerciciosCompletados = new Set();
 
-    // NUEVO: ejercicios para los que ya se ha iniciado una subida en esta sesión
+    // Ejercicios para los que ya se ha iniciado una subida en esta sesión
     let ejerciciosSubidosEnEstaSesion = new Set();
 
     // Flag para evitar múltiples stops por la misma grabación
     let stopAlreadyCalled = false;
+
+    // NUEVO: bloquear cambios de ejercicio mientras se graba
+    let lockCambioEjercicio = false;
 
     // Estado del gamepad
     let gamepadIndex = null;
@@ -370,6 +362,18 @@ document.addEventListener("DOMContentLoaded", function() {
                 return;
             }
 
+            // Si el backend manda el mismo ejercicio que ya estoy mostrando, no recargo demo
+            if (index === currentExercise) {
+                console.log("🔁 Mismo ejercicio ya cargado, se ignora cambio.");
+                return;
+            }
+
+            // Si estamos grabando y el bloqueo está activo, NO cambiar de demo ni de ejercicio
+            if (lockCambioEjercicio) {
+                console.log("🔒 Grabación en curso; se ignora cambio de ejercicio:", candidatoId);
+                return;
+            }
+
             // Vamos a cambiar de ejercicio
             cambioEnProceso = true;
             pollsMismoId = 0;
@@ -495,6 +499,7 @@ document.addEventListener("DOMContentLoaded", function() {
             mediaRecorder = new MediaRecorder(cameraPreview.srcObject);
             recordedChunks = [];
             stopAlreadyCalled = false;  // reset para esta grabación
+            lockCambioEjercicio = true; // BLOQUEAR cambios mientras se graba
 
             mediaRecorder.ondataavailable = (event) => {
                 if (event.data.size > 0) {
@@ -512,6 +517,7 @@ document.addEventListener("DOMContentLoaded", function() {
             timerInterval = setInterval(updateTimer, 1000);
         } catch (err) {
             console.error("Error al iniciar grabación:", err);
+            lockCambioEjercicio = false; // por si falla
         }
     }
 
@@ -528,6 +534,8 @@ document.addEventListener("DOMContentLoaded", function() {
         if (mediaRecorder.state === 'recording') {
             mediaRecorder.stop();
         }
+
+        lockCambioEjercicio = false;  // PERMITIR cambios cuando termina la grabación
 
         recordingStatus.classList.add('d-none');
         timerDisplay.classList.add('d-none');
@@ -557,7 +565,7 @@ document.addEventListener("DOMContentLoaded", function() {
             return;
         }
 
-        // NUEVO: si ya se inició una subida para este ejercicio en esta sesión, no iniciar otra
+        // Si ya se inició una subida para este ejercicio en esta sesión, no iniciar otra
         if (ejerciciosSubidosEnEstaSesion.has(ejercicioSesionId)) {
             console.warn("Ya se inició una subida para este ejercicio en esta sesión, se ignora:", ejercicioSesionId);
             return;
@@ -600,7 +608,6 @@ document.addEventListener("DOMContentLoaded", function() {
             isUploading = false;
         }
     }
-
 
     function endSession() {
         isSessionActive = false;
