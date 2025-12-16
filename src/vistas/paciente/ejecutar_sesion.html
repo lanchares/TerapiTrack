@@ -297,11 +297,17 @@ document.addEventListener("DOMContentLoaded", function() {
             // Sin ejercicio activo: resetea solo el candidato
             if (ejercicioActivoId == null) {
                 console.log("⏳ Sin ejercicio activo");
-                stopRecording();
+
+                // Solo cortar si había un ejercicio aceptado y realmente está grabando
+                if (ultimoEjercicioRecibido !== null && mediaRecorder && mediaRecorder.state === 'recording') {
+                    stopRecording();
+                }
+
                 candidatoId = null;
                 pollsMismoId = 0;
                 return;
             }
+
 
             // Si es el mismo que el último ya aceptado: nada que hacer
             if (ejercicioActivoId === ultimoEjercicioRecibido) {
@@ -327,6 +333,19 @@ document.addEventListener("DOMContentLoaded", function() {
                 console.log("Cambio ignorado por intervalo mínimo:", candidatoId);
                 return;
             }
+
+            // Si el id es null o inválido, no cambiamos
+            if (candidatoId == null) {
+                console.log("❌ candidatoId es null, se ignora cambio");
+                return;
+            }
+
+            const index = ejercicios.findIndex(ej => ej.Id === candidatoId);
+            if (index === -1) {
+                console.error(`❌ Ejercicio ${candidatoId} no encontrado en la lista`);
+                return;
+            }
+
 
             const index = ejercicios.findIndex(ej => ej.Id === candidatoId);
             if (index === -1) {
@@ -375,7 +394,10 @@ document.addEventListener("DOMContentLoaded", function() {
         currentExercise = index;
 
         const ejercicio = ejercicios[index];
-        
+
+        // Asegurar el id de Ejercicio_Sesion asociado a este índice
+        currentExerciseId = ejercicio.Id;
+
         // Actualizar título inmediatamente
         ejercicioNombre.textContent = ejercicio.ejercicio.Nombre;
         ejercicioTipo.textContent = ejercicio.ejercicio.Tipo;
