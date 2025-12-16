@@ -185,11 +185,9 @@ document.addEventListener("DOMContentLoaded", function() {
     let gamepadIndex = null;
     let lastButtonStates = { Y: false, X: false, B: false, A: false };
 
-    // Inicializar cámara automáticamente
+    // Inicializar cámara, mando y polling
     initCamera();
-    // Monitorear mando (solo indicador + volver antes de sesión)
     initGamepad();
-    // Escuchar al profesional
     startPollingEstadoSesion();
 
     async function initCamera() {
@@ -311,7 +309,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 return;
             }
 
-            // 2) SIN EJERCICIO ACTIVO (null) -> ignorar siempre (Heroku manda muchos)
+            // 2) SIN EJERCICIO ACTIVO (null) -> ignorar siempre
             if (ejercicioActivoId == null) {
                 console.log("⏳ Sin ejercicio activo (ignorado)");
                 candidatoId = null;
@@ -415,7 +413,6 @@ document.addEventListener("DOMContentLoaded", function() {
         demoVideo.removeAttribute('src');
         demoVideo.load();
         
-        // Esperar a que se limpie el estado
         await new Promise(resolve => setTimeout(resolve, 300));
 
         // Determinar ruta del video
@@ -428,11 +425,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
         console.log(`📹 Cargando nuevo video: ${videoSrc}`);
         
-        // Cargar el nuevo video
         demoVideo.src = videoSrc;
         demoVideo.load();
 
-        // Esperar a que el video esté listo
         return new Promise((resolve) => {
             let timeoutId;
             
@@ -444,7 +439,6 @@ document.addEventListener("DOMContentLoaded", function() {
                     await demoVideo.play();
                     console.log('✅ Video demo reproduciendo correctamente');
                     
-                    // Esperar 1 segundo antes de iniciar grabación
                     await new Promise(r => setTimeout(r, 1000));
                     startRecording();
                     resolve();
@@ -543,7 +537,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
             if (response.ok) {
                 console.log('Video subido correctamente');
-                // A partir de aquí, este ejercicio queda “cerrado” en el paciente
                 ejerciciosCompletados.add(ejercicioSesionId);
             } else {
                 const txt = await response.text();

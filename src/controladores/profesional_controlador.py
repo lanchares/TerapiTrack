@@ -13,7 +13,6 @@ import time
 from src.config import Config
 from collections import defaultdict
 
-
 profesional_bp = Blueprint('profesional', __name__, url_prefix='/profesional')
 
 cloudinary.config(
@@ -26,6 +25,7 @@ cloudinary.config(
 # Estado en tiempo real sesión
 # ---------------------------
 
+# Solo se usa como caché rápida; la verdad está en la BD
 estado_sesiones_tiempo_real = {}
 estado_sesion_terminada = set()
 
@@ -381,66 +381,78 @@ def finalizar_sesion(sesion_id):
     sesion.Estado = 'COMPLETADA'
     db.session.commit()
 
+    # Marcamos terminada en la caché también
     estado_sesion_terminada.add(sesion_id)
     return jsonify(success=True)
 
-@profesional_bp.route('/api/sesion/<int:sesion_id>/estado', methods=['GET'])
+@profesional_bp.route('/api/sesion/<int:sesion_id>/estado', methods=['GET', 'POST'])
 @login_required
-def obtener_estado_sesion(sesion_id):
+def estado_sesion(sesion_id):
+    """
+    GET: devuelve estado actual (desde BD + caché).
+    POST: actualiza ejercicio_activo_id y/o terminada, manteniendo id estable.
+    """
     sesion = Sesion.query.get_or_404(sesion_id)
-    ejercicio_activo_id = estado_sesiones_tiempo_real.get(sesion_id)
-    return jsonify({
-        'sesion_id': sesion_id,
-        'ejercicio_activo_id': ejercicio_activo_id,
-        'terminada': sesion_id in estado_sesion_terminada
-    })
 
-@profesional_bp.route('/api/sesion/<int:sesion_id>/estado', methods=['POST'])
-@login_required
-@profesional_required
-def actualizar_estado_sesion(sesion_id):
-    sesion = Sesion.query.get_or_404(sesion_id)
-    if sesion.Profesional_Id != current_user.Id:
+    # Permisos: el paciente y el profesional de la sesión pueden consultar;
+    # solo el profesional puede modificar.
+    if request.method == 'GET':
+        ejercicio_activo_id = estado_sesiones_tiempo_real.get(sesion_id, sesion.ejercicio_activo_id)
+        terminada = sesion_id in estado_sesion_terminada or getattr(sesion, 'terminada', False)
+        return jsonify({
+            'sesion_id': sesion_id,
+            'ejercicio_activo_id': ejercicio_activo_id,
+            'terminada': terminada
+        })
+
+    # POST
+    if not current_user.is_authenticated or sesion.Profesional_Id != current_user.Id:
         return jsonify({"error": "Sin permisos"}), 403
 
     data = request.get_json() or {}
-    ejercicio_activo_id = data.get('ejercicio_activo_id')
+    nuevo_id = data.get('ejercicio_activo_id', None)
+    terminada_flag = data.get('terminada', None)
 
     ahora = time.time()
-    anterior = estado_sesiones_tiempo_real.get(sesion_id)
+    anterior = estado_sesiones_tiempo_real.get(sesion_id, sesion.ejercicio_activo_id)
     ultimo = ultimo_cambio_sesion.get(sesion_id)
 
-    if ejercicio_activo_id is None:
-        estado_sesiones_tiempo_real[sesion_id] = None
+    # No hacer ping‑pong con null: si viene None, simplemente no cambiamos el id.
+    if nuevo_id is not None:
+        # anti‑rebote entre ids distintos demasiado rápido
+        if (anterior is not None and
+            nuevo_id != anterior and
+            ultimo is not None and
+            ahora - ultimo < MIN_INTERVAL_CAMBIO):
+            return jsonify({
+                "ok": False,
+                "sesion_id": sesion_id,
+                "ejercicio_activo_id": anterior
+            })
+
+        estado_sesiones_tiempo_real[sesion_id] = nuevo_id
         ultimo_cambio_sesion[sesion_id] = ahora
-        if sesion_id in estado_sesion_terminada:
+        # si usas campos en BD, también:
+        if hasattr(sesion, 'ejercicio_activo_id'):
+            sesion.ejercicio_activo_id = nuevo_id
+
+    # marcar terminada manteniendo el último ejercicio activo
+    if terminada_flag is not None:
+        terminada_bool = bool(terminada_flag)
+        if terminada_bool:
+            estado_sesion_terminada.add(sesion_id)
+        else:
             estado_sesion_terminada.discard(sesion_id)
-        return jsonify({
-            "ok": True,
-            "sesion_id": sesion_id,
-            "ejercicio_activo_id": None
-        })
+        if hasattr(sesion, 'terminada'):
+            sesion.terminada = terminada_bool
 
-    if (anterior is not None and
-        ejercicio_activo_id != anterior and
-        ultimo is not None and
-        ahora - ultimo < MIN_INTERVAL_CAMBIO):
-        return jsonify({
-            "ok": False,
-            "sesion_id": sesion_id,
-            "ejercicio_activo_id": anterior
-        })
-
-    estado_sesiones_tiempo_real[sesion_id] = ejercicio_activo_id
-    ultimo_cambio_sesion[sesion_id] = ahora
-
-    if sesion_id in estado_sesion_terminada:
-        estado_sesion_terminada.discard(sesion_id)
+    db.session.commit()
 
     return jsonify({
         "ok": True,
         "sesion_id": sesion_id,
-        "ejercicio_activo_id": ejercicio_activo_id
+        "ejercicio_activo_id": estado_sesiones_tiempo_real.get(sesion_id, sesion.ejercicio_activo_id),
+        "terminada": sesion_id in estado_sesion_terminada or getattr(sesion, 'terminada', False)
     })
 
 # ---------------------------

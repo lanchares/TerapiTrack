@@ -356,18 +356,35 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 
-    function showFinalizeConfirmation() {
+    async function showFinalizeConfirmation() {
+        const csrfToken = document.querySelector('meta[name=csrf-token]').getAttribute('content');
+
         // Marcar como completado el ejercicio actualmente seleccionado (último)
         const currentCard = document.querySelector('.exercise-card.selected');
         if (currentCard && !currentCard.classList.contains('completed')) {
             markExerciseAsCompleted(currentCard);
         }
 
+        // 1) marcar terminada en el estado en tiempo real (manteniendo el último ejercicio_activo_id)
+        try {
+            await fetch(`/profesional/api/sesion/{{ sesion.Id }}/estado`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({ terminada: true })
+            });
+        } catch (e) {
+            console.error("❌ Error marcando sesión terminada en estado tiempo real:", e);
+        }
+
+        // 2) llamar al endpoint que cambia Estado = COMPLETADA
         fetch(`/profesional/sesion/finalizar/{{ sesion.Id }}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': document.querySelector('meta[name=csrf-token]').getAttribute('content')
+                'X-CSRFToken': csrfToken
             }
         })
         .then(r => r.json())
