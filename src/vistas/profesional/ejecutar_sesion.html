@@ -93,7 +93,7 @@
                     {% endfor %}
                 </div>
 
-                <!-- Progreso + botón Finalizar ejercicio debajo (como antes) -->
+                <!-- Progreso sin botón de finalizar ejercicio -->
                 <div class="mt-3 p-2 bg-white rounded border">
                     <div class="d-flex justify-content-between align-items-center mb-1">
                         <small class="fw-bold">Progreso</small>
@@ -102,9 +102,6 @@
                     <div class="progress" style="height: 8px;">
                         <div id="progressBar" class="progress-bar bg-success" style="width: 0%;"></div>
                     </div>
-                    <button id="finishLastExerciseBtn" class="btn btn-warning btn-sm w-100 mt-2">
-                        <i class="bi bi-stop-circle me-1"></i>Finalizar ejercicio
-                    </button>
                 </div>
             </div>
         </div>
@@ -189,7 +186,6 @@ document.addEventListener("DOMContentLoaded", function() {
     const timer = document.getElementById('timer');
     const exerciseCards = document.querySelectorAll('.exercise-card');
     const btnFinalizar = document.getElementById('btnFinalizar');
-    const finishLastExerciseBtn = document.getElementById('finishLastExerciseBtn');
     const toast = new bootstrap.Toast(document.getElementById('liveToast'));
     const progressBar = document.getElementById('progressBar');
     const progressText = document.getElementById('progressText');
@@ -271,7 +267,10 @@ document.addEventListener("DOMContentLoaded", function() {
         timer.textContent = `${minutes}:${seconds}`;
     }
 
-    // Selección de ejercicio: SOLO selecciona y manda id, no completa ni resetea
+    // Selección de ejercicio:
+    // - Marca como completada la tarjeta previamente seleccionada (si existe y no está completada).
+    // - Selecciona la nueva tarjeta.
+    // - Notifica al paciente el nuevo id.
     exerciseCards.forEach((card, index) => {
         card.addEventListener('click', async () => {
             if (card.classList.contains('completed')) {
@@ -288,6 +287,13 @@ document.addEventListener("DOMContentLoaded", function() {
                 showMessage('No hay cámara disponible en este equipo. Solo se muestra el vídeo demo.', 'warning');
             }
 
+            // Completar el ejercicio anterior seleccionado, si lo hay
+            const previousSelected = document.querySelector('.exercise-card.selected');
+            if (previousSelected && !previousSelected.classList.contains('completed')) {
+                markExerciseAsCompleted(previousSelected);
+            }
+
+            // Seleccionar el nuevo ejercicio
             exerciseCards.forEach(c => c.classList.remove('selected'));
             card.classList.add('selected');
             currentExerciseIndex = index;
@@ -350,21 +356,13 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 
-    // Botón FINALIZAR EJERCICIO: marca como completado y manda null
-    finishLastExerciseBtn.addEventListener('click', async () => {
+    function showFinalizeConfirmation() {
+        // Marcar como completado el ejercicio actualmente seleccionado (último)
         const currentCard = document.querySelector('.exercise-card.selected');
-        if (!currentCard) {
-            showMessage("No hay ejercicio seleccionado para finalizar", "warning");
-            return;
+        if (currentCard && !currentCard.classList.contains('completed')) {
+            markExerciseAsCompleted(currentCard);
         }
 
-        markExerciseAsCompleted(currentCard);
-        stopTimer();
-        await resetEjercicioActivo();
-        showMessage("Ejercicio finalizado", "success");
-    });
-
-    function showFinalizeConfirmation() {
         fetch(`/profesional/sesion/finalizar/{{ sesion.Id }}`, {
             method: 'POST',
             headers: {
@@ -422,27 +420,6 @@ async function notificarEjercicioActivo(ejercicioId) {
         console.log("✅ Respuesta:", data);
     } catch (e) {
         console.error("❌ Error:", e);
-    }
-}
-
-// Notificar fin de ejercicio actual (null)
-async function resetEjercicioActivo() {
-    console.log("🔔 Reseteando ejercicio activo (null)");
-    try {
-        const csrfToken = document.querySelector('meta[name=csrf-token]').getAttribute('content');
-        const resp = await fetch(`/profesional/api/sesion/${sesionId}/estado`, {
-            method: "POST",
-            headers: { 
-                "Content-Type": "application/json",
-                "X-CSRFToken": csrfToken
-            },
-            body: JSON.stringify({ ejercicio_activo_id: null })
-        });
-        const data = await resp.json();
-        console.log("✅ Reset respuesta:", data);
-        ultimoEjercicioNotificado = null;
-    } catch (e) {
-        console.error("❌ Error al resetear:", e);
     }
 }
 </script>
