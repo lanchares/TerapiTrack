@@ -192,6 +192,9 @@ document.addEventListener("DOMContentLoaded", function() {
     // Ejercicios ya completados (vídeo subido)
     let ejerciciosCompletados = new Set();
 
+    // NUEVO: ejercicios para los que ya se ha iniciado una subida en esta sesión
+    let ejerciciosSubidosEnEstaSesion = new Set();
+
     // Flag para evitar múltiples stops por la misma grabación
     let stopAlreadyCalled = false;
 
@@ -554,6 +557,13 @@ document.addEventListener("DOMContentLoaded", function() {
             return;
         }
 
+        // NUEVO: si ya se inició una subida para este ejercicio en esta sesión, no iniciar otra
+        if (ejerciciosSubidosEnEstaSesion.has(ejercicioSesionId)) {
+            console.warn("Ya se inició una subida para este ejercicio en esta sesión, se ignora:", ejercicioSesionId);
+            return;
+        }
+        ejerciciosSubidosEnEstaSesion.add(ejercicioSesionId);
+
         if (isUploading) {
             console.warn("Ya hay una subida en curso, se ignora esta llamada.");
             return;
@@ -590,6 +600,7 @@ document.addEventListener("DOMContentLoaded", function() {
             isUploading = false;
         }
     }
+
 
     function endSession() {
         isSessionActive = false;
