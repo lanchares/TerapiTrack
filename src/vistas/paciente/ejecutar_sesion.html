@@ -175,7 +175,7 @@ document.addEventListener("DOMContentLoaded", function() {
     let lastChangeTime = 0;
     let cambioEnProceso = false;
 
-    // Evitar subidas duplicadas
+    // Evitar subidas duplicadas simultáneas
     let isUploading = false;
 
     // Ejercicios ya completados (vídeo subido)
@@ -287,8 +287,15 @@ document.addEventListener("DOMContentLoaded", function() {
                 ejercicioNombre.textContent = 'Sesión finalizada por tu terapeuta';
                 ejercicioTipo.textContent = '';
                 demoVideo.pause();
-                // Cortar si quedara algo grabando
-                stopRecording();
+
+                // Cortar solo si sigue grabando y este ejercicio no está marcado como completado
+                if (mediaRecorder &&
+                    mediaRecorder.state === 'recording' &&
+                    currentExerciseId &&
+                    !ejerciciosCompletados.has(currentExerciseId)) {
+                    stopRecording();
+                }
+
                 setTimeout(() => {
                     window.location.href = "{{ url_for('paciente.dashboard') }}";
                 }, 2000);
@@ -358,7 +365,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 !ejerciciosCompletados.has(ultimoEjercicioRecibido) &&
                 mediaRecorder &&
                 mediaRecorder.state === 'recording') {
-                stopRecording();                  // esto dispara uploadVideo()
+                stopRecording();                  // dispara uploadVideo()
                 await new Promise(r => setTimeout(r, 500));
             }
 
