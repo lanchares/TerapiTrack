@@ -395,13 +395,17 @@ document.addEventListener("DOMContentLoaded", function() {
             return;
         }
 
+        const ejercicio = ejercicios[index];
+
+        // NUEVO: si este ejercicio ya está completado, no volvemos a cargar ni grabar
+        if (ejerciciosCompletados.has(ejercicio.Id)) {
+            console.log("⛔ Ejercicio ya completado, no se vuelve a cargar:", ejercicio.Id);
+            return;
+        }
+
         console.log(`🎯 Cargando ejercicio ${index + 1}/${totalExercises}`);
         currentExercise = index;
 
-        const ejercicio = ejercicios[index];
-
-        // Asegurar el id de Ejercicio_Sesion asociado a este índice
-        currentExerciseId = ejercicio.Id;
 
         // Actualizar título inmediatamente
         ejercicioNombre.textContent = ejercicio.ejercicio.Nombre;
@@ -468,15 +472,15 @@ document.addEventListener("DOMContentLoaded", function() {
             return;
         }
 
-        // NUEVO: si ya hay un mediaRecorder grabando, no iniciar otro
+        // Si ya hay un mediaRecorder grabando, no iniciar otro
         if (mediaRecorder && mediaRecorder.state === 'recording') {
             console.warn("Ya hay una grabación en curso, se ignora startRecording.");
             return;
         }
 
         try {
+            recordedChunks = [];              // asegurarse de empezar vacío
             mediaRecorder = new MediaRecorder(cameraPreview.srcObject);
-            recordedChunks = [];
 
             mediaRecorder.ondataavailable = (event) => {
                 if (event.data.size > 0) {
@@ -498,15 +502,20 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
 
+
     function stopRecording() {
         if (mediaRecorder && mediaRecorder.state === 'recording') {
+            mediaRecorder.onstop = null; // evitar llamadas dobles colgadas
             mediaRecorder.stop();
             recordingStatus.classList.add('d-none');
             timerDisplay.classList.add('d-none');
             clearInterval(timerInterval);
             timer.textContent = "00:00";
+            mediaRecorder = null;        // NUEVO
+            // recordedChunks se vacía en startRecording
         }
     }
+
 
     function updateTimer() {
         const elapsed = Math.floor((Date.now() - startTime) / 1000);
@@ -524,7 +533,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
         const ejercicioSesionId = currentExerciseId;
 
-        // NUEVO: si este ejercicio ya está marcado como completado, no subas nada
         if (ejerciciosCompletados.has(ejercicioSesionId)) {
             console.warn("Ejercicio ya completado, se ignora uploadVideo:", ejercicioSesionId);
             return;
@@ -549,8 +557,13 @@ document.addEventListener("DOMContentLoaded", function() {
             });
 
             if (response.ok) {
-                console.log('Video subido correctamente');
-                ejerciciosCompletados.add(ejercicioSesionId);
+                let msg = '';
+                try {
+                    const data = await response.json();
+                    msg = data.mensaje || '';
+                } catch (e) {}
+                console.log('Video aceptado por el servidor:', msg);
+                ejerciciosCompletados.add(ejercicioSesionId);  // clave para no regrabar
             } else {
                 const txt = await response.text();
                 console.warn('Error HTTP al subir video:', response.status, txt);
@@ -561,6 +574,7 @@ document.addEventListener("DOMContentLoaded", function() {
             isUploading = false;
         }
     }
+
 
 
     function endSession() {
