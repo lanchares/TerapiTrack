@@ -12,6 +12,7 @@ import os
 import time
 from src.config import Config
 from collections import defaultdict
+from sqlalchemy.exc import IntegrityError
 
 profesional_bp = Blueprint('profesional', __name__, url_prefix='/profesional')
 
@@ -673,16 +674,26 @@ def guardar_video(ejercicio_sesion_id):
         # 5) Crear registro nuevo (ya sabemos que no existía)
         fecha_expiracion = datetime.now() + timedelta(days=30)
 
-        video_respuesta = VideoRespuesta(
-            Ejercicio_Sesion_Id=ejercicio_sesion_id,
-            Ruta_Almacenamiento=video_url,
-            Fecha_Expiracion=fecha_expiracion
-        )
-        db.session.add(video_respuesta)
-        db.session.commit()
+        try:
+            video_respuesta = VideoRespuesta(
+                Ejercicio_Sesion_Id=ejercicio_sesion_id,
+                Ruta_Almacenamiento=video_url,
+                Fecha_Expiracion=fecha_expiracion
+            )
+            db.session.add(video_respuesta)
+            db.session.commit()
 
-        print(f"✅ Video guardado en Cloudinary: {video_url}")
-        return jsonify({'success': True, 'mensaje': 'Video guardado correctamente'}), 200
+            print(f"✅ Video guardado en Cloudinary: {video_url}")
+            return jsonify({'success': True, 'mensaje': 'Video guardado correctamente'}), 200
+
+        except IntegrityError:
+            db.session.rollback()
+            # Otro proceso ha insertado ya este Ejercicio_Sesion_Id entre el chequeo y el commit
+            print(f"ℹ️ Video ya existente (race condition) para ejercicio_sesion_id={ejercicio_sesion_id}")
+            return jsonify({
+                'success': True,
+                'mensaje': 'Video ya existente (race condition), se ignora nueva subida'
+            }), 200
 
     except Exception as e:
         db.session.rollback()

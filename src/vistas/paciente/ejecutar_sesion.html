@@ -628,9 +628,15 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
             if (response.ok) {
-                console.log('Video subido correctamente');
+                let msg = '';
+                try {
+                    const data = await response.json();
+                    msg = data.mensaje || '';
+                } catch (e) {}
+                console.log('Video aceptado por el servidor:', msg);
                 ejerciciosCompletados.add(ejercicioSesionId);
-            } else {
+            }
+            else {
                 const txt = await response.text();
                 console.warn('Error HTTP al subir video:', response.status, txt);
             }
