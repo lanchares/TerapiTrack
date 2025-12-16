@@ -626,15 +626,29 @@ def ver_progreso(paciente_id):
 @login_required
 @csrf.exempt
 def guardar_video(ejercicio_sesion_id):
-    """Guardar video de respuesta en Cloudinary (CU7)"""
+    """Guardar video de respuesta en Cloudinary (CU7). Garantiza solo 1 vídeo por ejercicio_sesion."""
     try:
         ejercicio_sesion = Ejercicio_Sesion.query.get_or_404(ejercicio_sesion_id)
         sesion = ejercicio_sesion.sesion
         paciente = sesion.paciente
 
+        # 1) Permisos: solo el paciente dueño puede subir
         if paciente.Usuario_Id != current_user.Id:
             return jsonify({'success': False, 'error': 'Sin permisos'}), 403
 
+        # 2) Comprobar si ya existe un vídeo para este ejercicio_sesion
+        video_respuesta_existente = VideoRespuesta.query.filter_by(
+            Ejercicio_Sesion_Id=ejercicio_sesion_id
+        ).first()
+
+        if video_respuesta_existente:
+            # Ya hay vídeo guardado; no subir otro ni pisar el existente
+            return jsonify({
+                'success': True,
+                'mensaje': 'Video ya existente, se ignora nueva subida'
+            }), 200
+
+        # 3) Validar presencia de archivo
         if 'video' not in request.files:
             return jsonify({'success': False, 'error': 'No se encontró el archivo'}), 400
 
@@ -643,6 +657,7 @@ def guardar_video(ejercicio_sesion_id):
         if not video_file or video_file.filename == '':
             return jsonify({'success': False, 'error': 'Archivo vacío'}), 400
 
+        # 4) Subir a Cloudinary
         upload_result = cloudinary.uploader.upload(
             video_file,
             resource_type="video",
@@ -655,23 +670,15 @@ def guardar_video(ejercicio_sesion_id):
         if not video_url:
             return jsonify({'success': False, 'error': 'No se obtuvo URL del video'}), 500
 
-        video_respuesta = VideoRespuesta.query.filter_by(
-            Ejercicio_Sesion_Id=ejercicio_sesion_id
-        ).first()
-
+        # 5) Crear registro nuevo (ya sabemos que no existía)
         fecha_expiracion = datetime.now() + timedelta(days=30)
 
-        if video_respuesta:
-            video_respuesta.Ruta_Almacenamiento = video_url
-            video_respuesta.Fecha_Expiracion = fecha_expiracion
-        else:
-            video_respuesta = VideoRespuesta(
-                Ejercicio_Sesion_Id=ejercicio_sesion_id,
-                Ruta_Almacenamiento=video_url,
-                Fecha_Expiracion=fecha_expiracion
-            )
-            db.session.add(video_respuesta)
-
+        video_respuesta = VideoRespuesta(
+            Ejercicio_Sesion_Id=ejercicio_sesion_id,
+            Ruta_Almacenamiento=video_url,
+            Fecha_Expiracion=fecha_expiracion
+        )
+        db.session.add(video_respuesta)
         db.session.commit()
 
         print(f"✅ Video guardado en Cloudinary: {video_url}")
@@ -681,6 +688,7 @@ def guardar_video(ejercicio_sesion_id):
         db.session.rollback()
         print(f"❌ Error al guardar video: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
+
 
 @profesional_bp.route('/ver_evaluacion/<int:ejercicio_sesion_id>')
 @login_required
