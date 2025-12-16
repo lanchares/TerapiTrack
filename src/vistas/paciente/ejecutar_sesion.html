@@ -287,7 +287,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 ejercicioNombre.textContent = 'Sesión finalizada por tu terapeuta';
                 ejercicioTipo.textContent = '';
                 demoVideo.pause();
-                // El último ejercicio debe haberse cerrado con ejercicio_activo_id = null
+                // Si quedara algo grabando, cortarlo
+                stopRecording();
                 setTimeout(() => {
                     window.location.href = "{{ url_for('paciente.dashboard') }}";
                 }, 2000);
@@ -297,40 +298,42 @@ document.addEventListener("DOMContentLoaded", function() {
             const ejercicioActivoId = data.ejercicio_activo_id;
             const now = Date.now();
 
-            // Si el backend manda un id de un ejercicio ya completado, lo ignoramos
+            // 1) Si el backend manda un id de ejercicio YA COMPLETADO, lo ignoramos
             if (ejercicioActivoId != null && ejerciciosCompletados.has(ejercicioActivoId)) {
                 console.log("🔁 Id ya completado, se ignora:", ejercicioActivoId);
                 return;
             }
 
-            // Sin ejercicio activo: fin del ejercicio actual SOLO si ya había uno
+            // 2) SIN EJERCICIO ACTIVO (null):
+            // - Antes de haber aceptado ningún ejercicio (ultimoEjercicioRecibido === null): ignorar los null
+            // - Después de haber aceptado uno: interpretar el primer null como "Finalizar ejercicio" (botón)
             if (ejercicioActivoId == null) {
                 console.log("⏳ Sin ejercicio activo");
 
-                // Antes del primer ejercicio: ignora null del backend
                 if (ultimoEjercicioRecibido === null) {
+                    // Aún no hemos empezado ningún ejercicio, estos null son ruido inicial
                     candidatoId = null;
                     pollsMismoId = 0;
                     return;
                 }
 
-                // Después de haber recibido al menos un id: este null viene del botón
+                // Ya hemos tenido al menos un ejercicio. Este null corresponde al botón.
                 if (mediaRecorder && mediaRecorder.state === 'recording') {
-                    stopRecording();   // aquí se corta y se sube el vídeo
+                    stopRecording(); // Esto dispara uploadVideo()
                 }
 
                 candidatoId = null;
                 pollsMismoId = 0;
-                // NO resetees ultimoEjercicioRecibido: te indica cuál fue el último grabado
+                // IMPORTANTE: NO tocar ultimoEjercicioRecibido para saber qué ejercicio era el último
                 return;
             }
 
-            // Si es el mismo que el último ya aceptado: nada que hacer
+            // 3) Si el id es el mismo que el último aceptado, no hacer nada
             if (ejercicioActivoId === ultimoEjercicioRecibido) {
                 return;
             }
 
-            // Estabilización del nuevo id
+            // 4) Estabilización del nuevo id: mismo id en REQUIRED_STABLE_POLLS polls seguidos
             if (candidatoId === ejercicioActivoId) {
                 pollsMismoId += 1;
             } else {
@@ -339,19 +342,17 @@ document.addEventListener("DOMContentLoaded", function() {
             }
             console.log(`🔍 Visto nuevo id ${candidatoId} (${pollsMismoId} veces seguidas)`);
 
-            // Aún no es estable
             if (pollsMismoId < REQUIRED_STABLE_POLLS) {
                 return;
             }
 
-            // Intervalo mínimo entre cambios reales
+            // 5) Intervalo mínimo entre cambios reales de ejercicio
             if (ultimoEjercicioRecibido !== null &&
                 (now - lastChangeTime) < MIN_CHANGE_INTERVAL) {
                 console.log("Cambio ignorado por intervalo mínimo:", candidatoId);
                 return;
             }
 
-            // id inválido por seguridad
             if (candidatoId == null) {
                 console.log("❌ candidatoId es null, se ignora cambio");
                 return;
@@ -363,7 +364,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 return;
             }
 
-            // A partir de aquí, vamos a cambiar
+            // Vamos a cambiar de ejercicio
             cambioEnProceso = true;
             pollsMismoId = 0;
             lastChangeTime = now;
@@ -373,11 +374,13 @@ document.addEventListener("DOMContentLoaded", function() {
                 isSessionActive = true;
                 waitingOverlay.classList.add('d-none');
                 document.getElementById('exitButton').style.display = 'none';
-            } else {
-                // ❌ ANTES cortabas aquí. Elimínalo.
-                // stopRecording();
-                // await new Promise(resolve => setTimeout(resolve, 500));
             }
+
+            // OJO: ya NO cortamos aquí por cambio de id. El corte se hace solo con null (botón).
+            // if (mediaRecorder && mediaRecorder.state === 'recording') {
+            //     stopRecording();
+            //     await new Promise(resolve => setTimeout(resolve, 500));
+            // }
 
             // Guardar id real que ha marcado el profesional
             ultimoEjercicioRecibido = candidatoId;
@@ -387,12 +390,12 @@ document.addEventListener("DOMContentLoaded", function() {
             await loadExercise(index);
             cambioEnProceso = false;
 
-
         } catch (e) {
             console.error("❌ Error en polling:", e);
             cambioEnProceso = false;
         }
     }
+
 
     // LÓGICA DE EJERCICIOS
     async function loadExercise(index) {
