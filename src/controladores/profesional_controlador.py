@@ -5,13 +5,14 @@ from src.forms import CrearEjercicioForm, EvaluacionForm, CrearSesionDirectaForm
 from src.modelos import Ejercicio, Sesion, Evaluacion, VideoRespuesta, Paciente, Ejercicio_Sesion, Profesional, Usuario
 from src.modelos.asociaciones import Paciente_Profesional, Ejercicio_Profesional
 from datetime import datetime, timedelta
-from src.extensiones import db
+from src.extensiones import db, csrf
 import cloudinary
 import cloudinary.uploader
 import os
 import time
 from src.config import Config
 from collections import defaultdict
+
 
 profesional_bp = Blueprint('profesional', __name__, url_prefix='/profesional')
 
@@ -25,7 +26,6 @@ cloudinary.config(
 # Estado en tiempo real sesión
 # ---------------------------
 
-# Estado de sesiones en memoria: { sesion_id: ejercicio_activo_id }
 estado_sesiones_tiempo_real = {}
 estado_sesion_terminada = set()
 
@@ -53,9 +53,9 @@ def dashboard():
         Estado='PENDIENTE'
     ).count()
 
-    evaluaciones_pendientes = db.session.query(Ejercicio_Sesion)\
-        .join(Sesion)\
-        .join(VideoRespuesta, VideoRespuesta.Ejercicio_Sesion_Id == Ejercicio_Sesion.Id)\
+    evaluaciones_pendientes = db.session.query(Ejercicio_Sesion) \
+        .join(Sesion) \
+        .join(VideoRespuesta, VideoRespuesta.Ejercicio_Sesion_Id == Ejercicio_Sesion.Id) \
         .filter(
             Sesion.Profesional_Id == profesional.Usuario_Id,
             Sesion.Estado == 'COMPLETADA',
@@ -280,15 +280,15 @@ def listar_sesiones():
     sesiones_con_estado = []
     for sesion in sesiones:
         if sesion.Estado == 'COMPLETADA':
-            ejercicios_con_video = db.session.query(Ejercicio_Sesion)\
-                .join(VideoRespuesta, VideoRespuesta.Ejercicio_Sesion_Id == Ejercicio_Sesion.Id)\
-                .filter(Ejercicio_Sesion.Sesion_Id == sesion.Id)\
+            ejercicios_con_video = db.session.query(Ejercicio_Sesion) \
+                .join(VideoRespuesta, VideoRespuesta.Ejercicio_Sesion_Id == Ejercicio_Sesion.Id) \
+                .filter(Ejercicio_Sesion.Sesion_Id == sesion.Id) \
                 .count()
 
-            ejercicios_evaluados = db.session.query(Ejercicio_Sesion)\
-                .join(VideoRespuesta, VideoRespuesta.Ejercicio_Sesion_Id == Ejercicio_Sesion.Id)\
-                .join(Evaluacion, Evaluacion.Ejercicio_Sesion_Id == Ejercicio_Sesion.Id)\
-                .filter(Ejercicio_Sesion.Sesion_Id == sesion.Id)\
+            ejercicios_evaluados = db.session.query(Ejercicio_Sesion) \
+                .join(VideoRespuesta, VideoRespuesta.Ejercicio_Sesion_Id == Ejercicio_Sesion.Id) \
+                .join(Evaluacion, Evaluacion.Ejercicio_Sesion_Id == Ejercicio_Sesion.Id) \
+                .filter(Ejercicio_Sesion.Sesion_Id == sesion.Id) \
                 .count()
 
             if ejercicios_con_video > 0:
@@ -594,6 +594,7 @@ def ver_progreso(paciente_id):
 # ---------------------------
 @profesional_bp.route('/guardar_video/<int:ejercicio_sesion_id>', methods=['POST'])
 @login_required
+@csrf.exempt
 def guardar_video(ejercicio_sesion_id):
     """Guardar video de respuesta en Cloudinary (CU7)"""
     try:
@@ -601,7 +602,6 @@ def guardar_video(ejercicio_sesion_id):
         sesion = ejercicio_sesion.sesion
         paciente = sesion.paciente
 
-        # Asegurar que quien sube el vídeo es el paciente de la sesión
         if paciente.Usuario_Id != current_user.Id:
             return jsonify({'success': False, 'error': 'Sin permisos'}), 403
 

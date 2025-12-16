@@ -411,16 +411,12 @@ document.addEventListener("DOMContentLoaded", function() {
         .catch(() => showMessage('Error al finalizar la sesión', 'danger'));
     }
 
-    btnFinalizar.addEventListener('click', async () => {
-        const currentCard = document.querySelector('.exercise-card.selected');
-        if (currentCard) {
-            markExerciseAsCompleted(currentCard);
-        }
-        await resetEjercicioActivo();
+    btnFinalizar.addEventListener('click', () => {
+        // No tocar estado de ejercicio aquí: se supone que ya se ha finalizado
         stopTimer();
         showFinalizeConfirmation();
     });
-
+    
     initCamera();
 });
 </script>

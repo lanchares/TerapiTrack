@@ -175,6 +175,9 @@ document.addEventListener("DOMContentLoaded", function() {
     let lastChangeTime = 0;
     let cambioEnProceso = false;
 
+    // Evitar subidas duplicadas
+    let isUploading = false;
+
     // Estado del gamepad
     let gamepadIndex = null;
     let lastButtonStates = { Y: false, X: false, B: false, A: false };
@@ -281,7 +284,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 ejercicioNombre.textContent = 'Sesión finalizada por tu terapeuta';
                 ejercicioTipo.textContent = '';
                 demoVideo.pause();
-                stopRecording();
+                // stopRecording();
                 setTimeout(() => {
                     window.location.href = "{{ url_for('paciente.dashboard') }}";
                 }, 2000);
@@ -294,6 +297,7 @@ document.addEventListener("DOMContentLoaded", function() {
             // Sin ejercicio activo: resetea solo el candidato
             if (ejercicioActivoId == null) {
                 console.log("⏳ Sin ejercicio activo");
+                stopRecording();
                 candidatoId = null;
                 pollsMismoId = 0;
                 return;
@@ -483,6 +487,17 @@ document.addEventListener("DOMContentLoaded", function() {
 
     async function uploadVideo() {
         if (recordedChunks.length === 0) return;
+        if (!currentExerciseId) {
+            console.warn("No hay currentExerciseId, no se sube vídeo.");
+            return;
+        }
+
+        // Evitar subidas duplicadas simultáneas
+        if (isUploading) {
+            console.warn("Ya hay una subida en curso, se ignora esta llamada.");
+            return;
+        }
+        isUploading = true;
 
         console.log("⏫ Subiendo vídeo de ejercicio", currentExerciseId);
 
@@ -500,10 +515,13 @@ document.addEventListener("DOMContentLoaded", function() {
             if (response.ok) {
                 console.log('Video subido correctamente');
             } else {
-                console.warn('Error HTTP al subir video:', response.status);
+                const txt = await response.text();
+                console.warn('Error HTTP al subir video:', response.status, txt);
             }
         } catch (error) {
             console.error('Error subiendo video:', error);
+        } finally {
+            isUploading = false;
         }
     }
 
@@ -523,6 +541,5 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 </script>
 {% endblock %}
-
 
 {% endblock %}
