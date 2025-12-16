@@ -671,7 +671,7 @@ def guardar_video(ejercicio_sesion_id):
         if not video_url:
             return jsonify({'success': False, 'error': 'No se obtuvo URL del video'}), 500
 
-        # 5) Crear registro nuevo (ya sabemos que no existía)
+        # 5) Crear registro nuevo (ya sabemos que no existía en este proceso)
         fecha_expiracion = datetime.now() + timedelta(days=30)
 
         try:
@@ -687,18 +687,19 @@ def guardar_video(ejercicio_sesion_id):
             return jsonify({'success': True, 'mensaje': 'Video guardado correctamente'}), 200
 
         except IntegrityError:
+            # Otra petición paralela insertó este registro justo antes del commit
             db.session.rollback()
-            # Otro proceso ha insertado ya este Ejercicio_Sesion_Id entre el chequeo y el commit
-            print(f"ℹ️ Video ya existente (race condition) para ejercicio_sesion_id={ejercicio_sesion_id}")
+            print(f"ℹ️ Video ya existente (race) para ejercicio_sesion_id={ejercicio_sesion_id}")
             return jsonify({
                 'success': True,
-                'mensaje': 'Video ya existente (race condition), se ignora nueva subida'
+                'mensaje': 'Video ya existente (race), se ignora nueva subida'
             }), 200
 
     except Exception as e:
         db.session.rollback()
         print(f"❌ Error al guardar video: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
+
 
 
 @profesional_bp.route('/ver_evaluacion/<int:ejercicio_sesion_id>')

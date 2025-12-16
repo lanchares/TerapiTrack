@@ -594,16 +594,13 @@ document.addEventListener("DOMContentLoaded", function() {
             return;
         }
 
-
         const ejercicioSesionId = currentExerciseId;
 
-
-        // NUEVO: si este ejercicio ya está marcado como completado, no subas nada
+        // Si este ejercicio ya está marcado como completado, no subas nada
         if (ejerciciosCompletados.has(ejercicioSesionId)) {
             console.warn("Ejercicio ya completado, se ignora uploadVideo:", ejercicioSesionId);
             return;
         }
-
 
         if (isUploading) {
             console.warn("Ya hay una subida en curso, se ignora esta llamada.");
@@ -611,21 +608,17 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         isUploading = true;
 
-
         console.log("⏫ Subiendo vídeo de ejercicio", ejercicioSesionId);
-
 
         const blob = new Blob(recordedChunks, { type: 'video/webm' });
         const formData = new FormData();
         formData.append('video', blob, `respuesta_${ejercicioSesionId}.webm`);
-
 
         try {
             const response = await fetch(`/profesional/guardar_video/${ejercicioSesionId}`, {
                 method: 'POST',
                 body: formData
             });
-
 
             if (response.ok) {
                 let msg = '';
@@ -635,8 +628,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 } catch (e) {}
                 console.log('Video aceptado por el servidor:', msg);
                 ejerciciosCompletados.add(ejercicioSesionId);
-            }
-            else {
+            } else {
                 const txt = await response.text();
                 console.warn('Error HTTP al subir video:', response.status, txt);
             }
@@ -646,6 +638,7 @@ document.addEventListener("DOMContentLoaded", function() {
             isUploading = false;
         }
     }
+
 
 
 
