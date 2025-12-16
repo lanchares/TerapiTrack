@@ -303,12 +303,25 @@ document.addEventListener("DOMContentLoaded", function() {
                 return;
             }
 
-            // Sin ejercicio activo: fin del ejercicio actual (si lo había)
+            // Sin ejercicio activo: fin del ejercicio actual SOLO si ya había uno
             if (ejercicioActivoId == null) {
                 console.log("⏳ Sin ejercicio activo");
 
+                // Antes del primer ejercicio: ignora null del backend
+                if (ultimoEjercicioRecibido === null) {
+                    candidatoId = null;
+                    pollsMismoId = 0;
+                    return;
+                }
+
+                // Después de haber recibido al menos un id: este null viene del botón
+                if (mediaRecorder && mediaRecorder.state === 'recording') {
+                    stopRecording();   // aquí se corta y se sube el vídeo
+                }
+
                 candidatoId = null;
                 pollsMismoId = 0;
+                // NO resetees ultimoEjercicioRecibido: te indica cuál fue el último grabado
                 return;
             }
 
@@ -361,9 +374,9 @@ document.addEventListener("DOMContentLoaded", function() {
                 waitingOverlay.classList.add('d-none');
                 document.getElementById('exitButton').style.display = 'none';
             } else {
-                // Cambio de ejercicio: parar grabación anterior
-                stopRecording();
-                await new Promise(resolve => setTimeout(resolve, 500));
+                // ❌ ANTES cortabas aquí. Elimínalo.
+                // stopRecording();
+                // await new Promise(resolve => setTimeout(resolve, 500));
             }
 
             // Guardar id real que ha marcado el profesional
@@ -373,6 +386,7 @@ document.addEventListener("DOMContentLoaded", function() {
             console.log(`🎯 Cambiando a ejercicio con Id ${candidatoId}`);
             await loadExercise(index);
             cambioEnProceso = false;
+
 
         } catch (e) {
             console.error("❌ Error en polling:", e);
