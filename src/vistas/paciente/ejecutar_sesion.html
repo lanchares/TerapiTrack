@@ -307,12 +307,6 @@ document.addEventListener("DOMContentLoaded", function() {
             if (ejercicioActivoId == null) {
                 console.log("⏳ Sin ejercicio activo");
 
-                if (ultimoEjercicioRecibido !== null &&
-                    mediaRecorder &&
-                    mediaRecorder.state === 'recording') {
-                    stopRecording();
-                }
-
                 candidatoId = null;
                 pollsMismoId = 0;
                 return;
