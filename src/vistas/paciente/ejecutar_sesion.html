@@ -468,6 +468,12 @@ document.addEventListener("DOMContentLoaded", function() {
             return;
         }
 
+        // NUEVO: si ya hay un mediaRecorder grabando, no iniciar otro
+        if (mediaRecorder && mediaRecorder.state === 'recording') {
+            console.warn("Ya hay una grabación en curso, se ignora startRecording.");
+            return;
+        }
+
         try {
             mediaRecorder = new MediaRecorder(cameraPreview.srcObject);
             recordedChunks = [];
@@ -490,6 +496,7 @@ document.addEventListener("DOMContentLoaded", function() {
             console.error("Error al iniciar grabación:", err);
         }
     }
+
 
     function stopRecording() {
         if (mediaRecorder && mediaRecorder.state === 'recording') {
@@ -515,16 +522,22 @@ document.addEventListener("DOMContentLoaded", function() {
             return;
         }
 
-        // Evitar subidas duplicadas simultáneas
+        const ejercicioSesionId = currentExerciseId;
+
+        // NUEVO: si este ejercicio ya está marcado como completado, no subas nada
+        if (ejerciciosCompletados.has(ejercicioSesionId)) {
+            console.warn("Ejercicio ya completado, se ignora uploadVideo:", ejercicioSesionId);
+            return;
+        }
+
         if (isUploading) {
             console.warn("Ya hay una subida en curso, se ignora esta llamada.");
             return;
         }
         isUploading = true;
 
-        console.log("⏫ Subiendo vídeo de ejercicio", currentExerciseId);
+        console.log("⏫ Subiendo vídeo de ejercicio", ejercicioSesionId);
 
-        const ejercicioSesionId = currentExerciseId;
         const blob = new Blob(recordedChunks, { type: 'video/webm' });
         const formData = new FormData();
         formData.append('video', blob, `respuesta_${ejercicioSesionId}.webm`);
@@ -548,6 +561,7 @@ document.addEventListener("DOMContentLoaded", function() {
             isUploading = false;
         }
     }
+
 
     function endSession() {
         isSessionActive = false;
