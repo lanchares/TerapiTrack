@@ -13,8 +13,10 @@ import time
 from src.config import Config
 from collections import defaultdict
 from sqlalchemy.exc import IntegrityError
-from moviepy.editor import VideoFileClip
-
+try:
+    from moviepy.editor import VideoFileClip
+except Exception:
+    VideoFileClip = None 
 profesional_bp = Blueprint('profesional', __name__, url_prefix='/profesional')
 
 cloudinary.config(
@@ -258,13 +260,16 @@ def crear_ejercicio():
         video_path = os.path.join(upload_dir, filename)
         video.save(video_path)
 
-        # --- NUEVO: calcular duración real del vídeo ---
-        try:
-            clip = VideoFileClip(video_path)
-            duracion_segundos = int(clip.duration)  # duración en segundos
-            clip.close()
-        except Exception:
-            duracion_segundos = 0  # por si falla el cálculo
+        # Calcular duración real del vídeo si es posible
+        duracion_segundos = 0
+        if VideoFileClip is not None:
+            try:
+                clip = VideoFileClip(video_path)
+                duracion_segundos = int(clip.duration)  # duración en segundos
+                clip.close()
+            except Exception as e:
+                print(f"Error calculando duración del vídeo: {e}")
+                duracion_segundos = 0
 
         nuevo_ejercicio = Ejercicio(
             Nombre=form.nombre.data,
