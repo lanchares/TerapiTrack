@@ -190,6 +190,9 @@ document.addEventListener("DOMContentLoaded", function() {
     // Bloqueo parcial de cambios mientras se graba
     let lockCambioEjercicio = false;
 
+    // Flag para evitar procesar onstop más de una vez por grabación
+    let onStopHandled = false;
+
     // Estado del gamepad
     let gamepadIndex = null;
     let lastButtonStates = { Y: false, X: false, B: false, A: false };
@@ -407,9 +410,10 @@ document.addEventListener("DOMContentLoaded", function() {
             cambioEnProceso = false;
 
         } catch (e) {
-            console.error("❌ Error en polling:", e);
+            console.warn("⚠️ Error en polling (posible navegación o red):", e);
             cambioEnProceso = false;
         }
+
     }
 
     // LÓGICA DE EJERCICIOS
@@ -503,6 +507,7 @@ document.addEventListener("DOMContentLoaded", function() {
             recordedChunks = [];        // limpiar buffer siempre
             stopAlreadyCalled = false;  // reset para esta grabación
             lockCambioEjercicio = true; // bloquear retrocesos a ejerc. completados
+            onStopHandled = false;      // NUEVO: reset del flag de onstop
 
             mediaRecorder.ondataavailable = (event) => {
                 if (event.data.size > 0) {
@@ -510,7 +515,15 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             };
 
-            mediaRecorder.onstop = uploadVideo;
+            // NUEVO: envolvemos uploadVideo para que solo se ejecute una vez
+            mediaRecorder.onstop = () => {
+                if (onStopHandled) {
+                    console.warn("onstop ya se procesó, se ignora.");
+                    return;
+                }
+                onStopHandled = true;
+                uploadVideo();
+            };
 
             mediaRecorder.start();
             recordingStatus.classList.remove('d-none');
@@ -606,11 +619,12 @@ document.addEventListener("DOMContentLoaded", function() {
                 console.warn('Error HTTP al subir video:', response.status, txt);
             }
         } catch (error) {
-            console.error('Error subiendo video:', error);
+            console.warn('⚠️ Error subiendo video (posible navegación o red):', error);
         } finally {
             isUploading = false;
         }
     }
+
 
     function endSession() {
         isSessionActive = false;
