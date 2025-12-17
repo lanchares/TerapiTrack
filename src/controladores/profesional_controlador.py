@@ -663,9 +663,11 @@ def guardar_video(ejercicio_sesion_id):
             video_file,
             resource_type="video",
             folder="terapitrack/respuestas",
-            public_id=f"respuesta_{ejercicio_sesion_id}_{int(time.time())}",
-            overwrite=True
+            public_id=f"respuesta_{ejercicio_sesion_id}",
+            overwrite=True,
+            unique_filename=False
         )
+
 
         video_url = upload_result.get('secure_url')
         if not video_url:
