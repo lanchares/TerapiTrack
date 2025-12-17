@@ -15,7 +15,6 @@ from collections import defaultdict
 from sqlalchemy.exc import IntegrityError
 from moviepy.editor import VideoFileClip
 
-
 profesional_bp = Blueprint('profesional', __name__, url_prefix='/profesional')
 
 cloudinary.config(
