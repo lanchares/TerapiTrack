@@ -85,7 +85,9 @@
                             <h6 class="card-title mb-1 small">{{ ejercicio.ejercicio.Nombre }}</h6>
                             <p class="card-text small text-muted mb-1">{{ ejercicio.ejercicio.Tipo }}</p>
                             <div class="d-flex justify-content-between align-items-center">
-                                <small class="text-muted">{{ ejercicio.ejercicio.Duracion }}s</small>
+                                <small class="text-muted">
+                                    Duración: {{ ejercicio.ejercicio.Duracion|formatear_duracion }}
+                                </small>
                                 <span class="badge bg-secondary status-badge">Pendiente</span>
                             </div>
                         </div>

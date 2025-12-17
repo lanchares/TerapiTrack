@@ -3,6 +3,7 @@ from flask import Flask
 from src.extensiones import init_extensions, db
 from src.config import Config
 
+
 def create_app():
     app = Flask(__name__, template_folder='src/vistas', static_folder='src/static')
     app.config.from_object(Config)
@@ -22,6 +23,7 @@ def create_app():
     app.register_blueprint(profesional_bp, url_prefix='/profesional')
     app.register_blueprint(paciente_bp, url_prefix='/paciente')
 
+    # Filtro para formatear fechas
     @app.template_filter('datetimeformat')
     def datetimeformat_filter(value, format='%d/%m/%Y %H:%M'):
         if value is None:
@@ -33,10 +35,24 @@ def create_app():
                 return value
         return value.strftime(format)
 
+    # Filtro para formatear duración de ejercicios (segundos -> Xm Ys)
+    @app.template_filter('formatear_duracion')
+    def formatear_duracion(segundos):
+        try:
+            segundos = int(segundos or 0)
+        except (TypeError, ValueError):
+            segundos = 0
+        minutos = segundos // 60
+        resto = segundos % 60
+        if minutos > 0:
+            return f"{minutos}m {resto}s"
+        return f"{resto}s"
+
     with app.app_context():
         db.create_all()
 
     return app
+
 
 app = create_app()
 

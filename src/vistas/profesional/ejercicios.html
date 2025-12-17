@@ -45,6 +45,7 @@
                     <tr>
                         <th>Nombre</th>
                         <th>Tipo</th>
+                        <th>Duración</th>
                         <th>Descripción</th>
                         <th>Acciones</th>
                     </tr>
@@ -54,6 +55,7 @@
                     <tr>
                         <td>{{ ejercicio.Nombre }}</td>
                         <td><span class="badge bg-primary">{{ ejercicio.Tipo }}</span></td>
+                        <td>{{ ejercicio.Duracion|formatear_duracion }}</td>
                         <td>{{ ejercicio.Descripcion[:50] }}{% if ejercicio.Descripcion|length > 50 %}...{% endif %}</td>
                         <td>
                             <a href="#" class="btn btn-sm btn-info" data-bs-toggle="modal" 
