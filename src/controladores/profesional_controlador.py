@@ -13,6 +13,8 @@ import time
 from src.config import Config
 from collections import defaultdict
 from sqlalchemy.exc import IntegrityError
+from moviepy.editor import VideoFileClip
+
 
 profesional_bp = Blueprint('profesional', __name__, url_prefix='/profesional')
 
@@ -257,12 +259,20 @@ def crear_ejercicio():
         video_path = os.path.join(upload_dir, filename)
         video.save(video_path)
 
+        # --- NUEVO: calcular duración real del vídeo ---
+        try:
+            clip = VideoFileClip(video_path)
+            duracion_segundos = int(clip.duration)  # duración en segundos
+            clip.close()
+        except Exception:
+            duracion_segundos = 0  # por si falla el cálculo
+
         nuevo_ejercicio = Ejercicio(
             Nombre=form.nombre.data,
             Descripcion=form.descripcion.data,
             Tipo=form.tipo.data,
             Video=filename,
-            Duracion=0
+            Duracion=duracion_segundos
         )
         db.session.add(nuevo_ejercicio)
         db.session.commit()
@@ -278,6 +288,7 @@ def crear_ejercicio():
         return redirect(url_for('profesional.listar_ejercicios'))
 
     return render_template('profesional/crear_ejercicio.html', form=form)
+
 
 # ---------------------------
 # Gestión de sesiones
