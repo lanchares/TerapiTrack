@@ -96,18 +96,18 @@
         margin-right: 8px;
         animation: blink 1s infinite;
     }
-   
+
     @keyframes blink {
         0%, 50% { opacity: 1; }
         51%, 100% { opacity: 0.3; }
     }
-   
+
     .mini-snes-controller {
         display: flex;
         gap: 8px;
         align-items: center;
     }
-   
+
     .mini-snes-button {
         width: 24px;
         height: 24px;
@@ -121,7 +121,7 @@
         transition: transform 0.1s;
         opacity: 0.6;
     }
-   
+
     .mini-snes-button.active {
         opacity: 1;
         transform: scale(1.2);
@@ -152,7 +152,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // Datos de ejercicios y sesión
     const ejercicios = {{ ejercicios_json|tojson }};
     const sesionId = {{ sesion.Id }};
-   
+
     console.log("Ejercicios cargados del paciente:", ejercicios);
     console.log("Sesión ID:", sesionId);
 
@@ -162,9 +162,9 @@ document.addEventListener("DOMContentLoaded", function() {
     let recordedChunks = [];
     let startTime;
     let timerInterval;
-    let currentExercise = -1;       // índice en el array
-    let currentExerciseId = null;   // Id de Ejercicio_Sesion que marca el profesional
-    let totalExercises = ejercicios.length;
+    let currentExercise = -1;      // índice en el array
+    let currentExerciseId = null;  // Id de EjercicioSesion
+    const totalExercises = ejercicios.length;
 
     // Estabilidad del id enviado por el profesional
     let ultimoEjercicioRecibido = null;   // último id ya aceptado
@@ -179,15 +179,15 @@ document.addEventListener("DOMContentLoaded", function() {
     let isUploading = false;
 
     // Ejercicios ya completados (vídeo subido)
-    let ejerciciosCompletados = new Set();
+    const ejerciciosCompletados = new Set();
 
     // Ejercicios para los que ya se ha iniciado una subida en esta sesión
-    let ejerciciosSubidosEnEstaSesion = new Set();
+    const ejerciciosSubidosEnEstaSesion = new Set();
 
     // Flag para evitar múltiples stops por la misma grabación
     let stopAlreadyCalled = false;
 
-    // NUEVO: bloquear cambios de ejercicio mientras se graba
+    // Bloqueo parcial de cambios mientras se graba
     let lockCambioEjercicio = false;
 
     // Estado del gamepad
@@ -387,7 +387,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 !ejerciciosCompletados.has(ultimoEjercicioRecibido) &&
                 mediaRecorder &&
                 mediaRecorder.state === 'recording') {
-                stopRecording();                  // dispara uploadVideo()
+                stopRecording();          // dispara uploadVideo()
                 await new Promise(r => setTimeout(r, 500));
             }
 
@@ -424,7 +424,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         const ejercicio = ejercicios[index];
 
-        // Asegurar el id de Ejercicio_Sesion asociado a este índice
+        // Id de EjercicioSesion asociado a este índice
         currentExerciseId = ejercicio.Id;
 
         // Actualizar título inmediatamente
@@ -436,7 +436,7 @@ document.addEventListener("DOMContentLoaded", function() {
         demoVideo.pause();
         demoVideo.removeAttribute('src');
         demoVideo.load();
-       
+
         await new Promise(resolve => setTimeout(resolve, 300));
 
         // Determinar ruta del video
@@ -448,21 +448,21 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
         console.log(`📹 Cargando nuevo video: ${videoSrc}`);
-       
+
         demoVideo.src = videoSrc;
         demoVideo.load();
 
         return new Promise((resolve) => {
             let timeoutId;
-           
+
             const onCanPlay = async () => {
                 clearTimeout(timeoutId);
                 demoVideo.removeEventListener('canplay', onCanPlay);
-               
+
                 try {
                     await demoVideo.play();
                     console.log('✅ Video demo reproduciendo correctamente');
-                   
+
                     await new Promise(r => setTimeout(r, 1000));
                     startRecording();
                     resolve();
@@ -492,7 +492,7 @@ document.addEventListener("DOMContentLoaded", function() {
             return;
         }
 
-        // si ya hay un mediaRecorder grabando, no iniciar otro
+        // Si ya hay un mediaRecorder grabando, no iniciar otro
         if (mediaRecorder && mediaRecorder.state === 'recording') {
             console.warn("Ya hay una grabación en curso, se ignora startRecording.");
             return;
@@ -500,9 +500,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
         try {
             mediaRecorder = new MediaRecorder(cameraPreview.srcObject);
-            recordedChunks = [];
+            recordedChunks = [];        // limpiar buffer siempre
             stopAlreadyCalled = false;  // reset para esta grabación
-            lockCambioEjercicio = true; // BLOQUEAR cambios mientras se graba
+            lockCambioEjercicio = true; // bloquear retrocesos a ejerc. completados
 
             mediaRecorder.ondataavailable = (event) => {
                 if (event.data.size > 0) {
@@ -520,7 +520,7 @@ document.addEventListener("DOMContentLoaded", function() {
             timerInterval = setInterval(updateTimer, 1000);
         } catch (err) {
             console.error("Error al iniciar grabación:", err);
-            lockCambioEjercicio = false; // por si falla
+            lockCambioEjercicio = false;
         }
     }
 
@@ -538,7 +538,7 @@ document.addEventListener("DOMContentLoaded", function() {
             mediaRecorder.stop();
         }
 
-        lockCambioEjercicio = false;  // PERMITIR cambios cuando termina la grabación
+        lockCambioEjercicio = false;  // permitir cambios cuando termina la grabación
 
         recordingStatus.classList.add('d-none');
         timerDisplay.classList.add('d-none');
@@ -554,7 +554,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     async function uploadVideo() {
-        if (recordedChunks.length === 0) return;
+        if (!recordedChunks || recordedChunks.length === 0) return;
         if (!currentExerciseId) {
             console.warn("No hay currentExerciseId, no se sube vídeo.");
             return;
@@ -628,5 +628,4 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 </script>
 {% endblock %}
-
 {% endblock %}
