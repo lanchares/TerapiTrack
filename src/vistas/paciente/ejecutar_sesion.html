@@ -368,9 +368,12 @@ document.addEventListener("DOMContentLoaded", function() {
                 return;
             }
 
-            // Si estamos grabando y el bloqueo está activo, NO cambiar de demo ni de ejercicio
-            if (lockCambioEjercicio) {
-                console.log("🔒 Grabación en curso; se ignora cambio de ejercicio:", candidatoId);
+            // Si estamos grabando, solo bloqueamos saltar a ejercicios YA completados
+            if (lockCambioEjercicio &&
+                mediaRecorder &&
+                mediaRecorder.state === 'recording' &&
+                ejerciciosCompletados.has(candidatoId)) {
+                console.log("🔒 Grabación en curso; se ignora cambio a ejercicio YA completado:", candidatoId);
                 return;
             }
 
