@@ -134,7 +134,9 @@ def test_listar_usuarios_con_filtros(client, admin_user, login_admin, user_facto
 # -------------------- ver_usuario ------------------------
 
 
-def test_ver_usuario_no_admin_redirige_a_login(client, user_factory, login_user_fixture):
+def test_ver_usuario_no_admin_redirige_a_login(
+    client, user_factory, login_user_fixture
+):
     user = user_factory(Rol_Id=1, Email="p@example.com")
     login_user_fixture(user)
     resp = client.get(f"/admin/usuario/{user.Id}", follow_redirects=False)

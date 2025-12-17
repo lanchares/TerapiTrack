@@ -3,6 +3,8 @@ import json
 from datetime import datetime, timedelta
 
 import pytest
+import time
+from sqlalchemy.exc import IntegrityError
 
 from src.extensiones import db
 from src.modelos.usuario import Usuario
@@ -309,6 +311,23 @@ def test_crear_sesion_get_muestra_form(
     assert b"Crear Sesi" in resp.data
 
 
+def test_crear_sesion_preseleccion_paciente(
+    client, profesional_user, paciente_user, login_profesional
+):
+    vinc = Paciente_Profesional(
+        Paciente_Id=paciente_user.Id,
+        Profesional_Id=profesional_user.Id,
+        Fecha_Asignacion=datetime.now().date(),
+    )
+    db.session.add(vinc)
+    db.session.commit()
+
+    _crear_ejercicios_para_profesional(profesional_user.Id)
+
+    resp = client.get(f"/profesional/sesiones/crear?paciente_id={paciente_user.Id}")
+    assert resp.status_code == 200
+
+
 def test_crear_sesion_post_ok(
     client, profesional_user, paciente_user, login_profesional
 ):
@@ -532,6 +551,24 @@ def test_listar_sesiones_filtra_fecha_hasta(
     assert resp.status_code == 200
     assert ses_in.Fecha_Programada.strftime("%Y-%m-%d").encode() in resp.data
     assert ses_out.Fecha_Programada.strftime("%Y-%m-%d").encode() not in resp.data
+
+
+def test_listar_sesiones_fecha_hasta_invalida_no_revienta(
+    client, profesional_user, paciente_user, login_profesional
+):
+    ses = Sesion(
+        Paciente_Id=paciente_user.Id,
+        Profesional_Id=profesional_user.Id,
+        Fecha_Asignacion=datetime.now(),
+        Fecha_Programada=datetime.now(),
+        Estado="PENDIENTE",
+    )
+    db.session.add(ses)
+    db.session.commit()
+
+    resp = client.get("/profesional/sesiones?fecha_hasta=xxxx")
+    assert resp.status_code == 200
+
 
 
 def test_ver_sesion_permisos_y_detalle(
@@ -800,12 +837,192 @@ def test_actualizar_estado_sesion_sin_ejercicio_id(
     db.session.add(ses)
     db.session.commit()
 
-    resp = client.post(
+    # primero fijamos un estado conocido
+    payload = {"ejercicio_activo_id": 10}
+    resp1 = client.post(
+        f"/profesional/api/sesion/{ses.Id}/estado",
+        data=json.dumps(payload),
+        content_type="application/json",
+    )
+    assert resp1.status_code == 200
+    data1 = json.loads(resp1.data)
+    assert data1["ok"] is True
+    assert data1["ejercicio_activo_id"] == 10
+
+    # luego mandamos un POST vacío: no debería romper ni cambiar nada
+    resp2 = client.post(
         f"/profesional/api/sesion/{ses.Id}/estado",
         data=json.dumps({}),
         content_type="application/json",
     )
-    assert resp.status_code == 400
+    assert resp2.status_code == 200
+    data2 = json.loads(resp2.data)
+    assert data2["ok"] is True
+    # se mantiene el último ejercicio activo
+    assert data2["ejercicio_activo_id"] == 10
+    # assert data2["terminada"] is False
+
+
+def test_estado_sesion_reset_a_none(
+    client, profesional_user, paciente_user, login_profesional
+):
+    ses = Sesion(
+        Paciente_Id=paciente_user.Id,
+        Profesional_Id=profesional_user.Id,
+        Fecha_Asignacion=datetime.now(),
+        Fecha_Programada=datetime.now(),
+        Estado="PENDIENTE",
+    )
+    db.session.add(ses)
+    db.session.commit()
+
+    payload1 = {"ejercicio_activo_id": 10}
+    resp1 = client.post(
+        f"/profesional/api/sesion/{ses.Id}/estado",
+        data=json.dumps(payload1),
+        content_type="application/json",
+    )
+    assert resp1.status_code == 200
+
+    payload2 = {"ejercicio_activo_id": None}
+    resp2 = client.post(
+        f"/profesional/api/sesion/{ses.Id}/estado",
+        data=json.dumps(payload2),
+        content_type="application/json",
+    )
+    assert resp2.status_code == 200
+    data2 = json.loads(resp2.data)
+    assert data2["ok"] is True
+    assert data2["ejercicio_activo_id"] is None
+
+
+def test_estado_sesion_antirebote(
+    client, profesional_user, paciente_user, login_profesional, monkeypatch
+):
+    ses = Sesion(
+        Paciente_Id=paciente_user.Id,
+        Profesional_Id=profesional_user.Id,
+        Fecha_Asignacion=datetime.now(),
+        Fecha_Programada=datetime.now(),
+        Estado="PENDIENTE",
+    )
+    db.session.add(ses)
+    db.session.commit()
+
+    payload1 = {"ejercicio_activo_id": 10}
+    resp1 = client.post(
+        f"/profesional/api/sesion/{ses.Id}/estado",
+        data=json.dumps(payload1),
+        content_type="application/json",
+    )
+    assert resp1.status_code == 200
+
+    profesional_controlador.ultimo_cambio_sesion[ses.Id] = time.time()
+
+    payload2 = {"ejercicio_activo_id": 20}
+    resp2 = client.post(
+        f"/profesional/api/sesion/{ses.Id}/estado",
+        data=json.dumps(payload2),
+        content_type="application/json",
+    )
+    assert resp2.status_code == 200
+    data2 = json.loads(resp2.data)
+    assert data2["ok"] is False
+    assert data2["ejercicio_activo_id"] == 10
+
+
+def test_estado_sesion_terminada_flag_varias_veces(
+    client, profesional_user, paciente_user, login_profesional
+):
+    ses = Sesion(
+        Paciente_Id=paciente_user.Id,
+        Profesional_Id=profesional_user.Id,
+        Fecha_Asignacion=datetime.now(),
+        Fecha_Programada=datetime.now(),
+        Estado="PENDIENTE",
+    )
+    db.session.add(ses)
+    db.session.commit()
+
+    payload = {"terminada": True}
+    resp1 = client.post(
+        f"/profesional/api/sesion/{ses.Id}/estado",
+        data=json.dumps(payload),
+        content_type="application/json",
+    )
+    assert resp1.status_code == 200
+    data1 = json.loads(resp1.data)
+    assert data1["ok"] is True
+    assert data1["terminada"] is True
+
+    resp2 = client.post(
+        f"/profesional/api/sesion/{ses.Id}/estado",
+        data=json.dumps(payload),
+        content_type="application/json",
+    )
+    assert resp2.status_code == 200
+    data2 = json.loads(resp2.data)
+    assert data2["ok"] is True
+    assert data2["terminada"] is True
+
+
+def test_estado_sesion_marcar_y_desmarcar_terminada(
+    client, profesional_user, paciente_user, login_profesional
+):
+    ses = Sesion(
+        Paciente_Id=paciente_user.Id,
+        Profesional_Id=profesional_user.Id,
+        Fecha_Asignacion=datetime.now(),
+        Fecha_Programada=datetime.now(),
+        Estado="PENDIENTE",
+    )
+    db.session.add(ses)
+    db.session.commit()
+
+    # marcar terminada
+    resp1 = client.post(
+        f"/profesional/api/sesion/{ses.Id}/estado",
+        data=json.dumps({"terminada": True}),
+        content_type="application/json",
+    )
+    assert resp1.status_code == 200
+    assert ses.Id in profesional_controlador.estado_sesion_terminada
+
+    # desmarcar terminada
+    resp2 = client.post(
+        f"/profesional/api/sesion/{ses.Id}/estado",
+        data=json.dumps({"terminada": False}),
+        content_type="application/json",
+    )
+    assert resp2.status_code == 200
+    assert ses.Id not in profesional_controlador.estado_sesion_terminada
+
+
+def test_estado_sesion_marcar_terminada_desde_api(
+    client, profesional_user, paciente_user, login_profesional
+):
+    ses = Sesion(
+        Paciente_Id=paciente_user.Id,
+        Profesional_Id=profesional_user.Id,
+        Fecha_Asignacion=datetime.now(),
+        Fecha_Programada=datetime.now(),
+        Estado="PENDIENTE",
+    )
+    db.session.add(ses)
+    db.session.commit()
+
+    # llamamos al endpoint solo con terminada=True
+    resp = client.post(
+        f"/profesional/api/sesion/{ses.Id}/estado",
+        data=json.dumps({"terminada": True}),
+        content_type="application/json",
+    )
+    assert resp.status_code == 200
+    data = json.loads(resp.data)
+    assert data["ok"] is True
+    assert data["terminada"] is True
+    # comprueba que se ha añadido en la caché
+    assert ses.Id in profesional_controlador.estado_sesion_terminada
 
 
 # ----------------- evaluación de ejercicios ---------------
@@ -966,7 +1183,7 @@ def test_ver_progreso_sin_vinculacion(
 
 
 def test_guardar_video_ok(
-    client, profesional_user, paciente_user, login_profesional, tmp_path, monkeypatch
+    client, profesional_user, paciente_user, login_user_fixture, tmp_path, monkeypatch
 ):
     ses = Sesion(
         Paciente_Id=paciente_user.Id,
@@ -991,8 +1208,14 @@ def test_guardar_video_ok(
     db.session.add(es)
     db.session.commit()
 
-    # apuntar UPLOAD_FOLDER a tmp_path
-    monkeypatch.setattr(Config, "UPLOAD_FOLDER", str(tmp_path))
+    # login como paciente (dueño del ejercicio_sesion)
+    login_user_fixture(paciente_user)
+
+    # opcional: mock de cloudinary para que no haga llamadas reales
+    monkeypatch.setattr(
+        "src.controladores.profesional_controlador.cloudinary.uploader.upload",
+        lambda *args, **kwargs: {"secure_url": "https://example.com/video.mp4"},
+    )
 
     data = {
         "video": (io.BytesIO(b"fake webm"), "test.webm"),
@@ -1010,6 +1233,80 @@ def test_guardar_video_ok(
 
 
 def test_guardar_video_sin_archivo(
+    client, profesional_user, paciente_user, login_user_fixture
+):
+    ses = Sesion(
+        Paciente_Id=paciente_user.Id,
+        Profesional_Id=profesional_user.Id,
+        Fecha_Asignacion=datetime.now(),
+        Fecha_Programada=datetime.now(),
+        Estado="PENDIENTE",
+    )
+    db.session.add(ses)
+    db.session.commit()
+    ej = Ejercicio(
+        Nombre="VideoEj",
+        Descripcion="Desc",
+        Tipo="Test",
+        Video="v.mp4",
+        Duracion=10,
+    )
+    db.session.add(ej)
+    db.session.commit()
+    es = Ejercicio_Sesion(Sesion_Id=ses.Id, Ejercicio_Id=ej.Id)
+    db.session.add(es)
+    db.session.commit()
+
+    # login como paciente, que es quien podría subir
+    login_user_fixture(paciente_user)
+
+    resp = client.post(f"/profesional/guardar_video/{es.Id}", data={})
+    assert resp.status_code == 400
+    data_json = json.loads(resp.data)
+    assert data_json["success"] is False
+
+
+def test_guardar_video_archivo_vacio(
+    client, profesional_user, paciente_user, login_user_fixture
+):
+    ses = Sesion(
+        Paciente_Id=paciente_user.Id,
+        Profesional_Id=profesional_user.Id,
+        Fecha_Asignacion=datetime.now(),
+        Fecha_Programada=datetime.now(),
+        Estado="PENDIENTE",
+    )
+    db.session.add(ses)
+    db.session.commit()
+    ej = Ejercicio(
+        Nombre="VideoEj",
+        Descripcion="Desc",
+        Tipo="Test",
+        Video="v.mp4",
+        Duracion=10,
+    )
+    db.session.add(ej)
+    db.session.commit()
+    es = Ejercicio_Sesion(Sesion_Id=ses.Id, Ejercicio_Id=ej.Id)
+    db.session.add(es)
+    db.session.commit()
+
+    login_user_fixture(paciente_user)
+
+    data = {"video": (io.BytesIO(b""), "")}
+    resp = client.post(
+        f"/profesional/guardar_video/{es.Id}",
+        data=data,
+        content_type="multipart/form-data",
+    )
+    assert resp.status_code == 400
+    data_json = json.loads(resp.data)
+    assert data_json["success"] is False
+    assert "Archivo vacío" in data_json["error"]
+
+
+
+def test_guardar_video_sin_permiso_devuelve_403(
     client, profesional_user, paciente_user, login_profesional
 ):
     ses = Sesion(
@@ -1035,9 +1332,221 @@ def test_guardar_video_sin_archivo(
     db.session.commit()
 
     resp = client.post(f"/profesional/guardar_video/{es.Id}", data={})
+    assert resp.status_code == 403
+    data = json.loads(resp.data)
+    assert data["success"] is False
+
+
+def test_guardar_video_ya_existente(
+    client, profesional_user, paciente_user, login_user_fixture
+):
+    # ya crea un VideoRespuesta, no añadas otro
+    ses, es, _ = _crear_sesion_completada_con_video(
+        paciente_user.Id, profesional_user.Id
+    )
+
+    login_user_fixture(paciente_user)
+
+    data = {"video": (io.BytesIO(b"fake"), "test.webm")}
+    resp = client.post(
+        f"/profesional/guardar_video/{es.Id}",
+        data=data,
+        content_type="multipart/form-data",
+    )
     assert resp.status_code == 200
     data_json = json.loads(resp.data)
+    assert data_json["success"] is True
+    assert "ya existente" in data_json["mensaje"]
+
+
+
+def test_guardar_video_sin_url_cloudinary(
+    client, profesional_user, paciente_user, login_user_fixture, monkeypatch
+):
+    # crear sesion y ejercicio_sesion, pero sin VideoRespuesta
+    ses = Sesion(
+        Paciente_Id=paciente_user.Id,
+        Profesional_Id=profesional_user.Id,
+        Fecha_Asignacion=datetime.now(),
+        Fecha_Programada=datetime.now(),
+        Estado="PENDIENTE",
+    )
+    db.session.add(ses)
+    db.session.commit()
+    ej = Ejercicio(
+        Nombre="VideoEj",
+        Descripcion="Desc",
+        Tipo="Test",
+        Video="v.mp4",
+        Duracion=10,
+    )
+    db.session.add(ej)
+    db.session.commit()
+    es = Ejercicio_Sesion(Sesion_Id=ses.Id, Ejercicio_Id=ej.Id)
+    db.session.add(es)
+    db.session.commit()
+
+    login_user_fixture(paciente_user)
+
+    monkeypatch.setattr(
+        "src.controladores.profesional_controlador.cloudinary.uploader.upload",
+        lambda *args, **kwargs: {},
+    )
+
+    data = {"video": (io.BytesIO(b"fake"), "test.webm")}
+    resp = client.post(
+        f"/profesional/guardar_video/{es.Id}",
+        data=data,
+        content_type="multipart/form-data",
+    )
+    assert resp.status_code == 500
+    data_json = json.loads(resp.data)
     assert data_json["success"] is False
+    assert "No se obtuvo URL del video" in data_json["error"]
+
+
+
+def test_guardar_video_integrity_error(
+    client, profesional_user, paciente_user, login_user_fixture, monkeypatch
+):
+    ses, es, _ = _crear_sesion_completada_con_video(
+        paciente_user.Id, profesional_user.Id
+    )
+    login_user_fixture(paciente_user)
+
+    monkeypatch.setattr(
+        "src.controladores.profesional_controlador.cloudinary.uploader.upload",
+        lambda *args, **kwargs: {"secure_url": "https://example.com/video.mp4"},
+    )
+
+    def fake_commit():
+        raise IntegrityError("dummy", None, None)
+
+    monkeypatch.setattr(
+        "src.controladores.profesional_controlador.db.session.commit", fake_commit
+    )
+
+    data = {"video": (io.BytesIO(b"fake"), "test.webm")}
+    resp = client.post(
+        f"/profesional/guardar_video/{es.Id}",
+        data=data,
+        content_type="multipart/form-data",
+    )
+    assert resp.status_code == 200
+    data_json = json.loads(resp.data)
+    assert data_json["success"] is True
+    assert "Video ya existente" in data_json["mensaje"]
+
+from sqlalchemy.exc import IntegrityError
+
+def test_guardar_video_integrity_error_race(
+    client, profesional_user, paciente_user, login_user_fixture, monkeypatch
+):
+    # sesión + ejercicio_sesion sin VideoRespuesta previo
+    ses = Sesion(
+        Paciente_Id=paciente_user.Id,
+        Profesional_Id=profesional_user.Id,
+        Fecha_Asignacion=datetime.now(),
+        Fecha_Programada=datetime.now(),
+        Estado="PENDIENTE",
+    )
+    db.session.add(ses)
+    db.session.commit()
+    ej = Ejercicio(
+        Nombre="VideoEjRace",
+        Descripcion="Desc",
+        Tipo="Test",
+        Video="v.mp4",
+        Duracion=10,
+    )
+    db.session.add(ej)
+    db.session.commit()
+    es = Ejercicio_Sesion(Sesion_Id=ses.Id, Ejercicio_Id=ej.Id)
+    db.session.add(es)
+    db.session.commit()
+
+    login_user_fixture(paciente_user)
+
+    monkeypatch.setattr(
+        "src.controladores.profesional_controlador.cloudinary.uploader.upload",
+        lambda *args, **kwargs: {"secure_url": "https://example.com/video.mp4"},
+    )
+
+    # hacer que el commit de ese bloque concreto lance IntegrityError
+    original_commit = db.session.commit
+
+    def fake_commit():
+        raise IntegrityError("dummy", None, None)
+
+    monkeypatch.setattr(
+        "src.controladores.profesional_controlador.db.session.commit", fake_commit
+    )
+
+    data = {"video": (io.BytesIO(b"fake"), "test.webm")}
+    resp = client.post(
+        f"/profesional/guardar_video/{es.Id}",
+        data=data,
+        content_type="multipart/form-data",
+    )
+
+    # restaurar commit por si acaso
+    monkeypatch.setattr(
+        "src.controladores.profesional_controlador.db.session.commit", original_commit
+    )
+
+    assert resp.status_code == 200
+    data_json = json.loads(resp.data)
+    assert data_json["success"] is True
+    assert "ya existente" in data_json["mensaje"]
+
+
+
+def test_guardar_video_excepcion_generica(
+    client, profesional_user, paciente_user, login_user_fixture, monkeypatch
+):
+    ses = Sesion(
+        Paciente_Id=paciente_user.Id,
+        Profesional_Id=profesional_user.Id,
+        Fecha_Asignacion=datetime.now(),
+        Fecha_Programada=datetime.now(),
+        Estado="PENDIENTE",
+    )
+    db.session.add(ses)
+    db.session.commit()
+    ej = Ejercicio(
+        Nombre="VideoEj",
+        Descripcion="Desc",
+        Tipo="Test",
+        Video="v.mp4",
+        Duracion=10,
+    )
+    db.session.add(ej)
+    db.session.commit()
+    es = Ejercicio_Sesion(Sesion_Id=ses.Id, Ejercicio_Id=ej.Id)
+    db.session.add(es)
+    db.session.commit()
+
+    login_user_fixture(paciente_user)
+
+    def fake_upload(*args, **kwargs):
+        raise RuntimeError("fallo cloudinary")
+
+    monkeypatch.setattr(
+        "src.controladores.profesional_controlador.cloudinary.uploader.upload",
+        fake_upload,
+    )
+
+    data = {"video": (io.BytesIO(b"fake"), "test.webm")}
+    resp = client.post(
+        f"/profesional/guardar_video/{es.Id}",
+        data=data,
+        content_type="multipart/form-data",
+    )
+    assert resp.status_code == 500
+    data_json = json.loads(resp.data)
+    assert data_json["success"] is False
+    assert "fallo cloudinary" in data_json["error"]
+
 
 
 def test_ver_evaluacion_ok(

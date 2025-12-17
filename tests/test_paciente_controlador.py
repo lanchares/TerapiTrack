@@ -2,6 +2,7 @@ import json
 from datetime import datetime, timedelta
 
 import pytest
+import os
 
 from src.extensiones import db
 from src.modelos.usuario import Usuario
@@ -172,99 +173,6 @@ def test_ejecutar_sesion_otro_paciente_redirige_dashboard(
     assert b"No tienes permisos para esta sesi" in resp.data
 
 
-# ------------------ get_controller_state ------------------
-
-
-def test_get_controller_state_sin_mando(client, paciente_user, login_paciente, monkeypatch):
-    # asegurar mando None
-    monkeypatch.setattr(paciente_controlador, "snes_controller", None)
-    resp = client.get("/paciente/get_controller_state")
-    assert resp.status_code == 404
-    data = json.loads(resp.data)
-    assert data["error"] == "Mando no conectado"
-
-
-class DummyController:
-    """Simula un mando SNES simple."""
-
-    def __init__(self, buttons=None, axes=None):
-        self._buttons = buttons or {0: 0, 1: 1, 2: 0, 3: 0}
-        self._axes = axes or {0: 0.6, 1: -0.7}
-
-    def get_button(self, idx):
-        return self._buttons.get(idx, 0)
-
-    def get_numaxes(self):
-        return len(self._axes)
-
-    def get_axis(self, idx):
-        return self._axes.get(idx, 0.0)
-
-
-def test_get_controller_state_con_mando(
-    client, paciente_user, login_paciente, monkeypatch
-):
-    dummy = DummyController()
-    monkeypatch.setattr(paciente_controlador, "snes_controller", dummy)
-    # pygame.event.pump se llama pero no necesitamos que haga nada
-    resp = client.get("/paciente/get_controller_state")
-    assert resp.status_code == 200
-    data = json.loads(resp.data)
-    assert data["A"] is True
-    # por ejes simulados: right y up deberían estar activos
-    assert data["right"] is True
-    assert data["up"] is True
-
-def test_get_controller_state_error_lectura(
-    client, paciente_user, login_paciente, monkeypatch
-):
-    dummy = DummyController()
-    monkeypatch.setattr(paciente_controlador, "snes_controller", dummy)
-
-    # Hacemos que pygame.event.pump lance una excepción
-    def fake_pump():
-        raise Exception("lectura fallida")
-
-    import pygame
-    monkeypatch.setattr(pygame.event, "pump", fake_pump)
-
-    resp = client.get("/paciente/get_controller_state")
-    assert resp.status_code == 500
-    data = json.loads(resp.data)
-    assert "Error leyendo mando" in data["error"]
-
-
-# --------------------- reconectar_mando -------------------
-
-
-def test_reconectar_mando_ok(
-    client, paciente_user, login_paciente, monkeypatch
-):
-    # simular que init_snes_controller deja un mando conectado
-    def fake_init():
-        paciente_controlador.snes_controller = DummyController()
-
-    monkeypatch.setattr(paciente_controlador, "init_snes_controller", fake_init)
-
-    resp = client.get("/paciente/reconectar_mando")
-    assert resp.status_code == 200
-    data = json.loads(resp.data)
-    assert data["conectado"] is True
-
-
-def test_reconectar_mando_sin_mando(
-    client, paciente_user, login_paciente, monkeypatch
-):
-    def fake_init():
-        paciente_controlador.snes_controller = None
-
-    monkeypatch.setattr(paciente_controlador, "init_snes_controller", fake_init)
-
-    resp = client.get("/paciente/reconectar_mando")
-    assert resp.status_code == 200
-    data = json.loads(resp.data)
-    assert data["conectado"] is False
-
 
 # ------------------------ ejercicios ----------------------
 
@@ -395,12 +303,46 @@ def test_ayuda(client, paciente_user, login_paciente):
 def test_session_info(
     client, paciente_user, login_paciente, monkeypatch
 ):
-    # asegurar valor conocido de snes_controller
-    monkeypatch.setattr(paciente_controlador, "snes_controller", None)
+    # quitar esta línea porque ya no existe snes_controller en el controlador
+    # monkeypatch.setattr(paciente_controlador, "snes_controller", None)
 
     resp = client.get("/paciente/session_info")
     assert resp.status_code == 200
     data = json.loads(resp.data)
     assert data["usuario"] == "Pac"
     assert data["rol"] == "Paciente"
+    # esta sigue siendo válida porque tú devuelves False fijo
     assert data["mando_conectado"] is False
+
+
+
+def test_get_video_path_usa_uploads_si_existe(app, tmp_path):
+    from src.controladores.paciente_controlador import get_video_path
+    video_name = "demo.mp4"
+
+    static_dir = tmp_path / "static"
+    uploads_dir = static_dir / "uploads" / "ejercicios"
+    uploads_dir.mkdir(parents=True)
+    (uploads_dir / video_name).write_bytes(b"")
+
+    with app.app_context():
+        app.static_folder = str(static_dir)
+        path = get_video_path(video_name)
+
+    assert path == f"/static/uploads/ejercicios/{video_name}"
+
+
+def test_get_video_path_usa_videos_si_no_hay_uploads(app, tmp_path):
+    from src.controladores.paciente_controlador import get_video_path
+    video_name = "demo2.mp4"
+
+    static_dir = tmp_path / "static"
+    videos_dir = static_dir / "videos"
+    videos_dir.mkdir(parents=True)
+    (videos_dir / video_name).write_bytes(b"")
+
+    with app.app_context():
+        app.static_folder = str(static_dir)
+        path = get_video_path(video_name)
+
+    assert path == f"/static/videos/{video_name}"
