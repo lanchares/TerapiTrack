@@ -21,6 +21,7 @@ except Exception as e:
     VideoFileClip = None
 
 
+
 profesional_bp = Blueprint('profesional', __name__, url_prefix='/profesional')
 
 cloudinary.config(
