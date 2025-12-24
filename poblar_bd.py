@@ -141,6 +141,13 @@ def poblar_datos():
         db.session.add(e)
         db.session.flush()
         ejercicios.append(e)
+        ejercicios.append(e)
+
+        # añade esto:
+        print("IDs de ejercicios creados:")
+        for e in ejercicios:
+            print(e.Id, "-", e.Nombre)
+
 
     print("🔗 Asociando ejercicios con profesionales...")
     profesionales_objs = [u for u, d in usuarios if u.Rol_Id == 2]

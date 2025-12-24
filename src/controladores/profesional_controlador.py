@@ -15,10 +15,9 @@ from collections import defaultdict
 from sqlalchemy.exc import IntegrityError
 try:
     from moviepy.editor import VideoFileClip
-    print(">>> MoviePy importado correctamente")
-except Exception as e:
-    print(">>> ERROR importando MoviePy:", e)
+except Exception:
     VideoFileClip = None
+
 
 
 
@@ -265,21 +264,16 @@ def crear_ejercicio():
         video_path = os.path.join(upload_dir, filename)
         video.save(video_path)
 
-                # Calcular duración real del vídeo si es posible
+        # Calcular duración real del vídeo si es posible
         duracion_segundos = 0
         if VideoFileClip is not None:
             try:
                 clip = VideoFileClip(video_path)
-                duracion_segundos = int(clip.duration)  # duración en segundos
-                print(">>> DURACIÓN DETECTADA:", duracion_segundos)
+                duracion_segundos = int(clip.duration)
                 clip.close()
-            except Exception as e:
-                print(">>> ERROR DURACIÓN:", e)
+            except Exception:
                 duracion_segundos = 0
-        else:
-            print(">>> VideoFileClip es None, no se calcula duración")
-
-
+                
         nuevo_ejercicio = Ejercicio(
             Nombre=form.nombre.data,
             Descripcion=form.descripcion.data,

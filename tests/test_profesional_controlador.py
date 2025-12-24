@@ -262,6 +262,43 @@ def test_crear_ejercicio_ok(
     ).first()
     assert assoc is not None
 
+# ------------------- creación de ejercicios -----------------
+
+def test_crear_ejercicio_calcula_duracion(client, login_profesional, monkeypatch):
+    # Simular VideoFileClip para controlar la duración
+    class DummyClip:
+        def __init__(self, path):
+            self.duration = 12  # segundos
+
+        def close(self):
+            pass
+
+    monkeypatch.setattr(
+        profesional_controlador, "VideoFileClip", DummyClip, raising=True
+    )
+
+    # Fichero de vídeo “fake” en memoria
+    video_bytes = io.BytesIO(b"fake-video-content")
+    video_bytes.name = "test.mp4"
+
+    data = {
+        "nombre": "Ejercicio test",
+        "descripcion": "Desc",
+        "tipo": "MOVILIDAD",
+        "video": (video_bytes, "test.mp4"),
+    }
+
+    resp = client.post(
+        "/profesional/ejercicios/crear",
+        data=data,
+        content_type="multipart/form-data",
+        follow_redirects=False,
+    )
+    assert resp.status_code == 302  # redirección tras crear
+
+    ejercicio = Ejercicio.query.order_by(Ejercicio.Id.desc()).first()
+    assert ejercicio is not None
+    assert ejercicio.Duracion == 12
 
 # ------------------- creación de sesiones -----------------
 
