@@ -145,164 +145,157 @@ def poblar_datos():
             )
             db.session.add(p)
 
-        print("🏃‍♂️ Creando ejercicios específicos para Parkinson...")
-        ejercicios_data = [
-            {'nombre': 'Flexión de codo asistida', 'descripcion': 'Dobla el codo con ayuda de la otra mano. Sentado o tumbado.', 'tipo': 'Fortalecimiento', 'video': 'flexion_codo.mp4', 'duracion': 43},
-            {'nombre': 'Rotación de muñeca', 'descripcion': 'Rota suavemente la muñeca en círculos, apoyando el antebrazo.', 'tipo': 'Movilidad', 'video': 'rotacion_muneca.mp4', 'duracion': 105},
-            {'nombre': 'Separar y juntar dedos', 'descripcion': 'Abre y cierra los dedos de la mano lentamente.', 'tipo': 'Movilidad', 'video': 'dedos.mp4', 'duracion': 85},
-            {'nombre': 'Flexión de tobillo', 'descripcion': 'Mueve el pie hacia arriba y abajo desde la cama o silla.', 'tipo': 'Movilidad', 'video': 'flexion_tobillo.mp4', 'duracion': 15},
-            {'nombre': 'Respiración profunda', 'descripcion': 'Inspira por la nariz y suelta el aire por la boca lentamente.', 'tipo': 'Relajación', 'video': 'respiracion_profunda.mp4', 'duracion': 59},
-            {'nombre': 'Encoger hombros', 'descripcion': 'Lleva los hombros hacia las orejas y relájalos.', 'tipo': 'Movilidad', 'video': 'hombros.mp4', 'duracion': 10},
-            {'nombre': 'Giro de cabeza', 'descripcion': 'Gira la cabeza suavemente a un lado y luego al otro.', 'tipo': 'Movilidad', 'video': 'giro_cabeza.mp4', 'duracion': 57},
-            {'nombre': 'Marcha en el lugar', 'descripcion': 'Simula caminar levantando alternadamente los pies.', 'tipo': 'Equilibrio', 'video': 'marcha_sentado.mp4', 'duracion': 25},
-            {'nombre': 'Expresión facial', 'descripcion': 'Ejercicios de músculos faciales: sonreír, fruncir ceño, abrir ojos.', 'tipo': 'Movilidad', 'video': 'expresion_facial.mp4', 'duracion': 350},
-            {'nombre': 'Vocalizaciones', 'descripcion': 'Ejercicios de voz: decir "AH" fuerte y claro durante 10 segundos.', 'tipo': 'Relajación', 'video': 'vocalizaciones.mp4', 'duracion': 326},
-            {'nombre': 'Pasos amplios', 'descripcion': 'Caminar con pasos exagerados para mejorar la longitud del paso.', 'tipo': 'Equilibrio', 'video': 'pasos_amplios.mp4', 'duracion': 162},
-            {'nombre': 'Balanceo de brazos', 'descripcion': 'Caminar balanceando exageradamente los brazos alternos.', 'tipo': 'Equilibrio', 'video': 'balanceo_brazos.mp4', 'duracion': 55},
-            {'nombre': 'Levantarse de silla', 'descripcion': 'Práctica de levantarse y sentarse sin usar las manos.', 'tipo': 'Fortalecimiento', 'video': 'levantarse_silla.mp4', 'duracion': 69},
-            {'nombre': 'Aplausos rítmicos', 'descripcion': 'Aplaudir siguiendo diferentes ritmos y velocidades.', 'tipo': 'Movilidad', 'video': 'aplausos_ritmicos.mp4', 'duracion': 185}
-        ]
+    print("🏃‍♂️ Creando ejercicios específicos para Parkinson...")
+    ejercicios_data = [
+        {'nombre': 'Flexión de codo asistida', 'descripcion': 'Dobla el codo con ayuda de la otra mano. Sentado o tumbado.', 'tipo': 'Fortalecimiento', 'video': 'flexion_codo.mp4', 'duracion': 43},
+        {'nombre': 'Rotación de muñeca', 'descripcion': 'Rota suavemente la muñeca en círculos, apoyando el antebrazo.', 'tipo': 'Movilidad', 'video': 'rotacion_muneca.mp4', 'duracion': 105},
+        {'nombre': 'Separar y juntar dedos', 'descripcion': 'Abre y cierra los dedos de la mano lentamente.', 'tipo': 'Movilidad', 'video': 'dedos.mp4', 'duracion': 85},
+        {'nombre': 'Flexión de tobillo', 'descripcion': 'Mueve el pie hacia arriba y abajo desde la cama o silla.', 'tipo': 'Movilidad', 'video': 'flexion_tobillo.mp4', 'duracion': 15},
+        {'nombre': 'Respiración profunda', 'descripcion': 'Inspira por la nariz y suelta el aire por la boca lentamente.', 'tipo': 'Relajación', 'video': 'respiracion_profunda.mp4', 'duracion': 59},
+        {'nombre': 'Encoger hombros', 'descripcion': 'Lleva los hombros hacia las orejas y relájalos.', 'tipo': 'Movilidad', 'video': 'hombros.mp4', 'duracion': 10},
+        {'nombre': 'Giro de cabeza', 'descripcion': 'Gira la cabeza suavemente a un lado y luego al otro.', 'tipo': 'Movilidad', 'video': 'giro_cabeza.mp4', 'duracion': 57},
+        {'nombre': 'Marcha en el lugar', 'descripcion': 'Simula caminar levantando alternadamente los pies.', 'tipo': 'Equilibrio', 'video': 'marcha_sentado.mp4', 'duracion': 25},
+        {'nombre': 'Expresión facial', 'descripcion': 'Ejercicios de músculos faciales: sonreír, fruncir ceño, abrir ojos.', 'tipo': 'Movilidad', 'video': 'expresion_facial.mp4', 'duracion': 350},
+        {'nombre': 'Vocalizaciones', 'descripcion': 'Ejercicios de voz: decir "AH" fuerte y claro durante 10 segundos.', 'tipo': 'Relajación', 'video': 'vocalizaciones.mp4', 'duracion': 326},
+        {'nombre': 'Pasos amplios', 'descripcion': 'Caminar con pasos exagerados para mejorar la longitud del paso.', 'tipo': 'Equilibrio', 'video': 'pasos_amplios.mp4', 'duracion': 162},
+        {'nombre': 'Balanceo de brazos', 'descripcion': 'Caminar balanceando exageradamente los brazos alternos.', 'tipo': 'Equilibrio', 'video': 'balanceo_brazos.mp4', 'duracion': 55},
+        {'nombre': 'Levantarse de silla', 'descripcion': 'Práctica de levantarse y sentarse sin usar las manos.', 'tipo': 'Fortalecimiento', 'video': 'levantarse_silla.mp4', 'duracion': 69},
+        {'nombre': 'Aplausos rítmicos', 'descripcion': 'Aplaudir siguiendo diferentes ritmos y velocidades.', 'tipo': 'Movilidad', 'video': 'aplausos_ritmicos.mp4', 'duracion': 185}
+    ]
 
-        ejercicios = []
-        for edata in ejercicios_data:
-            e = Ejercicio(
-                Nombre=edata['nombre'],
-                Descripcion=edata['descripcion'],
-                Tipo=edata['tipo'],
-                Video=edata['video'],
-                Duracion=edata['duracion']
-            )
-            db.session.add(e)
-            db.session.flush()
-            ejercicios.append(e)
+    ejercicios = []
+    for edata in ejercicios_data:
+        e = Ejercicio(
+            Nombre=edata['nombre'],
+            Descripcion=edata['descripcion'],
+            Tipo=edata['tipo'],
+            Video=edata['video'],
+            Duracion=edata['duracion']
+        )
+        db.session.add(e)
+        db.session.flush()
+        ejercicios.append(e)
 
-        # Debug: comprobar que no hay ids duplicados en la lista
-        print("IDs de ejercicios creados (debug):")
-        ids = [e.Id for e in ejercicios]
-        print("Lista:", ids)
-        print("Total en lista ejercicios:", len(ejercicios))
-        print("Total únicos:", len(set(ids)))
+    print("IDs de ejercicios creados:")
+    for e in ejercicios:
+        print(e.Id, "-", e.Nombre)
 
-        print("IDs de ejercicios creados:")
-        for e in ejercicios:
-            print(e.Id, "-", e.Nombre)
-
-        print("🔗 Asociando ejercicios con profesionales...")
-        profesionales_objs = [u for u, d in usuarios if u.Rol_Id == 2]
-        for profesional in profesionales_objs:
-            for ejercicio in ejercicios:
-                existe = Ejercicio_Profesional.query.filter_by(
+    print("🔗 Asociando ejercicios con profesionales...")
+    profesionales_objs = [u for u, d in usuarios if u.Rol_Id == 2]
+    for profesional in profesionales_objs:
+        for ejercicio in ejercicios:
+            existe = Ejercicio_Profesional.query.filter_by(
+                Profesional_Id=profesional.Id,
+                Ejercicio_Id=ejercicio.Id
+            ).first()
+            if not existe:
+                asociacion = Ejercicio_Profesional(
                     Profesional_Id=profesional.Id,
                     Ejercicio_Id=ejercicio.Id
-                ).first()
-                if not existe:
-                    asociacion = Ejercicio_Profesional(
-                        Profesional_Id=profesional.Id,
-                        Ejercicio_Id=ejercicio.Id
-                    )
-                    db.session.add(asociacion)
+                )
+                db.session.add(asociacion)
 
-        print("🔗 Creando vinculaciones paciente-profesional...")
-        pacientes_objs = [u for u, d in usuarios if u.Rol_Id == 1]
-        profesionales_objs = [u for u, d in usuarios if u.Rol_Id == 2]
-        vinculaciones = []
+    print("🔗 Creando vinculaciones paciente-profesional...")
+    pacientes_objs = [u for u, d in usuarios if u.Rol_Id == 1]
+    profesionales_objs = [u for u, d in usuarios if u.Rol_Id == 2]
+    vinculaciones = []
 
-        for i, paciente in enumerate(pacientes_objs):
-            profesional = profesionales_objs[i % len(profesionales_objs)]
-            v = Paciente_Profesional(
-                Paciente_Id=paciente.Id,
-                Profesional_Id=profesional.Id,
-                Fecha_Asignacion=date.today() - timedelta(days=random.randint(1, 60))
+    for i, paciente in enumerate(pacientes_objs):
+        profesional = profesionales_objs[i % len(profesionales_objs)]
+        v = Paciente_Profesional(
+            Paciente_Id=paciente.Id,
+            Profesional_Id=profesional.Id,
+            Fecha_Asignacion=date.today() - timedelta(days=random.randint(1, 60))
+        )
+        db.session.add(v)
+        vinculaciones.append((paciente.Id, profesional.Id))
+
+    print("📅 Creando múltiples sesiones (pendientes y completadas)...")
+    sesiones = []
+
+    for pid, prid in vinculaciones:
+        num_sesiones = random.randint(6, 10)
+
+        for j in range(num_sesiones):
+            if j < num_sesiones * 0.5:
+                estado = 'COMPLETADA'
+                fecha_programada = date.today() - timedelta(days=random.randint(5, 90))
+            else:
+                estado = 'PENDIENTE'
+                fecha_programada = date.today() + timedelta(days=random.randint(1, 30))
+
+            s = Sesion(
+                Paciente_Id=pid,
+                Profesional_Id=prid,
+                Estado=estado,
+                Fecha_Asignacion=fecha_programada - timedelta(days=random.randint(1, 20)),
+                Fecha_Programada=fecha_programada
             )
-            db.session.add(v)
-            vinculaciones.append((paciente.Id, profesional.Id))
+            db.session.add(s)
+            db.session.flush()
+            sesiones.append(s)
 
-        print("📅 Creando múltiples sesiones (pendientes y completadas)...")
-        sesiones = []
+    print("🏃‍♂️ Asignando ejercicios a sesiones...")
+    Evaluacion.query.delete()
+    VideoRespuesta.query.delete()
+    Ejercicio_Sesion.query.delete()
+    db.session.commit()
 
-        for pid, prid in vinculaciones:
-            num_sesiones = random.randint(6, 10)
+    for s in sesiones:
+        num_ejercicios = random.randint(2, 4)
+        selected_ej = random.sample(ejercicios, num_ejercicios)
 
-            for j in range(num_sesiones):
-                if j < num_sesiones * 0.5:
-                    estado = 'COMPLETADA'
-                    fecha_programada = date.today() - timedelta(days=random.randint(5, 90))
-                else:
-                    estado = 'PENDIENTE'
-                    fecha_programada = date.today() + timedelta(days=random.randint(1, 30))
+        for ej in selected_ej:
+            existe = Ejercicio_Sesion.query.filter_by(
+                Sesion_Id=s.Id,
+                Ejercicio_Id=ej.Id
+            ).first()
+            if existe:
+                continue
 
-                s = Sesion(
-                    Paciente_Id=pid,
-                    Profesional_Id=prid,
-                    Estado=estado,
-                    Fecha_Asignacion=fecha_programada - timedelta(days=random.randint(1, 20)),
-                    Fecha_Programada=fecha_programada
+            es = Ejercicio_Sesion(
+                Sesion_Id=s.Id,
+                Ejercicio_Id=ej.Id
+            )
+            db.session.add(es)
+
+            if s.Estado == 'COMPLETADA':
+                video_resp = VideoRespuesta(
+                    Ejercicio_Sesion_Id=es.Id,
+                    Ruta_Almacenamiento="cloudinary://<438427374897353>:<jlQrF-JJ4yAMoScxwDj78J_W3k8>@dck4l5hfp",
+                    Fecha_Expiracion=date.today() + timedelta(days=30)
                 )
-                db.session.add(s)
-                db.session.flush()
-                sesiones.append(s)
+                db.session.add(video_resp)
 
-        print("🏃‍♂️ Asignando ejercicios a sesiones...")
-        Evaluacion.query.delete()
-        VideoRespuesta.query.delete()
-        Ejercicio_Sesion.query.delete()
-        db.session.commit()  # confirmar borrado
-
-        for s in sesiones:
-            num_ejercicios = random.randint(2, 4)
-            selected_ej = random.sample(ejercicios, num_ejercicios)
-
-            for ej in selected_ej:
-                # Protección fuerte contra duplicados Sesion_Id/Ejercicio_Id
-                existe = Ejercicio_Sesion.query.filter_by(
-                    Sesion_Id=s.Id,
-                    Ejercicio_Id=ej.Id
-                ).first()
-                if existe:
-                    continue
-
-                es = Ejercicio_Sesion(
-                    Sesion_Id=s.Id,
-                    Ejercicio_Id=ej.Id
-                )
-                db.session.add(es)
-
-                if s.Estado == 'COMPLETADA':
-                    video_resp = VideoRespuesta(
+                if random.random() < 0.7:
+                    evaluacion = Evaluacion(
                         Ejercicio_Sesion_Id=es.Id,
-                        Ruta_Almacenamiento="cloudinary://<438427374897353>:<jlQrF-JJ4yAMoScxwDj78J_W3k8>@dck4l5hfp",
-                        Fecha_Expiracion=date.today() + timedelta(days=30)
+                        Puntuacion=random.randint(2, 5),
+                        Comentarios=random.choice([
+                            "Excelente ejecución del ejercicio",
+                            "Buena técnica, mantener el ritmo",
+                            "Necesita mejorar la amplitud del movimiento",
+                            "Progreso notable desde la última sesión",
+                            "Ejercicio realizado correctamente",
+                            "Se observa rigidez, aumentar frecuencia",
+                            "Muy buen control del temblor"
+                        ]),
+                        Fecha_Evaluacion=s.Fecha_Programada + timedelta(days=random.randint(1, 3))
                     )
-                    db.session.add(video_resp)
+                    db.session.add(evaluacion)
 
-                    if random.random() < 0.7:
-                        evaluacion = Evaluacion(
-                            Ejercicio_Sesion_Id=es.Id,
-                            Puntuacion=random.randint(2, 5),
-                            Comentarios=random.choice([
-                                "Excelente ejecución del ejercicio",
-                                "Buena técnica, mantener el ritmo",
-                                "Necesita mejorar la amplitud del movimiento",
-                                "Progreso notable desde la última sesión",
-                                "Ejercicio realizado correctamente",
-                                "Se observa rigidez, aumentar frecuencia",
-                                "Muy buen control del temblor"
-                            ]),
-                            Fecha_Evaluacion=s.Fecha_Programada + timedelta(days=random.randint(1, 3))
-                        )
-                        db.session.add(evaluacion)
+    db.session.commit()
 
-        db.session.commit()
+    print(f"✅ Base de datos poblada exitosamente:")
+    print(f"   👥 Usuarios totales: {len(usuarios)}")
+    print(f"   🏥 Profesionales: {len(profesionales_objs)}")
+    print(f"   🤒 Pacientes con Parkinson: {len(pacientes_objs)}")
+    print(f"   🏃‍♂️ Ejercicios específicos: {len(ejercicios)}")
+    print(f"   🔗 Vinculaciones: {len(vinculaciones)}")
+    print(f"   📅 Sesiones totales: {len(sesiones)}")
+    print(f"   ✅ Sesiones completadas: {len([s for s in sesiones if s.Estado == 'COMPLETADA'])}")
+    print(f"   ⏳ Sesiones pendientes: {len([s for s in sesiones if s.Estado == 'PENDIENTE'])}")
 
-        print(f"✅ Base de datos poblada exitosamente:")
-        print(f"   👥 Usuarios totales: {len(usuarios)}")
-        print(f"   🏥 Profesionales: {len(profesionales_objs)}")
-        print(f"   🤒 Pacientes con Parkinson: {len(pacientes_objs)}")
-        print(f"   🏃‍♂️ Ejercicios específicos: {len(ejercicios)}")
-        print(f"   🔗 Vinculaciones: {len(vinculaciones)}")
-        print(f"   📅 Sesiones totales: {len(sesiones)}")
-        print(f"   ✅ Sesiones completadas: {len([s for s in sesiones if s.Estado == 'COMPLETADA'])}")
-        print(f"   ⏳ Sesiones pendientes: {len([s for s in sesiones if s.Estado == 'PENDIENTE'])}")
 
 
 
