@@ -246,6 +246,7 @@ def poblar_datos():
         selected_ej = random.sample(ejercicios, num_ejercicios)
 
         for ej in selected_ej:
+            # Evitar duplicados Sesion_Id / Ejercicio_Id
             existe = Ejercicio_Sesion.query.filter_by(
                 Sesion_Id=s.Id,
                 Ejercicio_Id=ej.Id
@@ -258,6 +259,7 @@ def poblar_datos():
                 Ejercicio_Id=ej.Id
             )
             db.session.add(es)
+            db.session.flush()  # ← es.Id ya no es None
 
             if s.Estado == 'COMPLETADA':
                 video_resp = VideoRespuesta(
