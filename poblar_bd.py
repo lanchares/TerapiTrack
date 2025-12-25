@@ -151,13 +151,20 @@ def poblar_datos():
 
     print("🔗 Asociando ejercicios con profesionales...")
     profesionales_objs = [u for u, d in usuarios if u.Rol_Id == 2]
+
     for profesional in profesionales_objs:
         for ejercicio in ejercicios:
-            asociacion = Ejercicio_Profesional(
+            existe = Ejercicio_Profesional.query.filter_by(
                 Profesional_Id=profesional.Id,
                 Ejercicio_Id=ejercicio.Id
-            )
-            db.session.add(asociacion)
+            ).first()
+            if not existe:
+                asociacion = Ejercicio_Profesional(
+                    Profesional_Id=profesional.Id,
+                    Ejercicio_Id=ejercicio.Id
+                )
+                db.session.add(asociacion)
+
 
     print("🔗 Creando vinculaciones paciente-profesional...")
     pacientes_objs = [u for u, d in usuarios if u.Rol_Id == 1]

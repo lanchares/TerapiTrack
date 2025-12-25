@@ -13,6 +13,8 @@ import time
 from src.config import Config
 from collections import defaultdict
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import or_
+
 try:
     from moviepy.editor import VideoFileClip
 except Exception:
@@ -273,7 +275,7 @@ def crear_ejercicio():
                 clip.close()
             except Exception:
                 duracion_segundos = 0
-                
+
         nuevo_ejercicio = Ejercicio(
             Nombre=form.nombre.data,
             Descripcion=form.descripcion.data,
@@ -308,6 +310,7 @@ def crear_sesion():
     paciente_id_preseleccionado = request.args.get('paciente_id', type=int)
     form = CrearSesionDirectaForm()
 
+    # ---------- Pacientes del profesional ----------
     pacientes_ids = db.session.query(Paciente_Profesional.Paciente_Id).filter_by(
         Profesional_Id=current_user.Id
     ).distinct().all()
@@ -319,14 +322,25 @@ def crear_sesion():
     if paciente_id_preseleccionado is not None:
         form.paciente_id.data = paciente_id_preseleccionado
 
+    # ---------- Ejercicios: propios + demos ----------
+    # Ids de ejercicios demo que deben ver todos los profesionales
+    DEMO_IDS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]  # ajusta la lista a los demos que quieras
+
     ejercicios_ids = db.session.query(Ejercicio_Profesional.Ejercicio_Id).filter_by(
         Profesional_Id=current_user.Id
     ).distinct().all()
-
     ejercicios_ids = [id_tuple[0] for id_tuple in ejercicios_ids]
-    ejercicios = Ejercicio.query.filter(Ejercicio.Id.in_(ejercicios_ids)).all()
+
+    ejercicios = Ejercicio.query.filter(
+        or_(
+            Ejercicio.Id.in_(ejercicios_ids),   # ejercicios asociados al profesional
+            Ejercicio.Id.in_(DEMO_IDS)          # ejercicios demo globales
+        )
+    ).all()
+
     form.ejercicios.choices = [(e.Id, e.Nombre) for e in ejercicios]
 
+    # ---------- Crear sesión ----------
     if form.validate_on_submit():
         nueva_sesion = Sesion(
             Paciente_Id=form.paciente_id.data,
@@ -350,6 +364,7 @@ def crear_sesion():
         return redirect(url_for('profesional.listar_sesiones'))
 
     return render_template('profesional/crear_sesion.html', form=form)
+
 
 @profesional_bp.route('/sesiones')
 @login_required
