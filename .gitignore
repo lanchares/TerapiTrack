@@ -57,7 +57,8 @@ TerapiTrack.db
 pip-log.txt
 
 # IDEs y editores
-.vscode/
+.vscode/*
+!.vscode/settings.json
 .idea/
 *.swp
 *.swo
