@@ -1,0 +1,73 @@
+\capitulo{4}{Técnicas y herramientas}
+Este capítulo describe las metodologías, tecnologías y utilidades elegidas para el desarrollo de TerapiTrack, justificando cada decisión y recogiendo las principales ventajas de cada alternativa considerada.
+
+\section{Metodología de desarrollo}
+
+\subsection{Gestión ágil con Jira}
+Se optó por una organización ágil utilizando \textbf{Jira} para la planificación y el control del trabajo. Esta herramienta ha permitido dividir el proyecto en sprints y tareas distribuidas en tableros, facilitando el seguimiento del progreso real y la adaptación ágil ante imprevistos. Jira es compatible con metodologías como Scrum y Kanban, permitiendo organizar el desarrollo por etapas incrementales y gestionar incidencias de forma eficiente.
+
+
+
+\section{Tecnologías de backend}
+
+\subsection{Python y Flask}
+\textbf{Flask} ha sido el framework seleccionado para el desarrollo web backend debido a su flexibilidad, ligereza y la facilidad con la que se puede integrar con diferentes extensiones. Permite crear aplicaciones a medida y controlar con detalle la estructura de cada módulo, sin imponer capas innecesarias ni patrones rígidos. Otras plataformas como Django fueron consideradas, aunque Flask resultó más idóneo para un proyecto modular y de tamaño medio, donde la sencillez y el control sobre la arquitectura eran prioritarios.
+
+\textbf{Ventajas de Flask:}
+\begin{itemize}
+    \item Ligero, flexible y fácil de aprender
+    \item Permite una estructura de proyecto a medida
+    \item Ecosistema de extensiones muy abundante
+    \item Ideal para aplicaciones modulares y APIs RESTful
+\end{itemize}
+
+\subsection{SQLAlchemy}
+Para la interacción con la base de datos se ha implementado \textbf{SQLAlchemy}, un ORM ampliamente utilizado en el ecosistema Python. SQLAlchemy permite gestionar modelos y relaciones mediante objetos, evitando la escritura directa de SQL y facilitando la migración o ampliación futura del sistema. Su uso minimiza errores y simplifica la validación de datos, además de proporcionar portabilidad entre distintos motores de base de datos.
+
+\subsection{Alternativas}
+Se evaluó el uso de otras bibliotecas ORM y la manipulación directa con SQL clásico, pero se descartaron para evitar redundancia y riesgos de inconsistencia.
+
+\section{Gestión de datos}
+
+\subsection{Base de datos: SQLite}
+Durante el desarrollo se ha empleado \textbf{SQLite} por su sencillez y portabilidad (no requiere servidor y almacena toda la información en un solo archivo), idónea para pruebas y prototipos rápidos.
+
+\subsection{Herramienta complementaria: DB Browser for SQLite}
+Durante la fase inicial, DB Browser for SQLite facilitó la visualización y depuración de la base de datos desde un entorno gráfico.
+
+\section{Tecnologías de frontend}
+
+\subsection{Bootswatch}
+El diseño y la apariencia de la interfaz de TerapiTrack se basan en \textbf{Bootswatch}, una colección de temas CSS construidos sobre Bootstrap. Esta decisión permitió aplicar rápidamente estilos accesibles y coherentes, favoreciendo la navegación intuitiva y el cumplimiento de estándares WCAG de accesibilidad web.
+
+\subsection{HTML5, JavaScript y Jinja}
+Se empleó \textbf{HTML5} como base estructural de las páginas, \textbf{JavaScript} para funcionalidades interactivas y la grabación web, y el motor \textbf{Jinja} para el renderizado dinámico del frontend en Flask. La combinación de estas tecnologías aporta flexibilidad y compatibilidad con todos los navegadores modernos.
+
+\section{Testing y aseguramiento de la calidad}
+
+\subsection{Pytest}
+El testeo automatizado se llevó a cabo con \textbf{Pytest}, por su sintaxis sencilla, el soporte de fixtures reutilizables y la facilidad para parametrizar y agrupar pruebas. Esta herramienta ha permitido obtener cobertura completa en los módulos críticos y facilita la detección precoz de errores antes del despliegue.
+
+\section{Despliegue e infraestructura}
+
+\subsection{Heroku}
+\textbf{Heroku} se eligió como plataforma de despliegue por su facilidad de uso, integración con Git y escalado automático de recursos según la carga de trabajo. El sistema de despliegue continuo con \textit{git push} agiliza las pruebas y actualizaciones en entornos cloud, permitiendo centrarse en la funcionalidad sin preocuparse por la gestión del servidor.
+
+\section{Control de versiones y colaboración}
+
+\subsection{Git y GitHub}
+Toda la gestión del código se apoyó en \textbf{Git} como sistema distribuido de control de versiones y \textbf{GitHub} como repositorio central, lo que facilitó el trabajo colaborativo y la trazabilidad de los cambios a lo largo de todas las iteraciones. El uso de GitHub permitió registrar issues, realizar revisiones de código y mantener sincronizado el trabajo entre las distintas ramas del repositorio.
+
+\section{Otras herramientas de desarrollo}
+
+\begin{itemize}
+\item \textbf{Visual Studio Code}: Entorno principal de edición y depuración, con extensiones dedicadas para Python, Flask y control de versiones.
+\item \textbf{Overleaf}: Redacción colaborativa de esta memoria en LaTeX, facilitando la organización de capítulos y anexos.
+\item \textbf{Draw.io}: Creación de diagramas para representar la arquitectura y el flujo de datos del sistema.
+\end{itemize}
+
+\section{Comparativas y justificación de elecciones}
+
+A lo largo del desarrollo, se compararon tecnologías tanto por facilidad de integración como por el soporte ofrecido por la comunidad, documentación y curva de aprendizaje. Herramientas como Flask y SQLAlchemy se adaptaron perfectamente a los requisitos de modularidad y personalización, mientras que plataformas como Heroku y GitHub ofrecieron un entorno sencillo y ágil para desplegar y gestionar el ciclo de vida completo del proyecto.
+
+Este conjunto de herramientas ha permitido desarrollar TerapiTrack de forma organizada, eficiente y con una sólida base para abordar futuras escalas y mejoras del sistema.

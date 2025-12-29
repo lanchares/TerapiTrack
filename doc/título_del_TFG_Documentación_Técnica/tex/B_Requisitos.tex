@@ -1,0 +1,580 @@
+\apendice{Especificación de Requisitos}
+
+\section{Introducción}
+
+En este anexo se recogen los requisitos funcionales y no funcionales definidos para el desarrollo de \textit{TerapiTrack}, así como la especificación detallada de los casos de uso principales del sistema.
+
+Estos requisitos se elaboraron durante la fase de análisis y diseño del proyecto, a partir de los objetivos generales y del contexto de uso descritos en la memoria. A partir de ellos se ha ido tomando decisiones sobre la arquitectura y la implementación de la aplicación web, de manera que cada módulo desarrollado responde a necesidades previamente identificadas y no a decisiones improvisadas durante la programación.
+
+\section{Objetivos generales}
+El sistema persigue los siguientes objetivos principales:
+\begin{itemize}
+    \item Facilitar el acceso a servicios de rehabilitación especializada para pacientes en entornos rurales.
+    \item Ofrecer una plataforma accesible y fácil de usar para personas con dificultades motoras o cognitivas.
+    \item Permitir el seguimiento remoto y personalizado por parte de profesionales sanitarios.
+    \item Garantizar la seguridad y confidencialidad de los datos médicos.
+    \item Mejorar el proceso de evaluación y seguimiento terapéutico mediante el uso de tecnologías digitales.
+\end{itemize}
+
+\section{Catálogo de requisitos}
+
+\subsection{Requisitos funcionales}
+
+\subsubsection{RF1: Gestión de usuarios}
+\begin{itemize}
+  \item \textbf{RF1.1}: El administrador creará usuarios asignándoles roles específicos (administrador, paciente, médico, terapeuta, psicólogo, enfermero) mediante formulario validado.
+  \item \textbf{RF1.2}: El administrador activará o desactivará cuentas mediante cambio de estado, enviando notificación al afectado.
+  \item \textbf{RF1.3}: El administrador vinculará pacientes con profesionales sanitarios mediante interfaz de asignación directa.
+  \item \textbf{RF1.4}: Los usuarios accederán mediante autenticación email/contraseña con sesiones temporales según rol.
+\end{itemize}
+
+\subsubsection{RF2: Gestión de ejercicios}
+\begin{itemize}
+  \item \textbf{RF2.1}: Los profesionales cargarán vídeos de ejercicios optimizados para visualización estándar.
+  \item \textbf{RF2.2}: Los pacientes visualizarán ejercicios filtrados según necesidades terapéuticas y condición médica.
+\end{itemize}
+
+\subsubsection{RF3: Gestión de sesiones}
+\begin{itemize}
+  \item \textbf{RF3.1}: Los profesionales crearán sesiones seleccionando ejercicios y definiendo orden, duración y objetivos.
+  \item \textbf{RF3.2}: Los profesionales asignarán sesiones a pacientes con fechas y horarios programados.
+  \item \textbf{RF3.3}: Los pacientes accederán a sesiones programadas desde fecha actual hasta el mes siguiente.
+  \item \textbf{RF3.4}: El sistema registrará automáticamente marcas temporales de cada ejercicio durante la sesión.
+\end{itemize}
+
+\subsubsection{RF4: Seguimiento y evaluación}
+\begin{itemize}
+  \item \textbf{RF4.1}: El sistema grabará automáticamente la ejecución de ejercicios mediante cámara del dispositivo.
+  \item \textbf{RF4.2}: El sistema almacenará vídeos con identificador único vinculado a sesión y ejercicio.
+  \item \textbf{RF4.3}: Los profesionales reproducirán vídeos grabados desde panel de evaluación.
+  \item \textbf{RF4.4}: Los profesionales evaluarán desempeño mediante puntuación (1–5) y comentarios.
+  \item \textbf{RF4.5}: Los pacientes consultarán evaluaciones históricas con puntuaciones y comentarios.
+  \item \textbf{RF4.6}: El sistema generará gráficos de progresión temporal para visualizar evolución.
+\end{itemize}
+
+\subsubsection{RF5: Configuración del sistema}
+\begin{itemize}
+  \item \textbf{RF5.1}: El administrador establecerá políticas de retención de vídeos según necesidades institucionales.
+\end{itemize}
+
+\subsubsection{RF6: Interfaz de usuario}
+\begin{itemize}
+  \item \textbf{RF6.1}: La interfaz funcionará con controles simplificados adaptados a dispositivos de entrada limitados.
+  \item \textbf{RF6.2}: Los pacientes visualizarán simultáneamente vídeo ejemplo y grabación en pantalla dividida.
+\end{itemize}
+
+\subsection{Requisitos no funcionales}
+
+\subsubsection{RNF1: Usabilidad}
+\begin{itemize}
+  \item \textbf{RNF1.1}: Interfaz diseñada para personas con dificultades motoras, con elementos visuales accesibles.
+  \item \textbf{RNF1.2}: Flujos optimizados para minimizar pasos en tareas principales.
+  \item \textbf{RNF1.3}: Navegación coherente permitiendo identificar posición en la aplicación.
+  \item \textbf{RNF1.4}: Sesión de acceso gestionada por personal autorizado, sin autenticación manual recurrente.
+\end{itemize}
+
+\subsubsection{RNF2: Rendimiento}
+\begin{itemize}
+  \item \textbf{RNF2.1}: Gestión eficiente de archivos multimedia adaptada a conectividad habitual.
+  \item \textbf{RNF2.2}: Respuesta ágil de páginas y funcionalidades bajo condiciones normales.
+  \item \textbf{RNF2.3}: Comportamiento estable ante concurrencia de múltiples usuarios.
+\end{itemize}
+
+\subsubsection{RNF3: Seguridad}
+\begin{itemize}
+  \item \textbf{RNF3.1}: Almacenamiento seguro de credenciales mediante cifrado adecuado.
+  \item \textbf{RNF3.2}: Acceso restringido según roles garantizando confidencialidad de datos.
+  \item \textbf{RNF3.3}: Comunicaciones protegidas mediante protocolos de cifrado estándar.
+  \item \textbf{RNF3.4}: Mecanismos de auditoría para registrar accesos a información sensible.
+\end{itemize}
+
+\subsubsection{RNF4: Disponibilidad}
+\begin{itemize}
+  \item \textbf{RNF4.1}: Accesibilidad en periodos necesarios para actividad asistencial.
+  \item \textbf{RNF4.2}: Procedimientos de recuperación minimizando tiempo de indisponibilidad.
+\end{itemize}
+
+\subsubsection{RNF5: Mantenibilidad}
+\begin{itemize}
+  \item \textbf{RNF5.1}: Arquitectura basada en separación de responsabilidades.
+  \item \textbf{RNF5.2}: Registros de actividad para análisis y diagnóstico de incidencias.
+\end{itemize}
+
+\raggedbottom        
+\setlength{\parskip}{0pt}
+
+\section{Especificación de requisitos}
+
+Esta sección recoge los principales casos de uso del sistema y define cómo interactúan los actores con la aplicación para satisfacer los requisitos funcionales descritos en el catálogo anterior. Cada caso de uso se presenta de forma estructurada, indicando sus precondiciones, flujo de acciones, postcondiciones y relación con los requisitos asociados.
+
+\subsection{Actores del sistema}
+
+En el sistema \textit{TerapiTrack} intervienen los siguientes actores principales:
+
+\begin{itemize}
+  \item \textbf{Administrador}: Gestiona los usuarios de la plataforma, las configuraciones globales y las vinculaciones entre pacientes y profesionales.
+  \item \textbf{Profesional sanitario}: Médico, terapeuta, psicólogo o enfermero responsable de planificar, programar y evaluar las sesiones terapéuticas de sus pacientes.
+  \item \textbf{Paciente}: Usuario final que realiza los ejercicios prescritos, completa las sesiones programadas y consulta su evolución a lo largo del tratamiento.
+\end{itemize}
+
+\subsection{Diagrama de casos de uso}
+
+En la Figura \ref{fig:casos-uso-terapitrack} se representa de forma global
+cómo interactúan los actores con los principales casos de uso del sistema,
+agrupados por módulos funcionales.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1.1\textwidth,height=2.7\textheight,keepaspectratio]{Diagrama_CasosDeUso.png}
+  \caption{Diagrama de casos de uso del sistema \textit{TerapiTrack}.}
+  \label{fig:casos-uso-terapitrack}
+\end{figure}
+
+% Caso de Uso 1 -> Iniciar sesión
+\begin{table}[p]
+\centering
+\begin{tabularx}{\linewidth}{ p{0.21\columnwidth} p{0.71\columnwidth} }
+\toprule
+\textbf{CU-1} & \textbf{Iniciar sesión}\\
+\toprule
+\textbf{Versión} & 1.0 \\
+\textbf{Autor} & Alberto Lanchares Diez \\
+\textbf{R. Asociados} & RF1.4 \\
+\textbf{Descripción} & Autenticación en el sistema según rol del usuario \\
+\textbf{Precondición} & Usuario registrado y cuenta activa \\
+\textbf{Acciones} &
+\begin{enumerate}[nosep]
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item El usuario introduce correo y contraseña
+\item El sistema valida las credenciales y estado de cuenta
+\item El sistema redirige al panel correspondiente según rol
+\end{enumerate}\\
+\textbf{Postcondición} & Usuario autenticado con permisos según su rol \\
+\textbf{Excepciones} & Credenciales incorrectas, cuenta inactiva \\
+\textbf{Importancia} & Alta \\
+\bottomrule
+\end{tabularx}
+\caption{CU-1 Iniciar sesión.}
+\end{table}
+% Caso de Uso 2.1 -> Crear usuario
+\begin{table}[p]
+\centering
+\begin{tabularx}{\linewidth}{ p{0.21\columnwidth} p{0.71\columnwidth} }
+\toprule
+\textbf{CU-2.1} & \textbf{Crear usuario}\\
+\toprule
+\textbf{Versión} & 1.0 \\
+\textbf{Autor} & Alberto Lanchares Diez \\
+\textbf{R. Asociados} & RF1.1 \\
+\textbf{Descripción} & Registrar nuevo usuario en el sistema \\
+\textbf{Precondición} & Administrador autenticado (CU-1) \\
+\textbf{Acciones} &
+\begin{enumerate}[nosep]
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item Accede al formulario de alta
+\item Introduce datos personales (nombre, apellidos, email)
+\item Asigna contraseña
+\item Selecciona rol (Administrador/Profesional/Paciente)
+\item Si es Profesional: selecciona tipo y especialidad
+\item Si es Paciente: registra fecha nacimiento y condición médica
+\item El sistema valida los datos y crea el usuario
+\end{enumerate}\\
+\textbf{Postcondición} & Usuario creado en estado activo \\
+\textbf{Excepciones} & Datos inválidos: sistema muestra errores de validación \\
+\textbf{Importancia} & Alta \\
+\bottomrule
+\end{tabularx}
+\caption{CU-2.1 Crear usuario.}
+\end{table}
+% Caso de Uso 2.2 -> Activar/desactivar usuario
+\begin{table}[p]
+\centering
+\begin{tabularx}{\linewidth}{ p{0.21\columnwidth} p{0.71\columnwidth} }
+\toprule
+\textbf{CU-2.2} & \textbf{Activar/desactivar usuario}\\
+\toprule
+\textbf{Versión} & 1.0 \\
+\textbf{Autor} & Alberto Lanchares Diez \\
+\textbf{R. Asociados} & RF1.2 \\
+\textbf{Descripción} & Modificar el estado de acceso de un usuario \\
+\textbf{Precondición} & Administrador autenticado (CU-1), usuario existente \\
+\textbf{Acciones} &
+\begin{enumerate}[nosep]
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item Busca y selecciona usuario
+\item Modifica estado (activo/inactivo)
+\item El sistema actualiza estado y envía notificación al usuario
+\end{enumerate}\\
+\textbf{Postcondición} & Estado de usuario actualizado \\
+\textbf{Excepciones} & Ninguna \\
+\textbf{Importancia} & Media \\
+\bottomrule
+\end{tabularx}
+\caption{CU-2.2 Activar/desactivar usuario.}
+\end{table}
+% Caso de Uso 2.3 -> Vincular paciente con profesional
+\begin{table}[p]
+\centering
+\begin{tabularx}{\linewidth}{ p{0.21\columnwidth} p{0.71\columnwidth} }
+\toprule
+\textbf{CU-2.3} & \textbf{Vincular paciente con profesional}\\
+\toprule
+\textbf{Versión} & 1.0 \\
+\textbf{Autor} & Alberto Lanchares Diez \\
+\textbf{R. Asociados} & RF1.3 \\
+\textbf{Descripción} & Establecer relación terapéutica entre profesional y paciente \\
+\textbf{Precondición} & Administrador autenticado (CU-1), ambos usuarios activos \\
+\textbf{Acciones} &
+\begin{enumerate}[nosep]
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item Selecciona profesional
+\item Selecciona paciente de la lista disponible
+\item Confirma vinculación y asigna fecha de inicio
+\item El sistema registra la relación en la base de datos
+\end{enumerate}\\
+\textbf{Postcondición} & Relación establecida; el profesional puede gestionar al paciente \\
+\textbf{Excepciones} & Ninguna \\
+\textbf{Importancia} & Alta \\
+\bottomrule
+\end{tabularx}
+\caption{CU-2.3 Vincular paciente con profesional.}
+\end{table}
+% Caso de Uso 3 -> Configurar sistema
+\begin{table}[p]
+\centering
+\begin{tabularx}{\linewidth}{ p{0.21\columnwidth} p{0.71\columnwidth} }
+\toprule
+\textbf{CU-3} & \textbf{Configurar sistema}\\
+\toprule
+\textbf{Versión} & 1.0 \\
+\textbf{Autor} & Alberto Lanchares Diez \\
+\textbf{R. Asociados} & RF5.1 \\
+\textbf{Descripción} & Definir parámetros de configuración global \\
+\textbf{Precondición} & Administrador autenticado (CU-1) \\
+\textbf{Acciones} &
+\begin{enumerate}[nosep]
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item Accede al panel de configuración
+\item Configura parámetros del sistema (política de retención de vídeos)
+\item El sistema valida y guarda la configuración
+\end{enumerate}\\
+\textbf{Postcondición} & Configuración actualizada \\
+\textbf{Excepciones} & Ninguna \\
+\textbf{Importancia} & Media \\
+\bottomrule
+\end{tabularx}
+\caption{CU-3 Configurar sistema.}
+\end{table}
+% Caso de Uso 4.1 -> Crear ejercicio
+\begin{table}[p]
+\centering
+\begin{tabularx}{\linewidth}{ p{0.21\columnwidth} p{0.71\columnwidth} }
+\toprule
+\textbf{CU-4.1} & \textbf{Crear ejercicio}\\
+\toprule
+\textbf{Versión} & 1.0 \\
+\textbf{Autor} & Alberto Lanchares Diez \\
+\textbf{R. Asociados} & RF2.1 \\
+\textbf{Descripción} & Añadir nuevo ejercicio al sistema \\
+\textbf{Precondición} & Profesional autenticado (CU-1) \\
+\textbf{Acciones} &
+\begin{enumerate}[nosep]
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item Accede al formulario de creación
+\item Sube vídeo demostrativo
+\item Introduce nombre, descripción, tipo y duración
+\item El sistema valida el formato y almacena el ejercicio
+\end{enumerate}\\
+\textbf{Postcondición} & Ejercicio disponible en la biblioteca del profesional \\
+\textbf{Excepciones} & Ninguna \\
+\textbf{Importancia} & Alta \\
+\bottomrule
+\end{tabularx}
+\caption{CU-4.1 Crear ejercicio.}
+\end{table}
+% Caso de Uso 4.2 -> Consultar biblioteca de ejercicios
+\begin{table}[p]
+\centering
+\begin{tabularx}{\linewidth}{ p{0.21\columnwidth} p{0.71\columnwidth} }
+\toprule
+\textbf{CU-4.2} & \textbf{Consultar biblioteca de ejercicios}\\
+\toprule
+\textbf{Versión} & 1.0 \\
+\textbf{Autor} & Alberto Lanchares Diez \\
+\textbf{R. Asociados} & RF2.2 \\
+\textbf{Descripción} & Visualizar ejercicios disponibles según perfil \\
+\textbf{Precondición} & Usuario autenticado (CU-1) \\
+\textbf{Acciones} &
+\begin{enumerate}[nosep]
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item Profesional: filtra ejercicios por tipo, duración, condición médica
+\item Profesional: ordena por popularidad o eficacia
+\item Profesional: visualiza detalles y vídeos de cada ejercicio
+\item Paciente: accede mediante navegación secuencial
+\item Paciente: visualiza únicamente ejercicios de sus sesiones pasadas
+\end{enumerate}\\
+\textbf{Postcondición} & Información del ejercicio accesible según permisos \\
+\textbf{Excepciones} & Ninguna \\
+\textbf{Importancia} & Media \\
+\bottomrule
+\end{tabularx}
+\caption{CU-4.2 Consultar biblioteca de ejercicios.}
+\end{table}
+% Caso de Uso 5.1 -> Crear sesión terapéutica
+\begin{table}[p]
+\centering
+\begin{tabularx}{\linewidth}{ p{0.21\columnwidth} p{0.71\columnwidth} }
+\toprule
+\textbf{CU-5.1} & \textbf{Crear sesión terapéutica}\\
+\toprule
+\textbf{Versión} & 1.0 \\
+\textbf{Autor} & Alberto Lanchares Diez \\
+\textbf{R. Asociados} & RF3.1 \\
+\textbf{Descripción} & Definir conjunto de ejercicios secuenciales \\
+\textbf{Precondición} & Profesional autenticado (CU-1), ejercicios disponibles \\
+\textbf{Acciones} &
+\begin{enumerate}[nosep]
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item Accede al creador de sesiones
+\item Selecciona ejercicios de la biblioteca (CU-4.2)
+\item Establece orden y objetivo terapéutico
+\item El sistema valida y guarda la sesión
+\end{enumerate}\\
+\textbf{Postcondición} & Sesión creada y lista para asignar \\
+\textbf{Excepciones} & Ninguna \\
+\textbf{Importancia} & Alta \\
+\bottomrule
+\end{tabularx}
+\caption{CU-5.1 Crear sesión terapéutica.}
+\end{table}
+% Caso de Uso 5.2 -> Asignar sesión a paciente
+\begin{table}[p]
+\centering
+\begin{tabularx}{\linewidth}{ p{0.21\columnwidth} p{0.71\columnwidth} }
+\toprule
+\textbf{CU-5.2} & \textbf{Asignar sesión a paciente}\\
+\toprule
+\textbf{Versión} & 1.0 \\
+\textbf{Autor} & Alberto Lanchares Diez \\
+\textbf{R. Asociados} & RF3.2 \\
+\textbf{Descripción} & Programar sesión para un paciente específico \\
+\textbf{Precondición} & Profesional autenticado (CU-1), paciente vinculado, sesión creada \\
+\textbf{Acciones} &
+\begin{enumerate}[nosep]
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item Selecciona paciente de su lista
+\item Selecciona sesión creada previamente
+\item Define fecha y hora programada
+\item El sistema agenda la sesión y notifica al paciente
+\end{enumerate}\\
+\textbf{Postcondición} & Sesión asignada con estado "Pendiente" \\
+\textbf{Excepciones} & Ninguna \\
+\textbf{Importancia} & Alta \\
+\bottomrule
+\end{tabularx}
+\caption{CU-5.2 Asignar sesión a paciente.}
+\end{table}
+% Caso de Uso 5.3 -> Consultar sesiones programadas
+\begin{table}[p]
+\centering
+\begin{tabularx}{\linewidth}{ p{0.21\columnwidth} p{0.71\columnwidth} }
+\toprule
+\textbf{CU-5.3} & \textbf{Consultar sesiones programadas}\\
+\toprule
+\textbf{Versión} & 1.0 \\
+\textbf{Autor} & Alberto Lanchares Diez \\
+\textbf{R. Asociados} & RF3.3 \\
+\textbf{Descripción} & Visualizar calendario de sesiones \\
+\textbf{Precondición} & Usuario autenticado (CU-1) \\
+\textbf{Acciones} &
+\begin{enumerate}[nosep]
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item Paciente: visualiza sus sesiones pendientes y completadas
+\item Profesional: visualiza todas las sesiones asignadas a sus pacientes
+\item Ambos pueden filtrar por estado (pendiente, completada, cancelada)
+\end{enumerate}\\
+\textbf{Postcondición} & Información de sesiones disponible \\
+\textbf{Excepciones} & Ninguna \\
+\textbf{Importancia} & Media \\
+\bottomrule
+\end{tabularx}
+\caption{CU-5.3 Consultar sesiones programadas.}
+\end{table}
+% Caso de Uso 6 -> Realizar sesión
+\begin{table}[p]
+\centering
+\begin{tabularx}{\linewidth}{ p{0.21\columnwidth} p{0.71\columnwidth} }
+\toprule
+\textbf{CU-6} & \textbf{Realizar sesión}\\
+\toprule
+\textbf{Versión} & 1.0 \\
+\textbf{Autor} & Alberto Lanchares Diez \\
+\textbf{R. Asociados} & RF3.4, RF6.1, RF6.2 \\
+\textbf{Descripción} & Completar sesión terapéutica con grabación \\
+\textbf{Precondición} & Paciente autenticado (CU-1), sesión programada \\
+\textbf{Acciones} &
+\begin{enumerate}[nosep]
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item Selecciona sesión pendiente
+\item El sistema muestra interfaz dividida (vídeo + cámara)
+\item Inicia secuencia de ejercicios con controles
+\item El sistema registra marcas temporales y graba automáticamente (CU-7)
+\item Actualiza el estado de la sesión a Completada
+\end{enumerate}\\
+\textbf{Postcondición} & Sesión completada, vídeos almacenados \\
+\textbf{Excepciones} & Ninguna \\
+\textbf{Importancia} & Alta \\
+\bottomrule
+\end{tabularx}
+\caption{CU-6 Realizar sesión.}
+\end{table}
+% Caso de Uso 7 -> Grabar respuesta de ejercicio
+\begin{table}[p]
+\centering
+\begin{tabularx}{\linewidth}{ p{0.21\columnwidth} p{0.71\columnwidth} }
+\toprule
+\textbf{CU-7} & \textbf{Grabar respuesta de ejercicio}\\
+\toprule
+\textbf{Versión} & 1.0 \\
+\textbf{Autor} & Alberto Lanchares Diez \\
+\textbf{R. Asociados} & RF4.1, RF4.2 \\
+\textbf{Descripción} & Almacenar vídeo de ejecución del ejercicio \\
+\textbf{Precondición} & Sesión en progreso, cámara activa \\
+\textbf{Acciones} &
+\begin{enumerate}[nosep]
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item El sistema inicia grabación al comenzar la sesión
+\item Registra fecha de grabación y calcula fecha de expiración
+\item Al finalizar el ejercicio, detiene la grabación
+\item Almacena el vídeo 
+\item Genera URL de almacenamiento
+\end{enumerate}\\
+\textbf{Postcondición} & Video\_Respuesta almacenado y accesible para evaluación \\
+\textbf{Excepciones} & Ninguna \\
+\textbf{Importancia} & Alta \\
+\bottomrule
+\end{tabularx}
+\caption{CU-7 Grabar respuesta de ejercicio.}
+\end{table}
+% Caso de Uso 8.1 -> Visualizar vídeos de respuesta
+\begin{table}[p]
+\centering
+\begin{tabularx}{\linewidth}{ p{0.21\columnwidth} p{0.71\columnwidth} }
+\toprule
+\textbf{CU-8.1} & \textbf{Visualizar vídeos de respuesta}\\
+\toprule
+\textbf{Versión} & 1.0 \\
+\textbf{Autor} & Alberto Lanchares Diez \\
+\textbf{R. Asociados} & RF4.3 \\
+\textbf{Descripción} & Revisar ejecución del paciente \\
+\textbf{Precondición} & Profesional autenticado (CU-1), sesión completada \\
+\textbf{Acciones} &
+\begin{enumerate}[nosep]
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item Selecciona paciente y sesión
+\item El sistema muestra lista de ejercicios grabados
+\item Selecciona ejercicio específico
+\item Reproduce vídeo con controles estándar
+\end{enumerate}\\
+\textbf{Postcondición} & Vídeo visualizado, listo para evaluar \\
+\textbf{Excepciones} & Ninguna \\
+\textbf{Importancia} & Alta \\
+\bottomrule
+\end{tabularx}
+\caption{CU-8.1 Visualizar vídeos de respuesta.}
+\end{table}
+% Caso de Uso 8.2 -> Registrar evaluación
+\begin{table}[p]
+\centering
+\begin{tabularx}{\linewidth}{ p{0.21\columnwidth} p{0.71\columnwidth} }
+\toprule
+\textbf{CU-8.2} & \textbf{Registrar evaluación}\\
+\toprule
+\textbf{Versión} & 1.0 \\
+\textbf{Autor} & Alberto Lanchares Diez \\
+\textbf{R. Asociados} & RF4.4 \\
+\textbf{Descripción} & Calificar y comentar ejecución del paciente \\
+\textbf{Precondición} & Vídeo visualizado (CU-8.1) \\
+\textbf{Acciones} &
+\begin{enumerate}[nosep]
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item Asigna puntuación (1-5)
+\item Añade comentarios específicos
+\item Registra fecha de evaluación
+\item El sistema almacena evaluación y la deja disponible para el paciente
+\end{enumerate}\\
+\textbf{Postcondición} & Evaluación accesible para el paciente y el profesional \\
+\textbf{Excepciones} & Ninguna \\
+\textbf{Importancia} & Alta \\
+\bottomrule
+\end{tabularx}
+\caption{CU-8.2 Registrar evaluación.}
+\end{table}
+% Caso de Uso 9.1 -> Ver historial de evaluaciones
+\begin{table}[p]
+\centering
+\begin{tabularx}{\linewidth}{ p{0.21\columnwidth} p{0.71\columnwidth} }
+\toprule
+\textbf{CU-9.1} & \textbf{Ver historial de evaluaciones}\\
+\toprule
+\textbf{Versión} & 1.0 \\
+\textbf{Autor} & Alberto Lanchares Diez \\
+\textbf{R. Asociados} & RF4.5 \\
+\textbf{Descripción} & Consultar evaluaciones anteriores \\
+\textbf{Precondición} & Usuario autenticado (CU-1), evaluaciones existentes \\
+\textbf{Acciones} &
+\begin{enumerate}[nosep]
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item Selecciona periodo de tiempo
+\item El sistema muestra lista de evaluaciones ordenadas cronológicamente
+\item Visualiza puntuación y comentarios para cada ejercicio
+\end{enumerate}\\
+\textbf{Postcondición} & Información histórica accesible \\
+\textbf{Excepciones} & Ninguna \\
+\textbf{Importancia} & Media \\
+\bottomrule
+\end{tabularx}
+\caption{CU-9.1 Ver historial de evaluaciones.}
+\end{table}
+% Caso de Uso 9.2 -> Visualizar gráficos de progreso
+\begin{table}[p]
+\centering
+\begin{tabularx}{\linewidth}{ p{0.21\columnwidth} p{0.71\columnwidth} }
+\toprule
+\textbf{CU-9.2} & \textbf{Visualizar gráficos de progreso}\\
+\toprule
+\textbf{Versión} & 1.0 \\
+\textbf{Autor} & Alberto Lanchares Diez \\
+\textbf{R. Asociados} & RF4.6 \\
+\textbf{Descripción} & Analizar evolución temporal del desempeño \\
+\textbf{Precondición} & Usuario autenticado (CU-1), múltiples evaluaciones \\
+\textbf{Acciones} &
+\begin{enumerate}[nosep]
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item Selecciona tipo de gráfico y periodo
+\item El sistema genera visualización con puntuaciones a lo largo del tiempo
+\item Muestra datos estadísticos relevantes
+\end{enumerate}\\
+\textbf{Postcondición} & Análisis visual disponible \\
+\textbf{Excepciones} & Ninguna \\
+\textbf{Importancia} & Media \\
+\bottomrule
+\end{tabularx}
+\caption{CU-9.2 Visualizar gráficos de progreso.}
+\end{table}

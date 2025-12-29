@@ -1,24 +1,100 @@
-# Entornos virtuales
+# Entornos virtuales de Python
 venv/
 env/
 ENV/
 .venv/
+env.bak/
+venv.bak/
 
 # Archivos compilados de Python
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Distribuciones de Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 
 # Directorio de instancia de Flask
 instance/
+*.db
 
-# Archivos de configuración sensibles (variables de entorno)
+# Archivos de configuración sensibles
 .env
+.env.local
+.env.*.local
 
-# Caché generada por pytest y coverage
+# Caché de pytest y coverage
 .pytest_cache/
 .coverage
+.coverage.*
 htmlcov/
+.tox/
+.nox/
 
-# Otros archivos generados automáticamente
-__pycache__/
+# Base de datos SQLite
+*.sqlite
+*.sqlite3
+TerapiTrack.db
 
+# Archivos de log
+*.log
+pip-log.txt
+
+# IDEs y editores
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+*~
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Archivos subidos por usuarios (vídeos de respuestas de pacientes)
+src/static/uploads/respuestas/*.webm
+src/static/uploads/respuestas/*.mp4
+src/static/uploads/respuestas/*.avi
+
+# Mantener la carpeta pero no el contenido
+!src/static/uploads/respuestas/.gitkeep
+!src/static/uploads/ejercicios/.gitkeep
+!src/static/videos/.gitkeep
+
+# Documentación LaTeX temporal
+doc/*.aux
+doc/*.log
+doc/*.out
+doc/*.toc
+doc/*.synctex.gz
+doc/*.fdb_latexmk
+doc/*.fls
+doc/*.bbl
+doc/*.blg
+
+# PDFs generados (descomenta si NO quieres subirlos)
+# doc/*.pdf
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+
+# Configuraciones de Heroku
+.heroku/

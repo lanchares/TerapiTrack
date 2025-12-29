@@ -1,0 +1,267 @@
+\apendice{Plan de Proyecto Software}
+\section{Introducción}
+
+Este anexo describe el plan de proyecto seguido para el desarrollo de TerapiTrack, incluyendo la planificación temporal del trabajo y el estudio de viabilidad correspondiente. El propósito es mostrar de forma ordenada cómo se ha organizado el proceso de desarrollo para alcanzar los objetivos planteados y justificar que el proyecto resulta asumible desde el punto de vista económico y adecuado en términos legales, teniendo en cuenta que se tratan datos de carácter sanitario.
+
+\section{Planificación temporal}
+El desarrollo de \textit{TerapiTrack} se gestionó mediante una metodología ágil, basada principalmente en Scrum, empleando Jira para la organización y seguimiento de tareas. Aunque la planificación inicial se estructuró en sprints, el avance práctico fue flexible y se adaptó constantemente al progreso real y a los retos técnicos del desarrollo individual. Por ello, la documentación en Jira refleja tanto la hoja de ruta como los reajustes efectuados en el proyecto.
+
+El desarrollo de TerapiTrack se ha organizado siguiendo una metodología ágil inspirada en Scrum, utilizando Jira para planificar y hacer el seguimiento del trabajo. La planificación inicial se estructuró en sprints, pero el avance real se fue ajustando a medida que aparecían imprevistos técnicos y se concretaban mejor los requisitos. Por este motivo, el tablero de Jira refleja tanto la planificación prevista como los cambios introducidos durante el proyecto.
+
+Se ha dado prioridad a completar primero los módulos y tareas considerados esenciales, procurando mantener una entrega de funcionalidad lo más continua posible. En las páginas siguientes se describen los sprints realizados y se incluyen los gráficos de evolución extraídos de Jira, donde puede verse el detalle de las tareas planificadas, su fecha de finalización y la progresión del trabajo en cada iteración.
+
+Aunque se ha utilizado la estructura de sprints para organizar el proyecto, la ejecución no ha seguido de forma estricta el calendario inicial. En varios casos la mayor parte del trabajo se concentró al final del sprint y algunos se cerraron más tarde de la fecha prevista. Esto se debe a que el desarrollo se ha realizado de manera individual, lo que ha obligado a reorganizar el tiempo disponible y a reagrupar tareas. Aun así, la planificación por sprints y el uso de Jira han resultado útiles para mantener una visión global del avance y de las prioridades en cada momento, por lo que los gráficos deben interpretarse como una guía del trabajo realizado más que como una aplicación estricta de Scrum.
+
+\subsubsection{Sprint 1: Configuración inicial (11–17 marzo 2025)}
+
+Este primer sprint se dedicó a poner en marcha el entorno de trabajo y a conocer las tecnologías básicas del proyecto. Se configuró el entorno con Flask, se creó el repositorio en GitHub y se definió una estructura inicial de carpetas y dependencias. Paralelamente se revisó la documentación de Flask y Jinja y se realizaron las primeras pruebas de conexión con SQLite para comprobar la persistencia de datos.\cite{flask_doc,jinja_doc_es}
+
+Quedaron pendientes tareas como el diseño completo de la base de datos y la documentación detallada de requisitos, que se trasladaron al sprint siguiente. El gráfico burndown muestra que la mayor parte del trabajo se concentró al final del periodo, algo lógico en esta fase inicial de familiarización con las herramientas.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{img/sprint_1.png}
+  \caption{Gráfico burndown del Sprint 1 obtenido de Jira.}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{img/sprint_1_t.png}
+  \caption{Resumen de tareas del Sprint 1 en Jira.}
+\end{figure}
+
+\subsubsection{Sprint 2: Estudio (18–24 marzo 2025)}
+
+En el segundo sprint el esfuerzo se centró en profundizar en las tecnologías clave y en definir con más detalle el modelo de datos. Se completó el estudio práctico de Flask, SQLAlchemy y Jinja mediante ejemplos y pequeñas pruebas, se diseñó la base de datos y se elaboró el primer modelo entidad–relación.\cite{flask_doc,sqlalchemy_doc,jinja_doc_es} También se validó la integración entre Flask y SQLite con pruebas de lectura y escritura, apoyándose en herramientas como DB Browser for SQLite para inspeccionar la base de datos.\cite{dbbrowser_sqlite}
+
+Algunas tareas de implementación de modelos en SQLAlchemy no llegaron a completarse y se arrastraron al sprint 3, donde se terminó de consolidar la capa de datos. El burndown refleja que las finalizaciones se concentran al final del sprint, más como registro de lo realizado que como una ejecución estricta del plan diario.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{img/sprint_2.png}
+  \caption{Gráfico burndown del Sprint 2 obtenido de Jira.}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{img/sprint_2_t.png}
+  \caption{Resumen de tareas del Sprint 2 en Jira.}
+\end{figure}
+
+\subsubsection{Sprint 3: Diseño (25–31 marzo 2025)}
+
+El tercer sprint se orientó al diseño detallado del sistema y a la implementación de los primeros modelos completos. Se ampliaron y ajustaron las tablas de la base de datos, se implementaron los modelos principales (usuario, paciente, profesional) en SQLAlchemy y se comprobó la estabilidad de la integración con SQLite.\cite{sqlalchemy_doc} Además, se avanzó en el diseño de las plantillas de Jinja y se revisó la documentación de requisitos para alinearla con las decisiones tomadas.\cite{jinja_doc_es}
+
+La creación de un sistema de permisos basado en Flask-Login quedó únicamente esbozada en este sprint y se abordó con más profundidad en los siguientes.\cite{flask_login} El gráfico burndown muestra cómo gran parte de los puntos de historia se cierran hacia el final, cuando se integran y prueban los distintos elementos de diseño.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{img/sprint_3.png}
+  \caption{Gráfico burndown del Sprint 3 obtenido de Jira.}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{img/sprint_3_t.png}
+  \caption{Resumen de tareas del Sprint 3 en Jira.}
+\end{figure}
+
+\subsubsection{Sprint 4: Base de datos (2–7 abril 2025)}
+
+En el sprint 4 se consolidó el trabajo previo sobre la base de datos y se empezó a reforzar la capa de seguridad y pruebas. Se completó la definición del modelo relacional, se ajustaron las relaciones entre entidades y se mejoró la integración con SQLAlchemy.\cite{sqlalchemy_doc} También se avanzó en la definición de permisos por rol y se continuó actualizando la documentación funcional y técnica.
+
+Las pruebas unitarias sobre los modelos y la redacción sistemática de la memoria en \LaTeX{} comenzaron en este sprint pero se fueron extendiendo a los posteriores.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{img/sprint_4.png}
+  \caption{Gráfico burndown del Sprint 4 obtenido de Jira.}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{img/sprint_4_t.png}
+  \caption{Resumen de tareas del Sprint 4 en Jira.}
+\end{figure}
+
+\subsubsection{Sprint 5: Diseño de la interfaz (8–13 abril 2025)}
+
+El quinto sprint se centró en la parte visible de la aplicación. Se diseñó la interfaz de administración de usuarios, se trabajó en los formularios y en la validación básica de datos y se fueron integrando estos elementos con la capa de modelos existente.\cite{flask_doc,flask_login} También se revisaron los requisitos funcionales para asegurarse de que la interfaz cubría los flujos principales de gestión.
+
+Algunas tareas de pruebas unitarias y de depuración más exhaustiva quedaron pendientes y se trasladaron a sprints posteriores.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{img/sprint_5.png}
+  \caption{Gráfico burndown del Sprint 5 obtenido de Jira.}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{img/sprint_5_t.png}
+  \caption{Resumen de tareas del Sprint 5 en Jira.}
+\end{figure}
+
+\subsubsection{Sprint 6: Base funcional (3–9 junio 2025)}
+
+Tras una pausa en el calendario académico, el sprint 6 se dedicó a dotar al sistema de la base funcional completa. Se implementaron los modelos relacionados con ejercicios, sesiones, evaluaciones y la relación paciente–profesional, y se definieron los flujos principales de trabajo (asignación de ejercicios, registro de sesiones, evaluación, etc.). Además, se incorporó el cifrado de contraseñas con \textit{bcrypt} y se reforzó la autenticación de usuarios.\cite{flask_login}
+
+Quedaron para más adelante algunos aspectos de la interfaz de administración y parte de las pruebas automáticas. El burndown de este sprint muestra un incremento importante de trabajo completado en pocos días, reflejando que muchas tareas se habían preparado en los sprints anteriores y se integraron en este bloque.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{img/sprint_6.png}
+  \caption{Gráfico burndown del Sprint 6 obtenido de Jira.}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{img/sprint_6_t1.png}
+  \caption{Resumen de tareas del Sprint 6 (vista 1) en Jira.}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{img/sprint_6_t2.png}
+  \caption{Resumen de tareas del Sprint 6 (vista 2) en Jira.}
+\end{figure}
+
+\subsubsection{Sprint 7: Base funcional 2 (17–22 junio 2025)}
+
+En el sprint 7 se completaron y pulieron muchas de las funcionalidades introducidas en el sprint anterior. Se reforzó la seguridad (protección CSRF, gestión avanzada de sesiones), se implementaron rutas CRUD para usuarios, sesiones, ejercicios y evaluaciones, y se añadieron características clave como la subida de vídeos por parte de los profesionales y la generación de diagramas UML de apoyo.\cite{flask_login,flask_blueprints_doc} También se avanzó en la documentación de casos de uso y en la preparación de material para la memoria.
+
+Algunas pruebas unitarias siguieron abiertas y se terminaron de consolidar en la fase final del proyecto.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{img/sprint_7.png}
+  \caption{Gráfico burndown del Sprint 7 obtenido de Jira.}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{img/sprint_7_t1.png}
+  \caption{Resumen de tareas del Sprint 7 (vista 1) en Jira.}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{img/sprint_7_t2.png}
+  \caption{Resumen de tareas del Sprint 7 (vista 2) en Jira.}
+\end{figure}
+
+\subsubsection{Sprint 8: Controladores y vistas (23–29 junio 2025)}
+
+En este sprint se continuó cerrando la integración entre controladores y vistas y se añadieron funcionalidades de apoyo a la explotación diaria de la herramienta. Se completaron los paneles de gestión para profesionales y pacientes, se refinaron los decoradores de autorización, se incorporó lógica de notificaciones y se implementó el borrado automático de vídeos pasados ciertos plazos para controlar el espacio de almacenamiento.\cite{flask_blueprints_doc,realpython_blueprints} Paralelamente se realizaron ajustes en los formularios y en la validación de datos en cliente y servidor.
+
+Durante este periodo también se avanzó en tareas de documentación técnica y en la elaboración del diccionario de datos, aunque parte de este trabajo se siguió afinando después fuera del marco de los sprints. Los gráficos de Jira muestran una evolución casi plana hasta las fechas cercanas al cierre, en las que se registran la mayoría de los puntos completados, reflejando la concentración de integración y pruebas en los últimos días.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{img/sprint_8.png}
+  \caption{Gráfico burndown del Sprint 8 obtenido de Jira.}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{img/sprint_8_t1.png}
+  \caption{Resumen de tareas del Sprint 8 (vista 1) en Jira.}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{img/sprint_8_t2.png}
+  \caption{Resumen de tareas del Sprint 8 (vista 2) en Jira.}
+\end{figure}
+
+\section{Estudio de viabilidad}
+
+Antes de abordar los aspectos economicos y legales, en este apartado se valora si el proyecto \textit{TerapiTrack} seria viable en un escenario real, suponiendo que su desarrollo y despliegue se encargan a una empresa de software a partir de los requisitos y del prototipo implementado en este Trabajo Fin de Grado.
+
+\subsection{Viabilidad economica}
+
+La viabilidad economica de \textit{TerapiTrack} se ha planteado considerando un escenario en el que una empresa de desarrollo recibe el encargo de construir una solucion similar a la descrita en este TFG. En ese contexto, el sistema se concibe como una herramienta web para el seguimiento terapeutico remoto de pacientes que viven en entornos rurales o alejados de los hospitales de referencia, permitiendo que puedan realizar parte de su rehabilitacion desde casa con el apoyo de un mando tipo SNES y la supervision a distancia de profesionales sanitarios.
+
+Tomando como referencia la planificacion temporal ya ejecutada y el alcance funcional previsto, puede estimarse que el desarrollo de una primera version completa de \textit{TerapiTrack} requeriria alrededor de seis meses de trabajo de un desarrollador junior, con un esfuerzo equivalente a unas 400 horas efectivas dedicadas al proyecto. Esta estimacion incluye el analisis de requisitos, el diseno de modelos y controladores, la implementacion de vistas y formularios, la integracion con la base de datos, la logica asociada al mando, la configuracion de pruebas automatizadas y las tareas basicas de despliegue. Si se considera un coste medio en torno a 24 euros por hora para este tipo de perfil, dentro de los rangos habituales para desarrolladores web junior en Espana, el coste de personal para esta primera version se situaria aproximadamente en 9 600 euros.\cite{homiaDesarrolladorWeb}
+
+En cuanto a recursos materiales para el desarrollo, la empresa necesitara al menos un equipo de trabajo estandar (ordenador portatil o de sobremesa) valorado en torno a 1 000 euros. Suponiendo una amortizacion de tres anos y que el proyecto ocupa aproximadamente medio ano de dedicacion, el coste imputable de hardware a este desarrollo se situaria en torno a 170 euros. Ademas, para que los pacientes puedan utilizar la aplicacion en su domicilio se requiere que dispongan de un ordenador o portatil con navegador web y camara. Si se parte de portatiles de gama media-baja en torno a 400 euros por unidad y se considera un piloto inicial con dieciseis pacientes a los que se les proporciona dicho equipo, el coste de estos terminales se situaria alrededor de 6 400 euros.
+
+A estos equipos habria que sumar los mandos de juego necesarios para realizar los ejercicios. En el mercado existen packs de dos mandos USB estilo SNES con precios ajustados; por ejemplo, se puede encontrar un pack de dos mandos por 12,95 euros, lo que permite equipar a varios pacientes con un coste muy reducido por dispositivo.\cite{omniretroMandosSNES} En el escenario de dieciseis pacientes, bastaria con adquirir ocho packs de este tipo (dieciseis mandos en total), con un coste aproximado de 103,60 euros, una cifra asumible dentro del presupuesto global del proyecto.
+
+Un aspecto que ayuda a contener los costes de desarrollo es el uso intensivo de tecnologias y herramientas de codigo abierto. El backend esta desarrollado en Python utilizando Flask para la gestion de rutas y controladores, mientras que la persistencia se resuelve mediante SQLAlchemy sobre una base de datos ligera como SQLite, lo que evita costes de licenciamiento en las primeras fases del proyecto.\cite{flask_doc,sqlalchemy_doc} La interfaz web se apoya en plantillas Jinja, HTML y CSS, empleando Bootstrap y temas de Bootswatch para lograr una presentacion adaptada a las necesidades de accesibilidad de los pacientes.\cite{jinja_doc_es,bootswatch} Durante el desarrollo se utilizan herramientas de soporte como Visual Studio Code, GitHub y plataformas colaborativas de edicion en sus modalidades gratuitas, de modo que no se generan costes directos asociados a licencias de software de desarrollo.
+
+En lo relativo a costes recurrentes, los elementos mas relevantes serian la infraestructura de despliegue y el almacenamiento de los videos terapeuticos generados durante las sesiones. En una fase de pruebas o piloto, el sistema podria alojarse en planes de hosting compartido o en un pequeño servidor en la nube, suficientes para ejecutar la aplicacion Flask y la base de datos SQLite en un mismo entorno, con precios para proyectos pequenos que suelen situarse entre 2 y 15 euros al mes.\cite{hostingerHostingCoste} A esto habria que anadir el espacio necesario para almacenar los videos y un sistema basico de copias de seguridad periodicas de la base de datos y del contenido multimedia. Si se asume un escenario conservador de unos 50 euros mensuales para cubrir hosting, almacenamiento y copias de seguridad durante los ultimos meses de desarrollo y una fase piloto limitada, el coste de infraestructura para esta primera version se situaria en el entorno de 150–200 euros, en funcion de la duracion efectiva del despliegue inicial.
+
+La tabla \ref{tab:costes_terapitrack} resume de forma orientativa los principales conceptos de coste considerados para una primera version profesional de \textit{TerapiTrack} en un horizonte de unos seis meses y un piloto con dieciseis pacientes:
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{p{0.58\textwidth} r}
+\hline
+Concepto & Coste estimado \\
+\hline
+Coste de personal (400 h a 24 €/h) & 9 600 € \\
+Coste imputable de hardware de desarrollo & 170 € \\
+Dispositivos para pacientes (16 portatiles de 400 €) & 6 400 € \\
+Mandos SNES USB para pacientes (16 mandos) & 103,60 € \\
+Infraestructura y servicios (despliegue inicial) & 150–200 € \\
+\hline
+Coste total aproximado primera version & 16 423,60–16 473,60 € \\
+\hline
+\end{tabular}
+\caption{Resumen orientativo de costes de la primera version de \textit{TerapiTrack} en un escenario de seis meses de proyecto y piloto con dieciseis pacientes.}
+\label{tab:costes_terapitrack}
+\end{table}
+
+Combinando el coste de personal, la amortizacion de hardware, la provision de ordenadores y mandos para un grupo inicial de dieciseis pacientes y un presupuesto razonable de infraestructura para el despliegue inicial y una fase piloto, puede concluirse que el coste total de una primera version profesional de \textit{TerapiTrack} se situaria en torno a 16 500 euros, sin incluir servicios posteriores de soporte continuado, mantenimiento evolutivo o integracion con otros sistemas clinicos.
+
+\subsection{Viabilidad legal}
+
+El desarrollo de \textit{TerapiTrack} se ha llevado a cabo utilizando de forma casi exclusiva software libre y de código abierto, lo que ha permitido reducir significativamente los costes de licenciamiento y facilita tanto la explotación académica como un eventual despliegue profesional sin restricciones legales importantes.
+
+El backend está construido sobre Python y el microframework Flask para la gestión de rutas y controladores, mientras que la persistencia de datos se resuelve con SQLAlchemy sobre SQLite.\cite{flask_doc,sqlalchemy_doc} Estas tecnologías fundamentales se distribuyen bajo licencias permisivas de tipo BSD o MIT, que autorizan el uso, modificación y redistribución del software siempre que se mantengan los avisos de derechos de autor y las notas de licencia de los autores originales.
+
+Flask se apoya en varias bibliotecas del ecosistema Pallets que se utilizan de forma indirecta a través del framework. Werkzeug proporciona la infraestructura WSGI de bajo nivel para gestionar peticiones y respuestas HTTP, cookies y depuración. Jinja2 actúa como motor de plantillas para la generación de vistas HTML. Click gestiona la interfaz de línea de comandos, ItsDangerous se encarga de la firma segura de tokens, y MarkupSafe proporciona funciones de escape para prevenir inyecciones de código.\cite{flask_doc,jinja_doc_es} Todas estas dependencias se distribuyen bajo licencias permisivas, por lo que su presencia en el proyecto no introduce restricciones adicionales.
+
+Para el control de acceso de usuarios se emplean Flask-Login para la gestión de sesiones, Flask-WTF y WTForms para la validación de formularios, y bcrypt junto con Flask-Bcrypt para el cifrado robusto de contraseñas.\cite{flask_login} Estas herramientas se publican bajo licencias MIT o BSD, permitiendo su integración en proyectos propios sin obligación de publicar el código fuente, siempre que se conserven las atribuciones exigidas.
+
+La interacción con el mando tipo SNES se resuelve mediante Pygame, una biblioteca de código abierto basada en SDL distribuida bajo licencia LGPL. Esta licencia permite el uso en aplicaciones propietarias siempre que la biblioteca se enlace de forma dinámica. En el caso de \textit{TerapiTrack}, Pygame se utiliza sin modificar su código interno, únicamente para gestionar la comunicación con el mando, por lo que su integración es totalmente compatible con un despliegue profesional.
+
+Además de las dependencias listadas, el proyecto utiliza herramientas de desarrollo como Visual Studio Code, Git, GitHub y pytest, todas ellas accesibles bajo modalidades gratuitas o de código abierto sin coste de licencia. El análisis conjunto de todas las dependencias y herramientas confirma que \textit{TerapiTrack} es completamente viable desde el punto de vista legal, siempre que se respeten los avisos de licencia de terceros y se cumpla la normativa de protección de datos aplicable al tratamiento de información sanitaria.
+
+La tabla \ref{tab:dependencias_terapitrack} recoge el análisis de licencias de todas las dependencias principales del proyecto.
+
+\begin{table}[!ht]
+\centering
+\small
+\begin{tabular}{p{3.5cm} p{2.2cm} p{6cm}}
+\toprule
+\textbf{Dependencia} & \textbf{Versión} & \textbf{Licencia y uso} \\
+\midrule
+Flask & 3.0.0 & BSD-3-Clause. Microframework web. \\
+Werkzeug & 3.1.4 & BSD-3-Clause. Librería WSGI (uso indirecto vía Flask). \\
+Jinja2 & 3.1.2 & BSD. Motor de plantillas. \\
+SQLAlchemy & 2.0.23 & MIT. ORM para BD relacional. \\
+Flask-SQLAlchemy & 3.1.1 & BSD. Integración SQLAlchemy--Flask. \\
+SQLite & (embebido) & Dominio público. BD embebida. \\
+Flask-Login & 0.6.3 & MIT. Gestión de sesiones de usuario. \\
+Flask-WTF & 1.2.1 & BSD-3-Clause. Formularios con CSRF. \\
+WTForms & 3.1.1 & BSD-3-Clause. Validación de formularios. \\
+bcrypt & 5.0.0 & Apache-2.0. Cifrado de contraseñas. \\
+Flask-Bcrypt & 1.0.1 & BSD. Integración bcrypt--Flask. \\
+Pygame & 2.5.2 & LGPL. Comunicación con el mando SNES. \\
+Bootstrap & 5.3.x & MIT. Framework CSS para la interfaz. \\
+Bootswatch & (temas) & MIT. Colección de temas para Bootstrap. \\
+Click & 8.3.1 & BSD. CLI interna de Flask. \\
+ItsDangerous & 2.2.0 & BSD. Firma segura de tokens. \\
+MarkupSafe & 3.0.3 & BSD. Escape de HTML en plantillas. \\
+Blinker & 1.9.0 & MIT. Sistema de señales en Flask. \\
+Greenlet & 3.2.4 & MIT. Soporte de contextos ligeros. \\
+Colorama & 0.4.6 & BSD. Colores en la salida de terminal. \\
+Typing-Extensions & 4.15.0 & PSF. Tipos adicionales para Python. \\
+\bottomrule
+\end{tabular}
+\caption{Análisis de dependencias y licencias de \textit{TerapiTrack}.}
+\label{tab:dependencias_terapitrack}
+\end{table}

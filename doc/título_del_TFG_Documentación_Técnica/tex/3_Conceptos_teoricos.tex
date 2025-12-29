@@ -1,0 +1,145 @@
+\capitulo{3}{Conceptos teóricos}
+Este capítulo sintetiza los aspectos teóricos esenciales para entender la naturaleza y el desarrollo del proyecto TerapiTrack. Se abordan tanto conceptos del ámbito sanitario como fundamentos tecnológicos y de ingeniería del software aplicados durante la implementación.
+
+\section{Telemedicina y rehabilitación remota}
+
+La telemedicina hace referencia al uso de las tecnologías de la información y la comunicación para prestar servicios sanitarios a distancia. En el caso concreto de la rehabilitación, estas herramientas permiten realizar el seguimiento y diseño de terapias físicas o cognitivas sin que paciente y profesional coincidan en el mismo lugar, facilitando así la continuidad asistencial en enfermedades crónicas como el Parkinson y superando barreras geográficas.
+
+\section{Accesibilidad y usabilidad en aplicaciones sanitarias}
+
+Las aplicaciones orientadas a la salud deben contemplar criterios estrictos de accesibilidad y usabilidad para garantizar que cualquier paciente, independientemente de sus capacidades motrices o cognitivas, pueda manejar la plataforma con facilidad. Algunos principios fundamentales son:
+
+\begin{itemize}
+    \item \textbf{Perceptible}: Que todos los elementos y mensajes sean claros y apreciables por los usuarios.
+    \item \textbf{Operable}: Los controles y formularios deben ser sencillos y adaptados para personas con limitaciones motoras.
+    \item \textbf{Comprensible}: El lenguaje, la navegación y las acciones deben ser directas y sin ambigüedades.
+    \item \textbf{Robusto}: El sistema ha de ser compatible con distintos dispositivos y tecnologías de apoyo.
+\end{itemize}
+
+\section{Arquitectura Modelo-Vista-Controlador (MVC)}
+
+El patrón de diseño MVC es una estrategia habitual para el desarrollo de aplicaciones web, como TerapiTrack, y divide la lógica en tres partes diferenciadas:
+
+\begin{itemize}
+    \item \textbf{Modelo}: Encargado de la gestión y estructura de los datos (usuarios, pacientes, profesionales, ejercicios, sesiones, etc.).
+    \item \textbf{Vista}: Responsable de mostrar la información utilizando una interfaz clara, jerárquica y accesible.
+    \item \textbf{Controlador}: Interpreta las acciones del usuario, comunica modelo y vista, y coordina la lógica de la aplicación (ejemplo: iniciar sesión, asignar sesiones, evaluar ejercicios, etc.).
+\end{itemize}
+
+\section{Bases de datos relacionales y modelos de información}
+
+El almacenamiento de información clínica o terapéutica requiere garantizar la integridad, trazabilidad y seguridad de los datos. Se utilizan bases de datos relacionales (en este caso, SQLite mediante SQLAlchemy) para organizar usuarios, pacientes, profesionales, ejercicios y sesiones. Destacan dos conceptos clave:
+
+\subsection{Normalización}
+
+El proceso de normalización evita la redundancia y asegura la integridad referencial. En TerapiTrack, las tablas principales (Usuario, Paciente, Profesional, Ejercicio, Sesión) mantienen relaciones claras y funcionales entre sí.
+
+\subsection{Relaciones de muchos a muchos}
+
+Para reflejar la realidad donde un paciente puede trabajar con varios profesionales, y un ejercicio puede asignarse a muchas sesiones, se utilizan tablas intermedias que permiten una asignación flexible y transparente.
+
+\section{Tecnologías empleadas en el desarrollo del sistema}
+
+En la construcción de TerapiTrack se han utilizado las siguientes tecnologías principales:
+
+\begin{itemize}
+    \item \textbf{Flask}: Framework web en Python para la gestión de rutas y lógica de servidor (backend).
+    \item \textbf{SQLAlchemy}: Herramienta ORM que gestiona la interacción con bases de datos relacionales.
+    \item \textbf{SQLite}: Motor de base de datos embebido, ideal para pruebas y despliegues sencillos.
+    \item \textbf{Jinja}: Motor de plantillas para renderizado dinámico de vistas e interfaces HTML.
+    \item \textbf{Bootswatch}: Colección de temas para Bootstrap que facilita una apariencia visual moderna y accesible.
+    \item \textbf{Jira}: Plataforma de gestión de proyectos y seguimiento de tareas.
+    \item \textbf{GitBash} y \textbf{GitHub}: Control del versionado de código y colaboración entre desarrolladores.
+\end{itemize}
+
+\section{Consideraciones de seguridad y privacidad}
+
+Por tratarse de datos sensibles, el desarrollo tiene en cuenta aspectos de seguridad:
+
+\begin{itemize}
+    \item Cifrado de contraseñas.
+    \item Control de acceso por roles (administrador, profesional, paciente).
+    \item Políticas de retención y eliminación de vídeos terapéuticos.
+    \item Uso de sesiones y validación para autenticación segura.
+\end{itemize}
+
+\section{Buenas prácticas y validación}
+
+Se fomenta la calidad y mantenibilidad del software mediante:
+
+\begin{itemize}
+    \item Pruebas automatizadas para comprobar el funcionamiento de módulos clave.
+    \item Documentación de código, manuales de usuario y de instalación.
+    \item Uso de metodologías ágiles en la organización del trabajo (por ejemplo, con Jira).
+\end{itemize}
+
+\section{Ejemplos prácticos de uso de la plantilla \LaTeX{}}
+
+A continuación se muestran algunos ejemplos de comandos útiles de la plantilla, siguiendo el formato recomendado por la documentación:
+
+\subsection{Secciones y subsecciones}
+
+Las secciones se incluyen con el comando:
+\begin{verbatim}
+\section{Nombre de sección}
+\end{verbatim}
+Las subsecciones se incluyen de forma análoga:
+\begin{verbatim}
+\subsection{Nombre de subsección}
+\end{verbatim}
+
+\subsubsection{Subsubsecciones}
+
+Para mayor detalle se puede emplear el comando:
+\begin{verbatim}
+\subsubsection{Nombre de subsubsección}
+\end{verbatim}
+
+\section{Referencias}
+
+Las referencias a artículos, webs o libros se incluyen con cite, como en el siguiente ejemplo: cite~\cite{wiki:latex}. Para citar varios recursos: ~\cite{koza92, bortolot2005}.
+
+\section{Imágenes}
+
+La plantilla dispone de comandos propios para incorporar imágenes, por ejemplo:
+
+\imagen{escudoInfor}{Escudo de la Universidad de Burgos}{.5}
+
+\section{Listas de items}
+
+Existen diversas formas de listar:
+
+\begin{itemize}
+    \item Primer ítem de la lista.
+    \item Segundo ítem relevante.
+\end{itemize}
+
+\begin{enumerate}
+    \item Primer elemento.
+    \item Segundo elemento.
+\end{enumerate}
+
+\begin{description}
+    \item[Primer ítem] Descripción más detallada.
+    \item[Segundo ítem] Segunda descripción relevante.
+\end{description}
+
+\section{Tablas}
+
+Se pueden emplear comandos clásicos o los de la plantilla. Ejemplo:
+
+\tablaSmall{Herramientas utilizadas en el proyecto}{l l l}
+{herramientas_terapitrack}
+{ \textbf{Herramienta} & \textbf{Ámbito} & \textbf{Descripción} \\}
+{
+Flask & Backend & Desarrollo de la lógica de servidor y API \\
+SQLAlchemy & Base de datos & ORM para conexión y gestión relacional de datos \\
+SQLite & Base de datos & Motor ligero y embebido para el almacenamiento de información \\
+Jinja & Plantillas & Renderizado dinámico de las páginas HTML \\
+Bootswatch & Frontend & Apariencia visual basada en Bootstrap \\
+Jira & Gestión & Organización, planificación y seguimiento del proyecto \\
+GitBash & Versionado & Control del código mediante terminal \\
+GitHub & Repositorio & Colaboración y almacenamiento del proyecto \\
+}
+
+Este capítulo proporciona así el contexto teórico y tecnológico que sustenta toda la memoria y el desarrollo de la aplicación.
