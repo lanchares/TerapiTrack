@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Progreso de {{ paciente.usuario.Nombre }} - TerapiTrack{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-graph-up me-2"></i>Progreso de {{ paciente.usuario.Nombre }}</h2>
+    <a href="{{ url_for('profesional.listar_pacientes') }}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left me-1"></i>Volver
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 fw-bold text-primary">Información del Paciente</h6>
+            </div>
+            <div class="card-body">
+                <p><strong>Nombre:</strong> {{ paciente.usuario.Nombre }} {{ paciente.usuario.Apellidos }}</p>
+                <p><strong>Condición:</strong> {{ paciente.Condicion_Medica or 'No especificada' }}</p>
+                <p><strong>Edad:</strong> {{ paciente.edad() or 'No disponible' }} años</p>
+                <p><strong>Notas:</strong> {{ paciente.Notas or 'Sin notas' }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8 mb-4">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 fw-bold text-primary">Gráfica de Progreso</h6>
+            </div>
+            <div class="card-body">
+                {% if evaluaciones %}
+                <canvas id="progressChart" width="400" height="200"></canvas>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="bi bi-graph-up fs-1 text-muted"></i>
+                    <h5 class="mt-3">Sin datos para mostrar</h5>
+                    <p>No hay evaluaciones suficientes para generar gráficas</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow">
+    <div class="card-header py-3">
+        <h6 class="m-0 fw-bold text-primary">Historial de Evaluaciones</h6>
+    </div>
+    <div class="card-body">
+        {% if evaluaciones %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Ejercicio</th>
+                        <th>Puntuación</th>
+                        <th>Comentarios</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for evaluacion in evaluaciones %}
+                    <tr>
+                        <td>{{ evaluacion.Fecha_Evaluacion|datetimeformat('%d/%m/%Y') }}</td>
+                        <td>{{ evaluacion.ejercicio_sesion.ejercicio.Nombre }}</td>
+                        <td>
+                            <span class="badge bg-{% if evaluacion.Puntuacion >= 4 %}success{% elif evaluacion.Puntuacion >= 3 %}warning{% else %}danger{% endif %}">
+                                {{ evaluacion.Puntuacion }}/5
+                            </span>
+                        </td>
+                        <td>{{ evaluacion.Comentarios or 'Sin comentarios' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-4">
+            <i class="bi bi-clipboard-x fs-1 text-muted"></i>
+            <h5 class="mt-3">Sin evaluaciones</h5>
+            <p>Este paciente aún no tiene evaluaciones registradas.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% if evaluaciones %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Preparar datos para la gráfica
+const evalSesion = {{ evaluaciones_sesion_json|tojson }};
+const fechas = evalSesion.map(e => e.Fecha);
+const puntuaciones = evalSesion.map(e => e.Media_Puntuacion);
+
+
+// Crear gráfica
+const ctx = document.getElementById('progressChart').getContext('2d');
+new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: fechas,
+        datasets: [{
+            label: 'Puntuación',
+            data: puntuaciones,
+            borderColor: 'rgb(75, 192, 192)',
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            tension: 0.1
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true,
+                max: 5
+            }
+        }
+    }
+});
+</script>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+{% block title %}Ver Usuario - TerapiTrack{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-person me-2"></i>Detalles del Usuario</h2>
+    <div class="btn-group">
+        <a href="{{ url_for('admin.editar_usuario', user_id=usuario.Id) }}" class="btn btn-warning">
+            <i class="bi bi-pencil me-1"></i>Editar
+        </a>
+        <a href="{{ url_for('admin.listar_usuarios') }}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left me-1"></i>Volver
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header">
+                <h5 class="mb-0">Información General</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Nombre:</strong></div>
+                    <div class="col-sm-9">{{ usuario.Nombre }} {{ usuario.Apellidos }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Email:</strong></div>
+                    <div class="col-sm-9">
+                        <i class="bi bi-envelope me-1"></i>{{ usuario.Email }}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Rol:</strong></div>
+                    <div class="col-sm-9">
+                        <span class="badge bg-{{ 'danger' if usuario.Rol_Id == 0 else 'success' if usuario.Rol_Id == 1 else 'info' }} fs-6">
+                            {% if usuario.Rol_Id == 0 %}
+                                <i class="bi bi-shield me-1"></i>Administrador
+                            {% elif usuario.Rol_Id == 1 %}
+                                <i class="bi bi-heart me-1"></i>Paciente
+                            {% elif usuario.Rol_Id == 2 %}
+                                <i class="bi bi-briefcase me-1"></i>Profesional
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Estado:</strong></div>
+                    <div class="col-sm-9">
+                        <span class="badge bg-{{ 'success' if usuario.Estado == 1 else 'danger' }} fs-6">
+                            <i class="bi bi-{{ 'check-circle' if usuario.Estado == 1 else 'x-circle' }} me-1"></i>
+                            {{ 'Activo' if usuario.Estado == 1 else 'Inactivo' }}
+                        </span>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>{{ usuario.Fecha_Registro|datetimeformat('%d/%m/%Y') }}</strong></div>
+                    <div class="col-sm-9">
+                        <i class="bi bi-calendar me-1"></i>
+                        {{ usuario.Fecha_Registro.strftime('%d/%m/%Y') if usuario.Fecha_Registro else 'No disponible' }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if info_adicional %}
+        <div class="card shadow mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">Información Específica</h5>
+            </div>
+            <div class="card-body">
+                {% if usuario.Rol_Id == 1 %}
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Fecha Nacimiento:</strong></div>
+                        <div class="col-sm-9">
+                            {{ info_adicional.Fecha_Nacimiento.strftime('%d/%m/%Y') if info_adicional.Fecha_Nacimiento else 'No disponible' }}
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Condición Médica:</strong></div>
+                        <div class="col-sm-9">{{ info_adicional.Condicion_Medica or 'No especificada' }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Notas:</strong></div>
+                        <div class="col-sm-9">{{ info_adicional.Notas or 'Sin notas' }}</div>
+                    </div>
+                {% elif usuario.Rol_Id == 2 %}
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Especialidad:</strong></div>
+                        <div class="col-sm-9">{{ info_adicional.Especialidad }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Tipo:</strong></div>
+                        <div class="col-sm-9">
+                            <span class="badge bg-info">{{ info_adicional.Tipo_Profesional }}</span>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if vinculaciones %}
+        <div class="card shadow mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    {% if usuario.Rol_Id == 1 %}
+                        Profesionales Asignados
+                    {% elif usuario.Rol_Id == 2 %}
+                        Pacientes Asignados
+                    {% endif %}
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    {% for vinculo_usuario, vinculo_info in vinculaciones %}
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ vinculo_usuario.Nombre }} {{ vinculo_usuario.Apellidos }}</h6>
+                            {% if usuario.Rol_Id == 1 %}
+                                <span class="badge bg-info">{{ vinculo_info.Tipo_Profesional }}</span>
+                            {% endif %}
+                        </div>
+                        <p class="mb-1">{{ vinculo_usuario.Email }}</p>
+                        {% if usuario.Rol_Id == 1 %}
+                            <small>Especialidad: {{ vinculo_info.Especialidad }}</small>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow">
+            <div class="card-header">
+                <h5 class="mb-0">Acciones</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('admin.editar_usuario', user_id=usuario.Id) }}" class="btn btn-warning">
+                        <i class="bi bi-pencil me-2"></i>Editar Usuario
+                    </a>
+                    
+                    {% if usuario.Id != current_user.Id %}
+                    <!-- ← CORREGIDO: Usar cambiar_estado en lugar de eliminar_usuario -->
+                    <button type="button" 
+                            class="btn btn-{{ 'danger' if usuario.Estado == 1 else 'success' }}" 
+                            data-bs-toggle="modal" 
+                            data-bs-target="#cambiarEstadoModal">
+                        <i class="bi bi-{{ 'toggle-off' if usuario.Estado == 1 else 'toggle-on' }} me-2"></i>
+                        {{ 'Desactivar Usuario' if usuario.Estado == 1 else 'Activar Usuario' }}
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">Navegación</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('admin.listar_usuarios') }}" class="btn btn-outline-primary">
+                        <i class="bi bi-people me-2"></i>Lista de Usuarios
+                    </a>
+                    <a href="{{ url_for('admin.crear_usuario') }}" class="btn btn-outline-success">
+                        <i class="bi bi-person-plus me-2"></i>Crear Usuario
+                    </a>
+                    <a href="{{ url_for('admin.ver_vinculaciones') }}" class="btn btn-outline-info">
+                        <i class="bi bi-diagram-3 me-2"></i>Ver Vinculaciones
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ← CORREGIDO: Modal para cambiar estado (no eliminar) -->
+{% if usuario.Id != current_user.Id %}
+<div class="modal fade" id="cambiarEstadoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-{{ 'danger' if usuario.Estado == 1 else 'success' }} text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-{{ 'toggle-off' if usuario.Estado == 1 else 'toggle-on' }} me-2"></i>
+                    Confirmar {{ 'Desactivación' if usuario.Estado == 1 else 'Activación' }}
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que deseas {{ 'desactivar' if usuario.Estado == 1 else 'activar' }} el usuario?</p>
+                <div class="alert alert-{{ 'warning' if usuario.Estado == 1 else 'info' }}">
+                    <strong>{{ usuario.Nombre }} {{ usuario.Apellidos }}</strong><br>
+                    <small>{{ usuario.Email }}</small>
+                </div>
+                <p class="small text-muted">
+                    <i class="bi bi-info-circle me-1"></i>
+                    {% if usuario.Estado == 1 %}
+                        Esta acción desactivará la cuenta. El usuario no podrá acceder al sistema.
+                    {% else %}
+                        Esta acción reactivará la cuenta. El usuario podrá acceder al sistema nuevamente.
+                    {% endif %}
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x me-1"></i>Cancelar
+                </button>
+                
+                <!-- ← CORREGIDO: Link a cambiar_estado_usuario -->
+                <a href="{{ url_for('admin.cambiar_estado_usuario', user_id=usuario.Id) }}" 
+                   class="btn btn-{{ 'danger' if usuario.Estado == 1 else 'success' }}">
+                    <i class="bi bi-{{ 'toggle-off' if usuario.Estado == 1 else 'toggle-on' }} me-2"></i>
+                    {{ 'Desactivar' if usuario.Estado == 1 else 'Activar' }}
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

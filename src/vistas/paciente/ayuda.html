@@ -1,0 +1,432 @@
+{% extends "base.html" %}
+
+{% block title %}Ayuda - TerapiTrack{% endblock %}
+
+{% block content %}
+<div class="container-fluid vh-100" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 2rem 0;">
+    
+    <!-- Botón de regreso VERDE -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <a href="{{ url_for('paciente.dashboard') }}" class="btn btn-outline-light btn-lg snes-back-btn" id="btn-back">
+            <span class="snes-letter">Y</span>
+            <i class="bi bi-arrow-left me-2"></i>Volver al Inicio
+        </a>
+        
+        <!-- Ayuda inmediata -->
+        <div class="help-contact-small">
+            <div class="card bg-danger text-white">
+                <div class="card-body py-2 px-3 text-center">
+                    <h6 class="mb-1"><i class="bi bi-telephone-fill me-1"></i>¿Ayuda?</h6>
+                    <p class="h6 mb-0">📞 666-666-666</p>
+                    <small>Soporte 24H</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mb-4">
+        <h1 class="display-5 fw-bold text-white mb-3">
+            <i class="bi bi-question-circle me-2"></i>Guía de Uso
+        </h1>
+        <p class="text-white-50">Aprende a usar tu mando SNES con TerapiTrack</p>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            
+            <!-- Mando SNES visual -->
+            <div class="card bg-white bg-opacity-95 mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-controller me-2"></i>Tu Mando SNES</h5>
+                </div>
+                <div class="card-body text-center">
+                    <div class="snes-controller-help">
+                        <div class="controller-visual">
+                            <div class="controller-body">
+                                <!-- Cruceta direccional (izquierda) -->
+                                <div class="dpad-section">
+                                    <div class="dpad-container">
+                                        <div class="dpad">
+                                            <div class="dpad-btn dpad-up">↑</div>
+                                            <div class="dpad-horizontal">
+                                                <div class="dpad-btn dpad-left">←</div>
+                                                <div class="dpad-center"></div>
+                                                <div class="dpad-btn dpad-right">→</div>
+                                            </div>
+                                            <div class="dpad-btn dpad-down">↓</div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-2">
+                                        <small class="text-muted"><strong>Flechas</strong><br>Direccionales</small>
+                                    </div>
+                                </div>
+                                
+                                <!-- Botones de acción (derecha) -->
+                                <div class="action-section">
+                                    <div class="action-buttons">
+                                        <div class="btn-x help-btn-x">X</div>
+                                        <div class="btn-y help-btn-y">Y</div>
+                                        <div class="btn-a help-btn-a">A</div>
+                                        <div class="btn-b help-btn-b">B</div>
+                                    </div>
+                                    <div class="mt-2">
+                                        <small class="text-muted"><strong>Botones</strong><br>de Acción</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Instrucciones por botón - SIN REPETICIÓN -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-6">
+                    <div class="card h-100 border-primary">
+                        <div class="card-body text-center p-4">
+                            <div class="help-btn-large help-btn-x-large mb-3">X</div>
+                            <h4 class="text-primary mb-3">Botón X (Azul)</h4>
+                            <h5 class="mb-3">👀 Ver Ejercicios</h5>
+                            <p class="text-muted fs-6">Muestra todos los ejercicios que puedes realizar</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card h-100 border-success">
+                        <div class="card-body text-center p-4">
+                            <div class="help-btn-large help-btn-y-large mb-3">Y</div>
+                            <h4 class="text-success mb-3">Botón Y (Verde)</h4>
+                            <h5 class="mb-3">📅 Ver Sesiones</h5>
+                            <p class="text-muted fs-6">Muestra tu calendario de terapia</p>
+                            <div class="alert alert-warning">
+                                <small><strong>También:</strong> Volver a la pantalla anterior</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card h-100 border-danger">
+                        <div class="card-body text-center p-4">
+                            <div class="help-btn-large help-btn-a-large mb-3">A</div>
+                            <h4 class="text-danger mb-3">Botón A (Rojo)</h4>
+                            <h5 class="mb-3">📈 Ver Progreso</h5>
+                            <p class="text-muted fs-6">Muestra cómo vas mejorando</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card h-100 border-warning">
+                        <div class="card-body text-center p-4">
+                            <div class="help-btn-large help-btn-b-large mb-3">B</div>
+                            <h4 class="text-warning mb-3">Botón B (Amarillo)</h4>
+                            <h5 class="mb-3">❓ Ver Ayuda</h5>
+                            <p class="text-muted fs-6">Muestra esta pantalla de ayuda</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navegación con el Mando centrada -->
+            <div class="card bg-light">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="bi bi-arrow-left-right me-2"></i>Navegación con el Mando</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row justify-content-center text-center">
+                        <div class="col-md-4 d-flex flex-column align-items-center">
+                            <div class="dpad-demo mb-2 mx-auto">← →</div>
+                            <strong>Izquierda / Derecha</strong><br>
+                            <small class="text-muted">Navegar entre sesiones o ejercicios</small>
+                        </div>
+                        <div class="col-md-4 d-flex flex-column align-items-center">
+                            <div class="dpad-demo mb-2 mx-auto">↑ ↓</div>
+                            <strong>Arriba / Abajo</strong><br>
+                            <small class="text-muted">Bajar o subir en la pantalla</small>
+                        </div>
+                    </div>
+
+                    <div class="navigation-help">
+                        <strong>🎮 Navegación:</strong><br>
+                        ↑ ↓ : Bajar/Subir en la pantalla<br>
+                        Y : Volver
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Botón verde como el mando */
+.snes-back-btn {
+    position: relative;
+    border: 3px solid rgba(255,255,255,0.8);
+    background: linear-gradient(145deg, #228B22, #006400);
+}
+
+.snes-back-btn:hover {
+    background: linear-gradient(145deg, #32CD32, #228B22);
+    border-color: white;
+    color: white;
+}
+
+.snes-letter {
+    position: absolute;
+    top: -5px;
+    right: 8px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    background: rgba(255,255,255,0.9);
+    color: #006400;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Ayuda de contacto pequeña */
+.help-contact-small {
+    max-width: 200px;
+}
+
+/* Controlador visual */
+.controller-visual {
+    padding: 2rem 0;
+}
+
+.controller-body {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    max-width: 650px;
+    margin: 0 auto;
+    background: linear-gradient(145deg, #e0e0e0, #f0f0f0);
+    border-radius: 60px;              /* más redondo, tipo SNES */
+    padding: 2.5rem 4.5rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+/* D-pad */
+.dpad-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.dpad-container {
+    background: #888;
+    border-radius: 15px;
+    padding: 8px;
+}
+
+.dpad {
+    display: grid;
+    grid-template-areas: 
+        ". up ."
+        "left center right"
+        ". down .";
+    grid-template-columns: 25px 25px 25px;
+    grid-template-rows: 25px 25px 25px;
+    gap: 1px;
+}
+
+.dpad-btn {
+    background: linear-gradient(145deg, #555, #333);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.9rem;
+    border: 1px solid #222;
+}
+
+.dpad-up { 
+    grid-area: up; 
+    border-radius: 6px 6px 2px 2px; 
+}
+.dpad-down { 
+    grid-area: down; 
+    border-radius: 2px 2px 6px 6px; 
+}
+.dpad-left { 
+    grid-area: left; 
+    border-radius: 6px 2px 2px 6px; 
+}
+.dpad-right { 
+    grid-area: right; 
+    border-radius: 2px 6px 6px 2px; 
+}
+.dpad-center { 
+    grid-area: center; 
+    background: #333; 
+}
+
+.dpad-horizontal {
+    display: contents;
+}
+
+/* Botones de acción */
+.action-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.action-buttons {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin-bottom: 10px;
+}
+
+.action-buttons > div {
+    position: absolute;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 1.1rem;
+    border: 3px solid rgba(255,255,255,0.8);
+}
+
+/* Posiciones correctas */
+.btn-x { 
+    top: 0; 
+    left: 50%; 
+    transform: translateX(-50%); 
+    background: linear-gradient(145deg, #4169E1, #1E90FF); 
+}
+.btn-y { 
+    top: 50%; 
+    left: 0; 
+    transform: translateY(-50%); 
+    background: linear-gradient(145deg, #228B22, #006400); 
+}
+.btn-a { 
+    top: 50%; 
+    right: 0; 
+    transform: translateY(-50%); 
+    background: linear-gradient(145deg, #DC143C, #B22222); 
+}
+.btn-b { 
+    bottom: 0; 
+    left: 50%; 
+    transform: translateX(-50%); 
+    background: linear-gradient(145deg, #FFD700, #DAA520); 
+    color: #000;
+}
+
+/* Botones de demostración */
+.help-btn-large {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 2rem;
+    margin: 0 auto;
+    border: 4px solid rgba(255,255,255,0.8);
+}
+
+.help-btn-x-large { background: linear-gradient(145deg, #4169E1, #1E90FF); }
+.help-btn-y-large { background: linear-gradient(145deg, #228B22, #006400); }
+.help-btn-a-large { background: linear-gradient(145deg, #DC143C, #B22222); }
+.help-btn-b-large { background: linear-gradient(145deg, #FFD700, #DAA520); color: #000; }
+
+/* Demo de navegación */
+.dpad-demo {
+    width: 80px;
+    height: 50px;
+    background: linear-gradient(145deg, #555, #333);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.help-btn-demo-a {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(145deg, #DC143C, #B22222);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.navigation-help {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 15px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    z-index: 1000;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+}
+
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const backBtn = document.getElementById('btn-back');
+    let lastButtonStates = { Y: false, up: false, down: false };
+    
+    function monitorController() {
+        fetch('/paciente/get_controller_state')
+            .then(response => response.json())
+            .then(data => {
+                if (!data.error) {
+                    // Monitorear botón Y
+                    if (data.Y && !lastButtonStates.Y) {
+                        backBtn.click();
+                    }
+                    
+                    // SCROLL CON ↑ ↓
+                    if (data.up && !lastButtonStates.up) {
+                        window.scrollBy(0, -200);
+                    }
+                    
+                    if (data.down && !lastButtonStates.down) {
+                        window.scrollBy(0, 200);
+                    }
+                    
+                    lastButtonStates = { 
+                        Y: data.Y, 
+                        up: data.up || false,
+                        down: data.down || false
+                    };
+                }
+            })
+            .catch(() => {});
+        
+        setTimeout(monitorController, 100);
+    }
+    
+    monitorController();
+});
+</script>
+{% endblock %}

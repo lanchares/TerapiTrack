@@ -1,0 +1,390 @@
+{% extends "base.html" %}
+
+{% block title %}Sesión en Curso - TerapiTrack{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0" style="height: 100vh; background: #000;">
+    <div class="row g-0 h-100">
+        <!-- Video demostración (50% - izquierda) -->
+        <div class="col-md-6 h-100 position-relative">
+            <div class="h-100 d-flex flex-column" style="min-height:0;">
+                <!-- Header del video demo -->
+                <div class="bg-primary text-white p-3 text-center">
+                    <h4 class="mb-0" id="ejercicioNombre">Esperando al profesional...</h4>
+                    <small id="ejercicioTipo" class="text-light"></small>
+                </div>
+
+                <!-- Video demostrativo -->
+                <div class="flex-grow-1 position-relative" style="min-height:0;">
+                    <video id="demoVideo" controls autoplay muted loop
+                           class="w-100 h-100"
+                           style="object-fit: cover; background: #1a1a1a; max-height:100%;">
+                        <source src="" type="video/mp4">
+                        Tu navegador no soporta videos.
+                    </video>
+
+                    <!-- Overlay cuando no hay video -->
+                    <div id="waitingOverlay" class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-dark bg-opacity-75">
+                        <div class="text-center text-white">
+                            <div class="spinner-border text-primary mb-3" role="status">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                            <h5>Esperando al profesional</h5>
+                            <p class="text-muted">Tu terapeuta iniciará la sesión en breve</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cámara del paciente (50% - derecha) -->
+        <div class="col-md-6 h-100 position-relative">
+            <div class="h-100 d-flex flex-column">
+                <!-- Header de la cámara -->
+                <div class="bg-success text-white p-3 text-center">
+                    <h4 class="mb-0">Tu ejecución</h4>
+                    <div id="recordingStatus" class="d-none">
+                        <span class="recording-dot"></span>
+                        <small>GRABANDO</small>
+                    </div>
+                </div>
+
+                <!-- Cámara del paciente -->
+                <div class="flex-grow-1 position-relative">
+                    <video id="cameraPreview" autoplay playsinline muted
+                           class="w-100 h-100"
+                           style="object-fit: cover; background: #1a1a1a;"></video>
+
+                    <!-- Timer de grabación -->
+                    <div id="timerDisplay" class="position-absolute top-0 end-0 bg-dark bg-opacity-75 text-white p-2 rounded-bottom-start d-none">
+                        <i class="bi bi-stopwatch me-1"></i>
+                        <span id="timer">00:00</span>
+                    </div>
+                </div>
+
+                <!-- Estado del mando -->
+                <div class="bg-dark text-white p-2">
+                    <div class="d-flex justify-content-center">
+                        <div class="mini-snes-controller">
+                            <!-- Colores correctos: Y verde, X azul, B amarillo, A roja -->
+                            <div class="mini-snes-button" id="mini-y" style="background: #4CAF50;">Y</div>
+                            <div class="mini-snes-button" id="mini-x" style="background: #2196F3;">X</div>
+                            <div class="mini-snes-button" id="mini-b" style="background: #FFC107;">B</div>
+                            <div class="mini-snes-button" id="mini-a" style="background: #F44336;">A</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botón de salida (solo visible si no está en sesión activa) -->
+    <div class="position-absolute top-0 end-0 p-3" id="exitButton">
+        <a href="{{ url_for('paciente.dashboard') }}" class="btn btn-outline-light">
+            <i class="bi bi-x-lg"></i>
+        </a>
+    </div>
+</div>
+
+<style>
+    .recording-dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background-color: #dc3545;
+        border-radius: 50%;
+        margin-right: 8px;
+        animation: blink 1s infinite;
+    }
+    
+    @keyframes blink {
+        0%, 50% { opacity: 1; }
+        51%, 100% { opacity: 0.3; }
+    }
+    
+    .mini-snes-controller {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+    
+    .mini-snes-button {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 0.7rem;
+        font-weight: bold;
+        transition: transform 0.1s;
+        opacity: 0.6;
+    }
+    
+    .mini-snes-button.active {
+        opacity: 1;
+        transform: scale(1.2);
+    }
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Elementos DOM
+    const cameraPreview = document.getElementById('cameraPreview');
+    const demoVideo = document.getElementById('demoVideo');
+    const ejercicioNombre = document.getElementById('ejercicioNombre');
+    const ejercicioTipo = document.getElementById('ejercicioTipo');
+    const recordingStatus = document.getElementById('recordingStatus');
+    const timerDisplay = document.getElementById('timerDisplay');
+    const timer = document.getElementById('timer');
+    const waitingOverlay = document.getElementById('waitingOverlay');
+
+    // Datos de ejercicios y sesión
+    const ejercicios = {{ ejercicios_json|tojson }};
+    const sesionId = {{ sesion.Id }};
+    
+    console.log("Ejercicios cargados del paciente:", ejercicios);
+    console.log("Sesión ID:", sesionId);
+
+    // Variables de estado
+    let isSessionActive = false;
+    let mediaRecorder = null;
+    let recordedChunks = [];
+    let startTime;
+    let timerInterval;
+    let currentExercise = -1;
+    let totalExercises = ejercicios.length;
+
+    // Inicializar cámara automáticamente
+    initCamera();
+    // Monitorear mando SNES
+    monitorController();
+    // Escuchar al profesional
+    startPollingEstadoSesion();
+
+    async function initCamera() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ 
+                video: { width: 1280, height: 720 }, 
+                audio: true 
+            });
+            cameraPreview.srcObject = stream;
+            console.log("Cámara inicializada correctamente");
+        } catch (err) {
+            console.error("Error al acceder a la cámara:", err);
+            showAlert("Error al acceder a la cámara. Verifica los permisos.");
+        }
+    }
+
+    function monitorController() {
+        const miniButtons = {
+            'Y': document.getElementById('mini-y'),
+            'X': document.getElementById('mini-x'),
+            'B': document.getElementById('mini-b'),
+            'A': document.getElementById('mini-a')
+        };
+
+        function updateMiniController() {
+            fetch('/paciente/get_controller_state')
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.error) {
+                        Object.keys(miniButtons).forEach(btn => {
+                            if (data[btn]) {
+                                miniButtons[btn].classList.add('active');
+                            } else {
+                                miniButtons[btn].classList.remove('active');
+                            }
+                        });
+
+                        // Y para volver a la lista de sesiones mientras aún no ha empezado
+                        if (!isSessionActive && data.Y) {
+                            window.location.href = "{{ url_for('paciente.mis_sesiones') }}";
+                            return;
+                        }
+                    }
+                })
+                .catch(err => {
+                    // Mando no disponible, continuar sin errores
+                });
+
+            setTimeout(updateMiniController, 100);
+        }
+
+        updateMiniController();
+    }
+
+    // SINCRONIZACIÓN CON PROFESIONAL
+    function startPollingEstadoSesion() {
+        console.log("🔄 Iniciando polling cada 2 segundos...");
+        comprobarEstadoSesion();
+        setInterval(comprobarEstadoSesion, 2000);
+    }
+
+    async function comprobarEstadoSesion() {
+        try {
+            console.log(`🔍 Consultando sesión ${sesionId}...`);
+            const resp = await fetch(`/profesional/api/sesion/${sesionId}/estado`);
+            
+            if (!resp.ok) {
+                console.warn("⚠️ Error:", resp.status);
+                return;
+            }
+
+            const data = await resp.json();
+            console.log("📦 Recibido:", data);
+
+            const terminada = data.terminada;
+            if (terminada) {
+                isSessionActive = false;
+                waitingOverlay.classList.add('d-none');
+                ejercicioNombre.textContent = 'Sesión finalizada por tu terapeuta';
+                ejercicioTipo.textContent = '';
+                setTimeout(() => {
+                    window.location.href = "{{ url_for('paciente.dashboard') }}";
+                }, 3000);
+                return;
+            }
+
+            const ejercicioActivoId = data.ejercicio_activo_id;
+
+            if (ejercicioActivoId === null || ejercicioActivoId === undefined) {
+                console.log("⏳ Aún no ha empezado");
+                return;
+            }
+
+            console.log(`✅ Ejercicio activo: ${ejercicioActivoId}`);
+
+            const index = ejercicios.findIndex(ej => ej.Id === ejercicioActivoId);
+
+            if (index === -1) {
+                console.warn(`⚠️ Ejercicio ${ejercicioActivoId} no encontrado`);
+                return;
+            }
+
+            if (!isSessionActive) {
+                console.log("🎬 Iniciando sesión...");
+                isSessionActive = true;
+                waitingOverlay.classList.add('d-none');
+                document.getElementById('exitButton').style.display = 'none';
+                loadExercise(index);
+                return;
+            }
+
+            if (index !== currentExercise) {
+                console.log(`🔄 Cambiando ejercicio ${currentExercise} → ${index}`);
+                stopRecording();
+                setTimeout(() => loadExercise(index), 1000);
+            }
+        } catch (e) {
+            console.error("❌ Error:", e);
+        }
+    }
+
+    // LÓGICA DE EJERCICIOS
+    function loadExercise(index) {
+        if (index >= totalExercises) {
+            endSession();
+            return;
+        }
+
+        currentExercise = index;
+
+        const ejercicio = ejercicios[index];
+        ejercicioNombre.textContent = ejercicio.ejercicio.Nombre;
+        ejercicioTipo.textContent = ejercicio.ejercicio.Tipo;
+
+        demoVideo.src = ejercicio.ejercicio.Video;
+        demoVideo.play();
+
+        setTimeout(startRecording, 2000);
+    }
+
+    function startRecording() {
+        if (!cameraPreview.srcObject) {
+            console.warn("No hay stream de cámara disponible para grabar.");
+            return;
+        }
+
+        try {
+            mediaRecorder = new MediaRecorder(cameraPreview.srcObject);
+            recordedChunks = [];
+
+            mediaRecorder.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    recordedChunks.push(event.data);
+                }
+            };
+
+            mediaRecorder.onstop = uploadVideo;
+
+            mediaRecorder.start();
+            recordingStatus.classList.remove('d-none');
+            timerDisplay.classList.remove('d-none');
+
+            startTime = Date.now();
+            timerInterval = setInterval(updateTimer, 1000);
+        } catch (err) {
+            console.error("Error al iniciar grabación:", err);
+        }
+    }
+
+    function stopRecording() {
+        if (mediaRecorder && mediaRecorder.state === 'recording') {
+            mediaRecorder.stop();
+            recordingStatus.classList.add('d-none');
+            timerDisplay.classList.add('d-none');
+            clearInterval(timerInterval);
+            timer.textContent = "00:00";
+        }
+    }
+
+    function updateTimer() {
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        const minutes = Math.floor(elapsed / 60).toString().padStart(2, '0');
+        const seconds = (elapsed % 60).toString().padStart(2, '0');
+        timer.textContent = `${minutes}:${seconds}`;
+    }
+
+    async function uploadVideo() {
+        if (recordedChunks.length === 0) return;
+
+        console.log("⏫ Subiendo vídeo de ejercicio", currentExercise);
+
+        const ejercicioSesionId = ejercicios[currentExercise].Id;
+        const blob = new Blob(recordedChunks, { type: 'video/webm' });
+        const formData = new FormData();
+        formData.append('video', blob, `respuesta_${ejercicioSesionId}.webm`);
+
+        try {
+            const response = await fetch(`/profesional/guardar_video/${ejercicioSesionId}`, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                console.log('Video subido correctamente');
+            }
+        } catch (error) {
+            console.error('Error subiendo video:', error);
+        }
+    }
+
+    function endSession() {
+        isSessionActive = false;
+        ejercicioNombre.textContent = '¡Sesión completada!';
+        ejercicioTipo.textContent = 'Excelente trabajo';
+
+        setTimeout(() => {
+            window.location.href = "{{ url_for('paciente.dashboard') }}";
+        }, 3000);
+    }
+
+    function showAlert(message) {
+        console.log(message);
+    }
+});
+</script>
+
+{% endblock %}

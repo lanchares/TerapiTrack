@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Mi Perfil - TerapiTrack{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-person me-2"></i>Mi Perfil</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Nombre:</strong></div>
+                    <div class="col-sm-9">{{ usuario.Nombre }} {{ usuario.Apellidos }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Email:</strong></div>
+                    <div class="col-sm-9">{{ usuario.Email }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Rol:</strong></div>
+                    <div class="col-sm-9">
+                        <span class="badge bg-{{ 'danger' if usuario.Rol_Id == 0 else 'success' if usuario.Rol_Id == 1 else 'info' }}">
+                            {% if usuario.Rol_Id == 0 %}Administrador
+                            {% elif usuario.Rol_Id == 1 %}Paciente
+                            {% elif usuario.Rol_Id == 2 %}Profesional
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Miembro desde:</strong></div>
+                    <div class="col-sm-9">{{ usuario.Fecha_Registro|datetimeformat('%d/%m/%Y') if usuario.Fecha_Registro else 'No disponible' }}</div>                </div>
+                <!-- ← CORREGIDO: Eliminar referencia a Ultimo_Login -->
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow">
+            <div class="card-header">
+                <h5 class="mb-0">Acciones</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('auth.cambiar_contrasena') }}" class="btn btn-warning">
+                        <i class="bi bi-key me-2"></i>Cambiar Contraseña
+                    </a>
+                    {% if current_user.Rol_Id == 0 %}
+                    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-primary">
+                        <i class="bi bi-speedometer2 me-2"></i>Menu
+                    </a>
+                    {% elif current_user.Rol_Id == 1 %}
+                    <a href="{{ url_for('paciente.dashboard') }}" class="btn btn-success">
+                        <i class="bi bi-house me-2"></i>Menu
+                    </a>
+                    {% elif current_user.Rol_Id == 2 %}
+                    <a href="{{ url_for('profesional.dashboard') }}" class="btn btn-info">
+                        <i class="bi bi-briefcase me-2"></i>Menu
+                    </a>
+                    {% endif %}
+                    <a href="{{ url_for('auth.logout') }}" class="btn btn-danger">
+                        <i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

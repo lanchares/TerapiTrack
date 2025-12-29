@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Vinculaciones Paciente-Profesional - TerapiTrack{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-diagram-3 me-2"></i>Vinculaciones Paciente-Profesional</h2>
+    <a href="{{ url_for('admin.vincular_paciente_profesional') }}" class="btn btn-success">
+        <i class="bi bi-link-45deg me-1"></i>Nueva Vinculación
+    </a>
+</div>
+
+<!-- Filtros -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 fw-bold text-primary">Filtros</h6>
+    </div>
+    <div class="card-body">
+        <form method="GET" class="row g-3">
+            <div class="col-md-3">
+                <label for="search" class="form-label">Buscar paciente:</label>
+                <input type="text" name="search" id="search" class="form-control" 
+                       placeholder="Nombre o apellidos..." 
+                       value="{{ search }}">
+            </div>
+            <div class="col-md-3">
+                <label for="profesional" class="form-label">Profesional:</label>
+                <select name="profesional" id="profesional" class="form-select">
+                    <option value="">Todos los profesionales</option>
+                    {% for prof_usuario, prof_data in profesionales %}
+                    <option value="{{ prof_usuario.Id }}" 
+                            {% if profesional_filter == prof_usuario.Id|string %}selected{% endif %}>
+                        {{ prof_usuario.Nombre }} {{ prof_usuario.Apellidos }} - {{ prof_data.Tipo_Profesional }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label for="fecha_desde" class="form-label">Desde:</label>
+                <input type="date" name="fecha_desde" id="fecha_desde" class="form-control" 
+                       value="{{ fecha_desde }}">
+            </div>
+            <div class="col-md-2">
+                <label for="fecha_hasta" class="form-label">Hasta:</label>
+                <input type="date" name="fecha_hasta" id="fecha_hasta" class="form-control" 
+                       value="{{ fecha_hasta }}">
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-funnel"></i> Filtrar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Tabla de relaciones -->
+<div class="card shadow">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Paciente</th>
+                        <th>Profesional</th>
+                        <th>Especialidad</th>
+                        <th>Fecha Asignación</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for relacion in relaciones %}
+                    <tr>
+                        <td>
+                            <strong>{{ relacion.paciente_usuario.Nombre }} {{ relacion.paciente_usuario.Apellidos }}</strong><br>
+                            <small class="text-muted">{{ relacion.paciente.Condicion_Medica or 'Sin condición especificada' }}</small>
+                        </td>
+                        <td>
+                            <strong>{{ relacion.profesional_usuario.Nombre }} {{ relacion.profesional_usuario.Apellidos }}</strong><br>
+                            <span class="badge bg-info">{{ relacion.profesional.Tipo_Profesional }}</span>
+                        </td>
+                        <td>{{ relacion.profesional.Especialidad }}</td>
+                        <td>{{ relacion.vinculacion.Fecha_Asignacion|datetimeformat('%d/%m/%Y') }}</td>
+                        <!-- En la celda de Acciones -->
+                        <td>
+                            <form method="POST"
+                                action="{{ url_for('admin.desvincular_paciente_profesional',
+                                paciente_id=relacion.vinculacion.Paciente_Id,
+                                profesional_id=relacion.vinculacion.Profesional_Id) }}"
+                                class="d-inline"
+                                onsubmit="return confirm('¿Desvincular esta relación?')">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                <button type="submit" class="btn btn-sm btn-danger">
+                                    <i class="bi bi-unlink"></i> Desvincular
+                                </button>
+                            </form>
+                        </td>
+
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center py-4">
+                            <i class="bi bi-diagram-3 fs-1 text-muted"></i>
+                            <h5 class="mt-3">No se encontraron relaciones</h5>
+                            <p>No hay vinculaciones que coincidan con los filtros seleccionados</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

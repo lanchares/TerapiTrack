@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}Panel de Administración - TerapiTrack{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-speedometer2 me-2"></i>Panel de Administración</h2>
+    <div class="btn-group">
+        <a href="{{ url_for('admin.crear_usuario') }}" class="btn btn-success">
+            <i class="bi bi-person-plus me-1"></i>Nuevo Usuario
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Tarjeta: Total Usuarios -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <a href="{{ url_for('admin.listar_usuarios') }}" class="text-decoration-none">
+            <div class="card border-start-primary shadow h-100 py-2 hover-card">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs fw-bold text-primary text-uppercase mb-1">Usuarios Totales</div>
+                            <div class="h5 mb-0 fw-bold text-gray-800">{{ stats.total_usuarios }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-people fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <!-- Tarjeta: Total Pacientes -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <a href="{{ url_for('admin.listar_usuarios') }}?rol=1" class="text-decoration-none">
+            <div class="card border-start-success shadow h-100 py-2 hover-card">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs fw-bold text-success text-uppercase mb-1">Pacientes Activos</div>
+                            <div class="h5 mb-0 fw-bold text-gray-800">{{ stats.total_pacientes }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-heart-pulse fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <!-- Tarjeta: Total Profesionales -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <a href="{{ url_for('admin.listar_usuarios') }}?rol=2" class="text-decoration-none">
+            <div class="card border-start-info shadow h-100 py-2 hover-card">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs fw-bold text-info text-uppercase mb-1">Profesionales</div>
+                            <div class="h5 mb-0 fw-bold text-gray-800">{{ stats.total_profesionales }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-briefcase fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <!-- Tarjeta: Usuarios Inactivos -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <a href="{{ url_for('admin.listar_usuarios') }}?estado=0" class="text-decoration-none">
+            <div class="card border-start-warning shadow h-100 py-2 hover-card">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs fw-bold text-warning text-uppercase mb-1">Usuarios Inactivos</div>
+                            <div class="h5 mb-0 fw-bold text-gray-800">{{ stats.usuarios_inactivos }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-person-x fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-lg-8">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 fw-bold text-primary">Acciones Rápidas</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-2">
+                        <a href="{{ url_for('admin.listar_usuarios') }}" class="btn btn-icon-split btn-info w-100">
+                            <span class="icon"><i class="bi bi-list-ul"></i></span>
+                            <span class="text">Ver Todos los Usuarios</span>
+                        </a>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <a href="{{ url_for('admin.vincular_paciente_profesional') }}" class="btn btn-icon-split btn-warning w-100">
+                            <span class="icon"><i class="bi bi-link-45deg"></i></span>
+                            <span class="text">Vincular Paciente-Profesional</span>
+                        </a>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <a href="{{ url_for('admin.ver_vinculaciones') }}" class="btn btn-icon-split btn-secondary w-100">
+                            <span class="icon"><i class="bi bi-diagram-3"></i></span>
+                            <span class="text">Ver Vinculaciones Existentes</span>
+                        </a>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <a href="{{ url_for('admin.crear_usuario') }}" class="btn btn-icon-split btn-success w-100">
+                            <span class="icon"><i class="bi bi-person-plus"></i></span>
+                            <span class="text">Crear Nuevo Usuario</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.hover-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+.hover-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+</style>
+{% endblock %}

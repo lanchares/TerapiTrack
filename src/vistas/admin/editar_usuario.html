@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block title %}Editar Usuario - TerapiTrack{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-pencil me-2"></i>Editar Usuario</h2>
+    <div class="btn-group">
+        <a href="{{ url_for('admin.ver_usuario', user_id=usuario.Id) }}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left me-1"></i>Volver
+        </a>
+    </div>
+</div>
+
+<div class="card shadow">
+    <div class="card-header">
+        <h5 class="mb-0">
+            Editando: {{ usuario.Nombre }} {{ usuario.Apellidos }}
+            <span class="badge bg-{{ 'danger' if usuario.Rol_Id == 0 else 'success' if usuario.Rol_Id == 1 else 'info' }}">
+                {% if usuario.Rol_Id == 0 %}Administrador
+                {% elif usuario.Rol_Id == 1 %}Paciente
+                {% elif usuario.Rol_Id == 2 %}Profesional
+                {% endif %}
+            </span>
+        </h5>
+    </div>
+    <div class="card-body">
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            
+            {% if form.errors %}
+            <div class="alert alert-danger">
+                <strong>❌ Errores en el formulario:</strong>
+                <ul class="mb-0">
+                    {% for field, errors in form.errors.items() %}
+                        {% for error in errors %}
+                            <li><strong>{{ field }}:</strong> {{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    {{ form.nombre.label(class="form-label") }}
+                    {{ form.nombre(class="form-control") }}
+                </div>
+                <div class="col-md-6">
+                    {{ form.apellidos.label(class="form-label") }}
+                    {{ form.apellidos(class="form-control") }}
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    {{ form.email.label(class="form-label") }}
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                        {{ form.email(class="form-control") }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    {{ form.password.label(class="form-label") }}
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-key"></i></span>
+                        {{ form.password(class="form-control") }}
+                    </div>
+                    <div class="form-text">Dejar vacío para mantener la contraseña actual</div>
+                </div>
+            </div>
+
+            {% if usuario.Rol_Id == 1 %}
+            <hr>
+            <h5 class="mt-4 mb-3"><i class="bi bi-heart me-2"></i>Información del Paciente</h5>
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    {{ form.condicion_medica.label(class="form-label") }}
+                    {{ form.condicion_medica(class="form-control") }}
+                </div>
+            </div>
+            <div class="mb-3">
+                {{ form.notas.label(class="form-label") }}
+                {{ form.notas(class="form-control", rows="3") }}
+            </div>
+            
+            {% elif usuario.Rol_Id == 2 %}
+            <hr>
+            <h5 class="mt-4 mb-3"><i class="bi bi-briefcase me-2"></i>Información del Profesional</h5>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    {{ form.especialidad.label(class="form-label") }}
+                    {{ form.especialidad(class="form-control") }}
+                </div>
+                <div class="col-md-6">
+                    {{ form.tipo_profesional.label(class="form-label") }}
+                    {{ form.tipo_profesional(class="form-select") }}
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="d-flex justify-content-end gap-2 mt-4">
+                <a href="{{ url_for('admin.ver_usuario', user_id=usuario.Id) }}" class="btn btn-secondary">
+                    <i class="bi bi-x me-1"></i>Cancelar
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save me-2"></i>Guardar Cambios
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

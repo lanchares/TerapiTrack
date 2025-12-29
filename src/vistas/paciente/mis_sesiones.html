@@ -1,0 +1,517 @@
+{% extends "base.html" %}
+
+{% block title %}Mis Sesiones - TerapiTrack{% endblock %}
+
+{% block content %}
+<div class="container-fluid vh-100" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 2rem 0;">
+    
+    <!-- Botón de regreso VERDE -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <a href="{{ url_for('paciente.dashboard') }}" class="btn btn-outline-light btn-lg snes-back-btn" id="btn-back">
+            <span class="snes-letter">Y</span>
+            <i class="bi bi-arrow-left me-2"></i>Volver al Inicio
+        </a>
+        
+        <!-- Estado del mando -->
+        <div class="text-white">
+            <i class="bi bi-controller me-1"></i>
+            <span class="badge bg-success" id="mando-status">Mando Conectado</span>
+        </div>
+    </div>
+
+    <!-- Header simple -->
+    <div class="text-center mb-4">
+        <h1 class="display-5 fw-bold text-white mb-3">
+            <i class="bi bi-calendar-check me-2"></i>Mis Sesiones
+        </h1>
+        
+        <!-- Título del período auto-actualizable -->
+        <div class="row justify-content-center mb-3">
+            <div class="col-md-6">
+                <div class="card bg-white bg-opacity-90">
+                    <div class="card-body py-2">
+                        <h5 class="mb-0" id="currentPeriod">Próximas 3 Semanas</h5>
+                        <small class="text-muted" id="dateRange">Cargando...</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calendario de 3 semanas auto-renovable -->
+    <div class="row justify-content-center">
+        <div class="col-md-11">
+            <div class="card bg-white bg-opacity-95">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-calendar3 me-2"></i>Calendario de Sesiones</h5>
+                </div>
+                <div class="card-body p-0">
+                    <!-- Días de la semana header -->
+                    <div class="row g-0 border-bottom bg-light">
+                        <div class="col text-center py-2 fw-bold">Lunes</div>
+                        <div class="col text-center py-2 fw-bold">Martes</div>
+                        <div class="col text-center py-2 fw-bold">Miércoles</div>
+                        <div class="col text-center py-2 fw-bold">Jueves</div>
+                        <div class="col text-center py-2 fw-bold">Viernes</div>
+                        <div class="col text-center py-2 fw-bold">Sábado</div>
+                        <div class="col text-center py-2 fw-bold">Domingo</div>
+                    </div>
+
+                    <!-- Semanas del calendario -->
+                    <div id="calendarWeeks">
+                        <!-- Se llena dinámicamente con JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sesión seleccionada - CAMBIO A ROJO -->
+            <div class="card mt-3 bg-white bg-opacity-95" id="selectedSessionCard" style="display: none;">
+                <div class="card-header text-white" style="background: #dc3545 !important;">
+                    <h5 class="mb-0"><i class="bi bi-play-circle me-2"></i>Sesión Lista para Iniciar</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <div id="selectedSessionInfo">
+                                <!-- Info de la sesión seleccionada -->
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <button class="btn btn-lg text-white" id="startSessionBtn" style="display: none; background: #dc3545 !important; border-color: #dc3545;">
+                                <span class="snes-letter-action">A</span>
+                                <i class="bi bi-play-circle me-1"></i>Iniciar Sesión
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Instrucciones de navegación -->
+    <div class="navigation-help">
+        <strong>🎮 Navegación:</strong><br>
+        ← → : Mover entre sesiones<br>
+        ↑ ↓ : Bajar/Subir en la pantalla<br>
+        A : Iniciar sesión<br>
+        Y : Volver
+    </div>
+</div>
+
+<style>
+.snes-back-btn {
+    position: relative;
+    border: 3px solid rgba(255,255,255,0.8);
+    background: linear-gradient(145deg, #228B22, #006400);
+}
+
+.snes-back-btn:hover {
+    background: linear-gradient(145deg, #32CD32, #228B22);
+    border-color: white;
+    color: white;
+}
+
+.snes-letter {
+    position: absolute;
+    top: -5px;
+    right: 8px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    background: rgba(255,255,255,0.9);
+    color: #006400;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.snes-letter-action {
+    position: absolute;
+    top: -5px;
+    right: 8px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    background: rgba(255,255,255,0.9);
+    color: #dc3545;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.calendar-day {
+    min-height: 120px;
+    border: 1px solid #dee2e6;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 8px;
+}
+
+.calendar-day:hover {
+    background-color: rgba(0,123,255,0.1);
+}
+
+.day-number {
+    position: absolute;
+    top: 5px;
+    left: 8px;
+    font-weight: bold;
+    color: #6c757d;
+    font-size: 1rem;
+}
+
+.day-sessions {
+    margin-top: 25px;
+    padding: 5px;
+}
+
+.session-item {
+    background: linear-gradient(145deg, #007bff, #0056b3);
+    color: white;
+    padding: 6px 8px;
+    margin-bottom: 4px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+}
+
+.session-item:hover {
+    transform: scale(1.02);
+    border-color: rgba(255,255,255,0.8);
+}
+
+/* SESIÓN SELECCIONADA EN ROJO - FORZADO */
+.session-item.selected {
+    background: #dc3545 !important;
+    border-color: white !important;
+    animation: pulseRed 2s infinite;
+}
+
+@keyframes pulseRed {
+    0%, 100% { 
+        box-shadow: 0 0 15px rgba(220,53,69,0.7); 
+        background: #dc3545 !important;
+    }
+    50% { 
+        box-shadow: 0 0 25px rgba(220,53,69,0.9); 
+        background: #c82333 !important;
+    }
+}
+
+/* Navegación mejorada */
+.session-item.mando-highlighted {
+    border-color: #ffc107 !important;
+    border-width: 3px !important;
+    animation: pulseHighlight 1s infinite;
+}
+
+@keyframes pulseHighlight {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+/* Instrucciones de navegación */
+.navigation-help {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 15px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    z-index: 1000;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const backBtn = document.getElementById('btn-back');
+    const calendarWeeks = document.getElementById('calendarWeeks');
+    const selectedSessionCard = document.getElementById('selectedSessionCard');
+    const selectedSessionInfo = document.getElementById('selectedSessionInfo');
+    const startSessionBtn = document.getElementById('startSessionBtn');
+    const mandoStatus = document.getElementById('mando-status');
+    const dateRange = document.getElementById('dateRange');
+    
+    let selectedSession = null;
+    let selectedSessionIndex = -1;
+    let availableSessions = [];
+    let lastButtonStates = { Y: false, A: false, left: false, right: false, up: false, down: false };
+    
+    // Datos de sesiones desde el servidor
+    const sesiones = {{ sesiones|tojson }};
+    
+    // Convertir Fecha_Programada manualmente (evita cambios de zona horaria)
+    sesiones.forEach(sesion => {
+        if (sesion.Fecha_Programada) {
+            const [fecha, hora] = sesion.Fecha_Programada.split('T');
+            const [y, m, d] = fecha.split('-').map(Number);
+
+            if (hora) {
+                const [hh, mm] = hora.split(':').map(Number);
+                sesion.fecha_obj = new Date(y, m - 1, d, hh, mm);
+            } else {
+                // sin hora explícita: usar 0:00
+                sesion.fecha_obj = new Date(y, m - 1, d, 0, 0);
+            }
+        } else {
+            sesion.fecha_obj = null;
+        }
+    });
+
+
+    
+    function getMonday(date) {
+        const d = new Date(date);
+        const day = d.getDay();
+        const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+        return new Date(d.setDate(diff));
+    }
+    
+    function getStartDate() {
+        const today = new Date();
+        const currentDay = today.getDay();
+        
+        if (currentDay >= 1) {
+            return new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        } else {
+            const nextMonday = new Date(today);
+            nextMonday.setDate(today.getDate() + 1);
+            return nextMonday;
+        }
+    }
+    
+    function updateAvailableSessions() {
+        availableSessions = [];
+        document.querySelectorAll('.session-item').forEach((item) => {
+            if (item.dataset.sesionId) {
+                availableSessions.push({
+                    element: item,
+                    sesionId: item.dataset.sesionId
+                });
+            }
+        });
+        console.log(`Found ${availableSessions.length} available sessions`);
+    }
+    
+    function highlightSession(index) {
+        // Limpiar destacado previo
+        document.querySelectorAll('.session-item').forEach(item => {
+            item.classList.remove('mando-highlighted');
+        });
+        
+        if (index >= 0 && index < availableSessions.length) {
+            const sessionData = availableSessions[index];
+            sessionData.element.classList.add('mando-highlighted');
+            sessionData.element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            // Auto-seleccionar sesión
+            selectSession(sessionData.sesionId);
+        }
+    }
+    
+    function renderCalendar() {
+        const startDate = getStartDate();
+        const endDate = new Date(startDate);
+        endDate.setDate(startDate.getDate() + 20);
+        
+        dateRange.textContent = `${startDate.toLocaleDateString('es-ES')} - ${endDate.toLocaleDateString('es-ES')}`;
+        
+        let html = '';
+        let currentWeekStart = getMonday(startDate);
+        
+        for (let week = 0; week < 3; week++) {
+            html += '<div class="row g-0">';
+            
+            for (let day = 0; day < 7; day++) {
+                const currentDate = new Date(currentWeekStart);
+                currentDate.setDate(currentWeekStart.getDate() + (week * 7) + day);
+                
+                const isValidDay = currentDate >= startDate;
+                
+                const daySessions = sesiones.filter(sesion => {
+                    return sesion.fecha_obj.toDateString() === currentDate.toDateString();
+                });
+                
+                html += `<div class="col calendar-day ${!isValidDay ? 'text-muted' : ''}" data-date="${currentDate.toISOString()}">`;
+                html += `<div class="day-number">${currentDate.getDate()}</div>`;
+                
+                if (isValidDay) {
+                    html += '<div class="day-sessions">';
+                    
+                    daySessions.forEach(sesion => {
+                        if (sesion.Estado === 'PENDIENTE') {
+                            const hora = sesion.Hora_Texto || sesion.fecha_obj.toLocaleTimeString('es-ES', {hour: '2-digit', minute: '2-digit'});
+                            html += `<div class="session-item" data-sesion-id="${sesion.Id}">`;
+                            html += `<div><strong>${hora}</strong></div>`;
+                            html += `<div class="text-truncate">${sesion.profesional.usuario.Nombre}</div>`;
+                            html += `<div class="text-truncate small">${sesion.profesional.Tipo_Profesional}</div>`;
+                            html += '</div>';
+                        }
+                    });
+                    
+                    html += '</div>';
+                }
+                
+                html += '</div>';
+            }
+            
+            html += '</div>';
+        }
+        
+        calendarWeeks.innerHTML = html;
+        
+        // Event listeners a sesiones
+        document.querySelectorAll('.session-item').forEach(item => {
+            item.addEventListener('click', function() {
+                selectSession(this.dataset.sesionId);
+            });
+        });
+        
+        // Actualizar sesiones disponibles
+        setTimeout(() => {
+            updateAvailableSessions();
+            if (availableSessions.length > 0 && selectedSessionIndex === -1) {
+                selectedSessionIndex = 0;
+                highlightSession(selectedSessionIndex);
+            }
+        }, 100);
+    }
+    
+    function selectSession(sesionId) {
+        // Limpiar selección previa
+        document.querySelectorAll('.session-item').forEach(item => {
+            item.classList.remove('selected');
+        });
+        
+        // Buscar y seleccionar nueva sesión
+        const sesion = sesiones.find(s => s.Id == sesionId);
+        if (sesion && sesion.Estado === 'PENDIENTE') {
+            selectedSession = sesion;
+            
+            // Marcar como seleccionada - FORZAR ROJO
+            const sessionElement = document.querySelector(`[data-sesion-id="${sesionId}"]`);
+            if (sessionElement) {
+                sessionElement.classList.add('selected');
+                sessionElement.style.background = '#dc3545 !important';
+            }
+            
+            // Mostrar info de la sesión
+            const fecha = sesion.fecha_obj.toLocaleDateString('es-ES', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            const hora = sesion.Hora_Texto || sesion.fecha_obj.toLocaleTimeString('es-ES', {hour: '2-digit', minute: '2-digit'});
+            
+            selectedSessionInfo.innerHTML = `
+                <h6 class="text-primary mb-2">${fecha} a las ${hora}</h6>
+                <p class="mb-1"><strong>Profesional:</strong> ${sesion.profesional.usuario.Nombre} ${sesion.profesional.usuario.Apellidos}</p>
+                <p class="mb-1"><strong>Especialidad:</strong> ${sesion.profesional.Tipo_Profesional}</p>
+                <p class="mb-0"><strong>Ejercicios:</strong> ${sesion.ejercicios_sesion.length}</p>
+            `;
+            
+            selectedSessionCard.style.display = 'block';
+            startSessionBtn.style.display = 'block';
+            startSessionBtn.onclick = () => {
+                window.location.href = `/paciente/ejecutar_sesion/${sesionId}`;
+            };
+        }
+    }
+    
+    // Monitorear mando SNES
+    function monitorController() {
+        fetch('/paciente/get_controller_state')
+            .then(response => response.json())
+            .then(data => {
+                if (!data.error) {
+                    mandoStatus.className = 'badge bg-success';
+                    mandoStatus.innerHTML = '<i class="bi bi-controller me-1"></i>Mando Conectado';
+                    
+                    // Botón Y - Volver
+                    if (data.Y && !lastButtonStates.Y) {
+                        backBtn.click();
+                    }
+                    
+                    // Botón A - Iniciar sesión seleccionada
+                    if (data.A && !lastButtonStates.A && selectedSession) {
+                        startSessionBtn.classList.add('mando-selected');
+                        setTimeout(() => {
+                            startSessionBtn.click();
+                        }, 300);
+                    }
+                    
+                    // NAVEGACIÓN: ← → entre sesiones
+                    if (data.left && !lastButtonStates.left) {
+                        if (selectedSessionIndex > 0) {
+                            selectedSessionIndex--;
+                            highlightSession(selectedSessionIndex);
+                        }
+                    }
+                    
+                    if (data.right && !lastButtonStates.right) {
+                        if (selectedSessionIndex < availableSessions.length - 1) {
+                            selectedSessionIndex++;
+                            highlightSession(selectedSessionIndex);
+                        }
+                    }
+                    
+                    // SCROLL CON ↑ ↓
+                    if (data.up && !lastButtonStates.up) {
+                        window.scrollBy(0, -200);
+                    }
+                    
+                    if (data.down && !lastButtonStates.down) {
+                        window.scrollBy(0, 200);
+                    }
+                    
+                    lastButtonStates = { 
+                        Y: data.Y, 
+                        A: data.A, 
+                        left: data.left || false,
+                        right: data.right || false,
+                        up: data.up || false,
+                        down: data.down || false
+                    };
+                } else {
+                    mandoStatus.className = 'badge bg-danger';
+                    mandoStatus.innerHTML = '<i class="bi bi-x-circle me-1"></i>Mando Desconectado';
+                }
+            })
+            .catch(() => {
+                mandoStatus.className = 'badge bg-warning';
+                mandoStatus.innerHTML = '<i class="bi bi-exclamation-triangle me-1"></i>Error de Conexión';
+            });
+        
+        setTimeout(monitorController, 120);
+    }
+    
+    // Inicializar
+    renderCalendar();
+    monitorController();
+    
+    // Auto-renovar cada lunes
+    const now = new Date();
+    const nextMonday = new Date(now);
+    nextMonday.setDate(now.getDate() + (8 - now.getDay()) % 7);
+    nextMonday.setHours(0, 0, 0, 0);
+    
+    const timeUntilNextMonday = nextMonday.getTime() - now.getTime();
+    setTimeout(() => {
+        renderCalendar();
+        setInterval(renderCalendar, 7 * 24 * 60 * 60 * 1000);
+    }, timeUntilNextMonday);
+});
+</script>
+{% endblock %}

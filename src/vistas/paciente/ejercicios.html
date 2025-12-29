@@ -1,0 +1,374 @@
+{% extends "base.html" %}
+
+{% block title %}Ejercicios - TerapiTrack{% endblock %}
+
+{% block content %}
+<div class="container-fluid vh-100" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 2rem 0;">
+    
+    <!-- Botón de regreso VERDE -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <a href="{{ url_for('paciente.dashboard') }}" class="btn btn-outline-light btn-lg snes-back-btn" id="btn-back">
+            <span class="snes-letter">Y</span>
+            <i class="bi bi-arrow-left me-2"></i>Volver al Inicio
+        </a>
+    </div>
+
+    <div class="text-center mb-4">
+        <h1 class="display-5 fw-bold text-white mb-3">
+            <i class="bi bi-play-circle me-2"></i>Mis Ejercicios
+        </h1>
+        <p class="text-white-50">Usa ← → para navegar y A para ver el video</p>
+    </div>
+
+    <!-- Grid de ejercicios NAVEGABLE -->
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            {% if ejercicios %}
+                <div class="row g-4" id="ejerciciosGrid">
+                    {% for ejercicio_data in ejercicios %}
+                    <div class="col-md-6 col-lg-4 exercise-card-wrapper" data-index="{{ loop.index0 }}">
+                        <div class="card h-100 exercise-card" data-ejercicio-id="{{ ejercicio_data.ejercicio.Id }}">
+                            <div class="card-body d-flex flex-column">
+                                <!-- Video SIN reproducción automática -->
+                                <div class="mb-3 position-relative video-container">
+                                    <video class="w-100 rounded exercise-video" 
+                                           style="height: 200px; object-fit: cover;" 
+                                           muted 
+                                           preload="metadata"
+                                           data-video-src="{{ ejercicio_data.video_path }}">
+                                        <source src="{{ ejercicio_data.video_path }}" type="video/mp4">
+                                    </video>
+                                    <!-- Overlay de play visible -->
+                                    <div class="position-absolute top-50 start-50 translate-middle play-overlay">
+                                        <div class="play-icon">
+                                            <i class="bi bi-play-circle-fill fs-1 text-white"></i>
+                                        </div>
+                                    </div>
+                                
+                                </div>
+                                
+                                <h5 class="card-title text-primary">{{ ejercicio_data.ejercicio.Nombre }}</h5>
+                                <p class="card-text text-muted small mb-3">{{ ejercicio_data.ejercicio.Descripcion }}</p>
+                                
+                                <div class="mt-auto">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="badge bg-info">{{ ejercicio_data.ejercicio.Tipo }}</span>
+                                        <small class="text-muted">
+                                            <i class="bi bi-clock me-1"></i>{{ ejercicio_data.ejercicio.Duracion }}s
+                                        </small>
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-between text-muted small">
+                                        <span>
+                                            <i class="bi bi-repeat me-1"></i>
+                                            Asignado {{ ejercicio_data.veces_asignado }} vez{{ 'es' if ejercicio_data.veces_asignado != 1 else '' }}
+                                        </span>
+                                        <span>
+                                            <i class="bi bi-calendar me-1"></i>
+                                            {{ ejercicio_data.ultima_sesion|datetimeformat('%d/%m/%Y') if ejercicio_data.ultima_sesion else '' }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="card bg-white bg-opacity-90">
+                    <div class="card-body text-center py-5">
+                        <i class="bi bi-play-circle fs-1 text-muted mb-3"></i>
+                        <h5 class="text-muted">No tienes ejercicios asignados</h5>
+                        <p class="text-muted">Cuando tu terapeuta te asigne sesiones, los ejercicios aparecerán aquí</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Modal para ejercicio grande -->
+    <div id="ejercicio-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.9); z-index:2000; align-items:center; justify-content:center;">
+        <div id="ejercicio-contenido" style="background:#fff; padding:2rem; border-radius:1rem; max-width:90vw; max-height:90vh; overflow:auto; position:relative;">
+            <!-- Contenido se inserta dinámicamente -->
+        </div>
+        <div style="position:absolute; top:2rem; right:3rem; color:#fff; font-size:1.5rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">
+            Pulsa <strong style="color:#00ff00;">Y</strong> para volver
+        </div>
+    </div>
+
+    <!-- Instrucciones de navegación -->
+    <div class="navigation-help">
+        <strong>🎮 Navegación:</strong><br>
+        ← → : Mover entre ejercicios<br>
+        A : Ver ejercicio<br>
+        ↑ ↓ : Bajar/Subir en la pantalla<br>
+        Y : Volver
+    </div>
+</div>
+
+<style>
+/* Botón verde como el mando */
+.snes-back-btn {
+    position: relative;
+    border: 3px solid rgba(255,255,255,0.8);
+    background: linear-gradient(145deg, #228B22, #006400);
+}
+
+.snes-back-btn:hover {
+    background: linear-gradient(145deg, #32CD32, #228B22);
+    border-color: white;
+    color: white;
+}
+
+.snes-letter {
+    position: absolute;
+    top: -5px;
+    right: 8px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    background: rgba(255,255,255,0.9);
+    color: #006400;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Tarjetas de ejercicios navegables */
+.exercise-card {
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 3px solid transparent;
+}
+
+.exercise-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+}
+
+.exercise-card-wrapper.mando-selected .exercise-card {
+    border-color: #ffc107;
+    box-shadow: 0 0 30px rgba(255,193,7,0.8);
+    transform: scale(1.08);
+    animation: pulseExercise 2s infinite;
+}
+
+@keyframes pulseExercise {
+    0%, 100% { box-shadow: 0 0 30px rgba(255,193,7,0.8); }
+    50% { box-shadow: 0 0 40px rgba(255,193,7,1); }
+}
+
+/* Video container */
+.video-container {
+    overflow: hidden;
+    border-radius: 8px;
+    background: #000;
+    position: relative;
+}
+
+.play-overlay {
+    text-shadow: 0 0 10px rgba(0,0,0,0.8);
+}
+
+.exercise-card-wrapper.mando-selected .play-overlay .play-icon {
+    animation: playPulse 1s infinite;
+}
+
+@keyframes playPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+}
+
+/* Modal styling */
+#ejercicio-modal {
+    display: none;
+}
+
+#ejercicio-modal.show {
+    display: flex !important;
+}
+
+/* Instrucciones de navegación */
+.navigation-help {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 15px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    z-index: 1000;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const backBtn = document.getElementById('btn-back');
+    const exerciseWrappers = document.querySelectorAll('.exercise-card-wrapper');
+    const modal = document.getElementById('ejercicio-modal');
+    const modalContent = document.getElementById('ejercicio-contenido');
+    
+    let selectedExerciseIndex = 0;
+    let currentEjercicio = null;
+    let lastButtonStates = { Y: false, A: false, left: false, right: false, up: false, down: false };
+    
+    console.log(`Found ${exerciseWrappers.length} exercises for navigation`);
+    
+    function highlightExercise(index) {
+        // Limpiar selección previa
+        exerciseWrappers.forEach((wrapper) => {
+            wrapper.classList.remove('mando-selected');
+        });
+        
+        if (index >= 0 && index < exerciseWrappers.length) {
+            const selectedWrapper = exerciseWrappers[index];
+            selectedWrapper.classList.add('mando-selected');
+            selectedWrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            // Actualizar ejercicio actual
+            const ejercicioId = selectedWrapper.querySelector('.exercise-card').dataset.ejercicioId;
+            currentEjercicio = {
+                Id: ejercicioId,
+                Nombre: selectedWrapper.querySelector('.card-title').textContent,
+                Descripcion: selectedWrapper.querySelector('.card-text').textContent,
+                Video: selectedWrapper.querySelector('.exercise-video').querySelector('source').src,
+                Tipo: selectedWrapper.querySelector('.badge').textContent,
+            };
+            
+            console.log(`Selected exercise ${index + 1} of ${exerciseWrappers.length} - Press A to view`);
+        }
+    }
+    
+    function mostrarEjercicioGrande() {
+        if (!currentEjercicio) return;
+        
+        modalContent.innerHTML = `
+            <button onclick="cerrarEjercicioGrande()" style="position: absolute; top: 10px; right: 15px; background: none; border: none; font-size: 2rem; cursor: pointer; color: #666;">&times;</button>
+            <h2 style="color: #007bff; margin-bottom: 1rem;">${currentEjercicio.Nombre}</h2>
+            <div style="text-align: center; margin-bottom: 1rem;">
+                <video src="${currentEjercicio.Video}" controls autoplay
+                    style="width: 100%; max-width: 900px; max-height: 70vh; border-radius: 8px;"></video>
+            </div>
+            <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                <span style="background: #17a2b8; color: white; padding: 0.5rem 1rem; border-radius: 1rem; font-size: 0.9rem;">
+                    ${currentEjercicio.Tipo}
+                </span>
+            </div>
+            <p style="color: #666; line-height: 1.6; font-size: 1.05rem;">
+                ${currentEjercicio.Descripcion}
+            </p>
+        `;
+        
+        modal.classList.add('show');
+        modal.style.display = 'flex';
+    }
+
+
+    function cerrarEjercicioGrande() {
+        modal.classList.remove('show');
+        modal.style.display = 'none';
+        
+        // Pausar video si está reproduciéndose
+        const video = modalContent.querySelector('video');
+        if (video) {
+            video.pause();
+        }
+    }
+    
+    // Hacer función global para el botón de cerrar
+    window.cerrarEjercicioGrande = cerrarEjercicioGrande;
+    
+    // Click en tarjetas para seleccionar
+    exerciseWrappers.forEach((wrapper, index) => {
+        wrapper.addEventListener('click', function() {
+            selectedExerciseIndex = index;
+            highlightExercise(selectedExerciseIndex);
+        });
+    });
+    
+    // Monitorear mando SNES
+    function monitorController() {
+        fetch('/paciente/get_controller_state')
+            .then(response => response.json())
+            .then(data => {
+                if (!data.error) {
+                    // Botón Y - Volver (funciona siempre)
+                    if (data.Y && !lastButtonStates.Y) {
+                        if (modal.classList.contains('show')) {
+                            // Si el modal está abierto, cerrarlo
+                            cerrarEjercicioGrande();
+                        } else {
+                            // Si no, volver al dashboard
+                            backBtn.click();
+                        }
+                    }
+                    
+                    // Botón A - Mostrar ejercicio en grande (solo si no está el modal abierto)
+                    if (data.A && !lastButtonStates.A && !modal.classList.contains('show')) {
+                        mostrarEjercicioGrande();
+                    }
+                    
+                    // Navegación solo si no está el modal abierto
+                    if (!modal.classList.contains('show')) {
+                        // NAVEGACIÓN ← → entre ejercicios
+                        if (data.left && !lastButtonStates.left) {
+                            if (selectedExerciseIndex > 0) {
+                                selectedExerciseIndex--;
+                                highlightExercise(selectedExerciseIndex);
+                            }
+                        }
+                        
+                        if (data.right && !lastButtonStates.right) {
+                            if (selectedExerciseIndex < exerciseWrappers.length - 1) {
+                                selectedExerciseIndex++;
+                                highlightExercise(selectedExerciseIndex);
+                            }
+                        }
+                        
+                        // SCROLL CON ↑ ↓
+                       if (data.up && !lastButtonStates.up) {
+                            window.scrollBy(0, -200);
+                        }
+                        if (data.down && !lastButtonStates.down) {
+                            window.scrollBy(0, 200);
+                        }
+                    } else {
+                        // Cuando el modal está abierto, usar ↑ ↓ para desplazar dentro del modal
+                        if (data.up && !lastButtonStates.up) {
+                            modalContent.scrollBy(0, -150);
+                        }
+                        if (data.down && !lastButtonStates.down) {
+                            modalContent.scrollBy(0, 150);
+                        }
+                    }
+                    
+                    lastButtonStates = { 
+                        Y: data.Y, 
+                        A: data.A, 
+                        left: data.left || false,
+                        right: data.right || false,
+                        up: data.up || false,
+                        down: data.down || false
+                    };
+                }
+            })
+            .catch(err => {
+                console.log('Controller fetch error:', err);
+            });
+        
+        setTimeout(monitorController, 100);
+    }
+    
+    // Inicializar
+    if (exerciseWrappers.length > 0) {
+        highlightExercise(selectedExerciseIndex);
+    }
+    
+    monitorController();
+});
+</script>
+{% endblock %}

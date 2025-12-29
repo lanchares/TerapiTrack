@@ -1,0 +1,417 @@
+{% extends "base.html" %}
+
+{% block title %}Mi Progreso - TerapiTrack{% endblock %}
+
+{% block content %}
+<div class="container-fluid vh-100" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 2rem 0;">
+    
+    <!-- Botón de regreso VERDE -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <a href="{{ url_for('paciente.dashboard') }}" class="btn btn-outline-light btn-lg snes-back-btn" id="btn-back">
+            <span class="snes-letter">Y</span>
+            <i class="bi bi-arrow-left me-2"></i>Volver al Inicio
+        </a>
+    </div>
+
+    <div class="text-center mb-4">
+        <h1 class="display-5 fw-bold text-white mb-3">
+            <i class="bi bi-graph-up me-2"></i>Mi Progreso
+        </h1>
+        <p class="text-white-50">Seguimiento de tu evolución terapéutica</p>
+    </div>
+
+    <!-- LAYOUT MODIFICADO: Gráfico pequeño + Estadísticas lado a lado -->
+    {% if stats.total_evaluaciones > 0 %}
+    <div class="row justify-content-center mb-4">
+        <div class="col-md-10">
+            <div class="row g-4">
+                <!-- Estadísticas principales (izquierda) -->
+                <div class="col-md-6">
+                    <div class="card bg-white bg-opacity-95 h-100">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0"><i class="bi bi-bar-chart me-2"></i>Tus Números</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-6">
+                                    <div class="stat-card bg-primary text-white text-center p-3 rounded">
+                                        <h3 class="mb-0">{{ stats.total_evaluaciones }}</h3>
+                                        <small>Evaluaciones</small>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="stat-card bg-success text-white text-center p-3 rounded">
+                                        <h3 class="mb-0">{{ stats.puntuacion_promedio }}</h3>
+                                        <small>Promedio</small>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="stat-card bg-warning text-white text-center p-3 rounded">
+                                        <h3 class="mb-0">{{ stats.mejor_puntuacion }}</h3>
+                                        <small>Mejor nota</small>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="stat-card bg-info text-white text-center p-3 rounded">
+                                        <h3 class="mb-0">{{ stats.ultima_evaluacion|datetimeformat('%d/%m') if stats.ultima_evaluacion else '--' }}</h3>
+                                        <small>Última eval.</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Mensaje motivacional -->
+                            <div class="mt-4 text-center">
+                                {% if stats.puntuacion_promedio >= 4 %}
+                                    <div class="alert alert-success">
+                                        <i class="bi bi-trophy-fill me-2"></i>¡Excelente trabajo! Sigues mejorando.
+                                    </div>
+                                {% elif stats.puntuacion_promedio >= 3 %}
+                                    <div class="alert alert-info">
+                                        <i class="bi bi-thumbs-up-fill me-2"></i>Vas por buen camino. ¡Sigue así!
+                                    </div>
+                                {% else %}
+                                    <div class="alert alert-warning">
+                                        <i class="bi bi-heart-fill me-2"></i>Cada día es una nueva oportunidad de mejorar.
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gráfico pequeño (derecha) -->
+                <div class="col-md-6">
+                    <div class="card bg-white bg-opacity-95 h-100">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0"><i class="bi bi-graph-up me-2"></i>Tu Evolución</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="progressChart" width="300" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Ejercicios evaluados NAVEGABLES -->
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card bg-white bg-opacity-95">
+                <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-list-check me-2"></i>Mis Ejercicios Evaluados</h5>
+                    <small class="text-light">Usa ← → para navegar</small>
+                </div>
+                <div class="card-body">
+                    {% if evaluaciones %}
+                        <!-- Vista navegable por tarjetas -->
+                        <div id="evaluacionesContainer" class="position-relative">
+                            <div class="row g-3" id="evaluacionesGrid">
+                                {% for evaluacion in evaluaciones %}
+                                <div class="col-md-6 evaluacion-card" data-index="{{ loop.index0 }}">
+                                    <div class="card border-left-primary h-100">
+                                        <div class="card-body p-3">
+                                            <!-- Ejercicio y fecha -->
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <h6 class="card-title text-primary mb-1">{{ evaluacion.ejercicio_sesion.ejercicio.Nombre }}</h6>
+                                                <small class="text-muted">{{ evaluacion.Fecha_Evaluacion|datetimeformat('%d/%m/%Y') }}</small>
+                                            </div>
+                                            
+                                            <!-- Puntuación con estrellas grandes -->
+                                            <div class="text-center mb-2">
+                                                <div class="score-display-large">
+                                                    {% for i in range(1, 6) %}
+                                                        <i class="bi bi-star{% if i <= evaluacion.Puntuacion %}-fill text-warning{% else %} text-muted{% endif %} fs-4"></i>
+                                                    {% endfor %}
+                                                </div>
+                                                <div class="mt-1">
+                                                    <span class="badge bg-primary fs-6">{{ evaluacion.Puntuacion }}/5</span>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Tipo de ejercicio -->
+                                            <div class="text-center mb-2">
+                                                <span class="badge bg-info">{{ evaluacion.ejercicio_sesion.ejercicio.Tipo }}</span>
+                                            </div>
+                                            
+                                            <!-- Comentario del profesional -->
+                                            {% if evaluacion.Comentarios %}
+                                            <div class="alert alert-light mb-0">
+                                                <small><strong>💬 Tu terapeuta dice:</strong></small>
+                                                <p class="mb-0 mt-1"><em>"{{ evaluacion.Comentarios }}"</em></p>
+                                            </div>
+                                            {% else %}
+                                            <div class="text-center text-muted">
+                                                <small><em>Sin comentarios adicionales</em></small>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="bi bi-graph-up fs-1 text-muted mb-3"></i>
+                            <h5 class="text-muted">No tienes evaluaciones aún</h5>
+                            <p class="text-muted">Cuando completes sesiones, tu terapeuta las evaluará y aparecerán aquí</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Instrucciones de navegación -->
+    <div class="navigation-help">
+        <strong>🎮 Navegación:</strong><br>
+        ← → : Navegar entre evaluaciones<br>
+        ↑ ↓ : Bajar/Subir en la pantalla<br>
+        Y : Volver
+    </div>
+</div>
+
+<style>
+/* Botón verde como el mando */
+.snes-back-btn {
+    position: relative;
+    border: 3px solid rgba(255,255,255,0.8);
+    background: linear-gradient(145deg, #228B22, #006400);
+}
+
+.snes-back-btn:hover {
+    background: linear-gradient(145deg, #32CD32, #228B22);
+    border-color: white;
+    color: white;
+}
+
+.snes-letter {
+    position: absolute;
+    top: -5px;
+    right: 8px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    background: rgba(255,255,255,0.9);
+    color: #006400;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Estadísticas mejoradas */
+.stat-card {
+    transition: transform 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: scale(1.05);
+}
+
+/* Tarjetas de evaluación navegables */
+.border-left-primary {
+    border-left: 4px solid #007bff !important;
+}
+
+.evaluacion-card {
+    transition: all 0.3s ease;
+}
+
+.evaluacion-card.mando-selected {
+    transform: scale(1.02);
+    z-index: 10;
+}
+
+.evaluacion-card.mando-selected .card {
+    border: 3px solid #ffc107;
+    box-shadow: 0 0 20px rgba(255,193,7,0.5);
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+/* Estrellas grandes para mejor visibilidad */
+.score-display-large {
+    letter-spacing: 2px;
+}
+
+/* Instrucciones de navegación */
+.navigation-help {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 15px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    z-index: 1000;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+}
+
+/* Responsive mejorado */
+@media (max-width: 768px) {
+    .col-md-6 {
+        margin-bottom: 1rem;
+    }
+    
+    .fs-4 {
+        font-size: 1.2rem !important;
+    }
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const backBtn = document.getElementById('btn-back');
+    
+    let selectedCardIndex = 0;
+    let lastButtonStates = { Y: false, left: false, right: false, up: false, down: false };
+    
+    // Crear gráfico si hay datos
+    {% if stats.total_evaluaciones > 0 %}
+    const ctx = document.getElementById('progressChart').getContext('2d');
+    // Usar la media por sesión (como en el profesional)
+    const evalSesion = {{ evaluaciones_sesion_json|tojson }};
+
+    // Tomar como máximo las últimas 8 sesiones
+    const ultimasSesiones = evalSesion;
+
+    const fechas = ultimasSesiones.map(e =>
+        e.Fecha
+            ? new Date(e.Fecha).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })
+            : ''
+    );
+    const puntuaciones = ultimasSesiones.map(e => e.Media_Puntuacion);
+
+    
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: fechas,
+            datasets: [{
+                label: 'Puntuación',
+                data: puntuaciones,
+                borderColor: 'rgb(75, 192, 192)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                tension: 0.4,
+                fill: true,
+                pointRadius: 8,
+                pointHoverRadius: 10,
+                pointBackgroundColor: 'rgb(75, 192, 192)',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 5,
+                    ticks: {
+                        stepSize: 1,
+                        font: {
+                            size: 16
+                        }
+                    }
+                },
+                x: {
+                    ticks: {
+                        font: {
+                            size: 14
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+    {% endif %}
+    
+    function highlightCard(index) {
+        // Limpiar selección previa
+        document.querySelectorAll('.evaluacion-card').forEach(card => {
+            card.classList.remove('mando-selected');
+        });
+        
+        const cards = document.querySelectorAll('.evaluacion-card');
+        if (index >= 0 && index < cards.length) {
+            cards[index].classList.add('mando-selected');
+            cards[index].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+    
+    
+    function monitorController() {
+        fetch('/paciente/get_controller_state')
+            .then(response => response.json())
+            .then(data => {
+                if (!data.error) {
+                    // Botón Y - Volver
+                    if (data.Y && !lastButtonStates.Y) {
+                        backBtn.click();
+                    }
+                    
+                    // NAVEGACIÓN ← → entre tarjetas
+                    if (data.left && !lastButtonStates.left) {
+                        const cards = document.querySelectorAll('.evaluacion-card');
+                        if (selectedCardIndex > 0) {
+                            selectedCardIndex--;
+                            highlightCard(selectedCardIndex);
+                        }
+                    }
+
+                    if (data.right && !lastButtonStates.right) {
+                        const cards = document.querySelectorAll('.evaluacion-card');
+                        if (selectedCardIndex < cards.length - 1) {
+                            selectedCardIndex++;
+                            highlightCard(selectedCardIndex);
+                        }
+                    }
+
+                    
+                    // SCROLL CON ↑ ↓
+                    if (data.up && !lastButtonStates.up) {
+                        window.scrollBy(0, -200);
+                    }
+                    
+                    if (data.down && !lastButtonStates.down) {
+                        window.scrollBy(0, 200);
+                    }
+                    
+                    lastButtonStates = { 
+                        Y: data.Y, 
+                        left: data.left || false,
+                        right: data.right || false,
+                        up: data.up || false,
+                        down: data.down || false
+                    };
+                }
+            })
+            .catch(() => {});
+        
+        setTimeout(monitorController, 120);
+    }
+    
+    // Inicializar
+    if (document.querySelectorAll('.evaluacion-card').length > 0) {
+        highlightCard(selectedCardIndex);
+    }
+    monitorController();
+});
+</script>
+{% endblock %}

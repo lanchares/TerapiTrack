@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Ver Evaluación - TerapiTrack{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-clipboard-check me-2"></i>Evaluación Registrada</h2>
+    <a href="{{ url_for('profesional.evaluar_sesion', sesion_id=ejercicio_sesion.Sesion_Id) }}" 
+       class="btn btn-secondary">
+        <i class="bi bi-arrow-left me-1"></i>Volver a la sesión
+    </a>
+</div>
+
+<div class="card shadow mb-4">
+    <div class="card-header bg-success text-white">
+        <h5 class="mb-0">{{ ejercicio_sesion.ejercicio.Nombre }}</h5>
+        <small>Evaluado el {{ evaluacion.Fecha_Evaluacion|datetimeformat('%d/%m/%Y %H:%M') }}</small>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <!-- Video del paciente -->
+            <div class="col-md-6 mb-4">
+                <h5>Video del paciente:</h5>
+                {% if video_respuesta %}
+                <video controls class="w-100 rounded" style="max-height: 300px;">
+                    <source src="{{ url_for('static', filename='uploads/respuestas/' + video_respuesta.Ruta_Almacenamiento) }}" type="video/webm">
+                    Tu navegador no soporta videos.
+                </video>
+                {% endif %}
+            </div>
+            
+            <!-- Evaluación -->
+            <div class="col-md-6 mb-4">
+                <h5>Evaluación:</h5>
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <h6>Puntuación:</h6>
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    {% for i in range(1, 6) %}
+                                        {% if i <= evaluacion.Puntuacion %}
+                                            <i class="bi bi-star-fill text-warning fs-4"></i>
+                                        {% else %}
+                                            <i class="bi bi-star text-muted fs-4"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                                <span class="badge bg-success fs-6">{{ evaluacion.Puntuacion }}/5</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <h6>Comentarios:</h6>
+                            <div class="bg-white p-3 rounded border">
+                                {{ evaluacion.Comentarios or 'Sin comentarios adicionales' }}
+                            </div>
+                        </div>
+                        
+                        <div class="text-muted small">
+                            <i class="bi bi-calendar3 me-1"></i>
+                            Evaluado por: {{ current_user.Nombre }} {{ current_user.Apellidos }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

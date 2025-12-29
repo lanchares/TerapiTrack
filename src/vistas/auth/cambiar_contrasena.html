@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Cambiar Contraseña - TerapiTrack{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header text-center bg-warning text-dark">
+                <h4><i class="bi bi-key me-2"></i>Cambiar Contraseña</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    
+                    {% if form.errors %}
+                    <div class="alert alert-danger">
+                        {% for field, errors in form.errors.items() %}
+                            {% for error in errors %}
+                                <div><i class="bi bi-exclamation-triangle me-1"></i>{{ error }}</div>
+                            {% endfor %}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="mb-3">
+                        {{ form.contrasena_actual.label(class="form-label") }}
+                        {{ form.contrasena_actual(class="form-control") }}
+                        <div class="form-text">Introduce tu contraseña actual</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.nueva_contrasena.label(class="form-label") }}
+                        {{ form.nueva_contrasena(class="form-control") }}
+                        <div class="form-text">Mínimo 6 caracteres</div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        {{ form.confirmar_contrasena.label(class="form-label") }}
+                        {{ form.confirmar_contrasena(class="form-control") }}
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-warning">
+                            <i class="bi bi-shield-check me-2"></i>Actualizar Contraseña
+                        </button>
+                        <a href="{{ url_for('auth.perfil') }}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left me-1"></i>Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

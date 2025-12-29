@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% block title %}Gestión de Usuarios - TerapiTrack{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-people me-2"></i>Gestión de Usuarios</h2>
+    <a href="{{ url_for('admin.crear_usuario') }}" class="btn btn-primary">
+        <i class="bi bi-person-plus me-1"></i>Nuevo Usuario
+    </a>
+</div>
+
+<!-- Filtros de búsqueda -->
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <form method="GET" class="row g-3">
+            <div class="col-md-4">
+                <label for="search" class="form-label">Buscar Usuario</label>
+                <input type="text" name="search" id="search" class="form-control" 
+                       placeholder="Nombre, apellidos o email..." value="{{ search }}">
+            </div>
+            <div class="col-md-3">
+                <label for="rol" class="form-label">Filtrar por Rol</label>
+                <select name="rol" id="rol" class="form-select">
+                    <option value="">Todos los roles</option>
+                    <option value="0" {{ 'selected' if rol_filter == '0' }}>Administrador</option>
+                    <option value="1" {{ 'selected' if rol_filter == '1' }}>Paciente</option>
+                    <option value="2" {{ 'selected' if rol_filter == '2' }}>Profesional</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="estado" class="form-label">Filtrar por Estado</label>
+                <select name="estado" id="estado" class="form-select">
+                    <option value="">Todos los estados</option>
+                    <option value="1" {{ 'selected' if estado_filter == '1' }}>Activo</option>
+                    <option value="0" {{ 'selected' if estado_filter == '0' }}>Inactivo</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">&nbsp;</label>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-outline-primary">
+                        <i class="bi bi-search me-1"></i>Buscar
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if usuarios %}
+<div class="card shadow">
+    <div class="card-header">
+        <h5 class="mb-0">Lista de Usuarios ({{ usuarios|length }} usuarios)</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Email</th>
+                        <th>Rol</th>
+                        <th>Estado</th>
+                        <th>Fecha Registro</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for usuario in usuarios %}
+                    <tr class="{{ 'table-secondary' if usuario.Estado == 0 else '' }}">
+                        <td>{{ usuario.Id }}</td>
+                        <td>
+                            <strong>{{ usuario.Nombre }} {{ usuario.Apellidos }}</strong>
+                        </td>
+                        <td>{{ usuario.Email }}</td>
+                        <td>
+                            <span class="badge bg-{{ 'danger' if usuario.Rol_Id == 0 else 'success' if usuario.Rol_Id == 1 else 'info' }}">
+                                {% if usuario.Rol_Id == 0 %}
+                                    <i class="bi bi-shield me-1"></i>Administrador
+                                {% elif usuario.Rol_Id == 1 %}
+                                    <i class="bi bi-heart me-1"></i>Paciente
+                                {% elif usuario.Rol_Id == 2 %}
+                                    <i class="bi bi-briefcase me-1"></i>Profesional
+                                {% endif %}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge bg-{{ 'success' if usuario.Estado == 1 else 'danger' }}">
+                                <i class="bi bi-{{ 'check-circle' if usuario.Estado == 1 else 'x-circle' }} me-1"></i>
+                                {{ 'Activo' if usuario.Estado == 1 else 'Inactivo' }}
+                            </span>
+                        </td>
+                        <td>{{ usuario.Fecha_Registro|datetimeformat('%d/%m/%Y') }}</td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <!-- ← NUEVO: Solo mostrar "Ver" y "Editar" si está activo -->
+                                {% if usuario.Estado == 1 %}
+                                <a href="{{ url_for('admin.ver_usuario', user_id=usuario.Id) }}" 
+                                   class="btn btn-sm btn-outline-info" title="Ver detalles">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                
+                                <a href="{{ url_for('admin.editar_usuario', user_id=usuario.Id) }}" 
+                                   class="btn btn-sm btn-outline-warning" title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                {% endif %}
+                                
+                                <!-- Cambiar estado (siempre disponible) -->
+                                {% if usuario.Id != current_user.Id %}
+                                <a href="{{ url_for('admin.cambiar_estado_usuario', user_id=usuario.Id) }}" 
+                                   class="btn btn-sm btn-outline-{{ 'danger' if usuario.Estado == 1 else 'success' }}" 
+                                   title="{{ 'Desactivar' if usuario.Estado == 1 else 'Activar' }}">
+                                    <i class="bi bi-{{ 'toggle-off' if usuario.Estado == 1 else 'toggle-on' }}"></i>
+                                </a>
+                                {% endif %}
+                                
+                                <!-- ← NUEVO: Mostrar mensaje para usuarios inactivos -->
+                                {% if usuario.Estado == 0 %}
+                                <span class="btn btn-sm btn-outline-secondary disabled" title="Usuario inactivo">
+                                    <i class="bi bi-lock"></i>
+                                </span>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% else %}
+<div class="alert alert-info text-center">
+    <i class="bi bi-info-circle me-2"></i>
+    No se encontraron usuarios que coincidan con los criterios de búsqueda.
+    {% if search or rol_filter or estado_filter %}
+    <div class="mt-2">
+        <a href="{{ url_for('admin.listar_usuarios') }}" class="btn btn-outline-primary btn-sm">
+            <i class="bi bi-arrow-counterclockwise me-1"></i>Limpiar Filtros
+        </a>
+    </div>
+    {% else %}
+    <div class="mt-2">
+        <a href="{{ url_for('admin.crear_usuario') }}" class="btn btn-primary">
+            <i class="bi bi-person-plus me-1"></i>Crear Primer Usuario
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

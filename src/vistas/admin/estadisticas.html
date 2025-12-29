@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+{% block title %}Estadísticas - TerapiTrack{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-bar-chart me-2"></i>Estadísticas del Sistema</h2>
+    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left me-1"></i>Menu
+    </a>
+</div>
+
+<!-- Tarjetas de estadísticas -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <h5>Total Usuarios</h5>
+                <h2>{{ stats.distribucion_roles.administradores + stats.distribucion_roles.pacientes + stats.distribucion_roles.profesionales }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-danger">
+            <div class="card-body">
+                <h5>Administradores</h5>
+                <h2>{{ stats.distribucion_roles.administradores }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <h5>Pacientes</h5>
+                <h2>{{ stats.distribucion_roles.pacientes }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-info">
+            <div class="card-body">
+                <h5>Profesionales</h5>
+                <h2>{{ stats.distribucion_roles.profesionales }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card text-white bg-secondary">
+            <div class="card-body">
+                <h5>Vinculaciones Activas</h5>
+                <h2>{{ stats.total_vinculaciones }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card text-white bg-warning">
+            <div class="card-body">
+                <h5>Nuevos este Mes</h5>
+                <h2>{{ stats.usuarios_por_mes[0].count if stats.usuarios_por_mes else 0 }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Gráficos de estadísticas -->
+<div class="row">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header">
+                <h5 class="mb-0">Distribución por Roles</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="rolesChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header">
+                <h5 class="mb-0">Registros por Mes</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="registrosChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Acciones rápidas -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header">
+                <h5 class="mb-0">Acciones Rápidas</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <a href="{{ url_for('admin.listar_usuarios') }}" class="btn btn-outline-primary w-100">
+                            <i class="bi bi-people me-2"></i>Ver Usuarios
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{{ url_for('admin.crear_usuario') }}" class="btn btn-outline-success w-100">
+                            <i class="bi bi-person-plus me-2"></i>Crear Usuario
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{{ url_for('admin.ver_vinculaciones') }}" class="btn btn-outline-info w-100">
+                            <i class="bi bi-diagram-3 me-2"></i>Ver Vinculaciones
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{{ url_for('admin.exportar_usuarios') }}" class="btn btn-outline-secondary w-100">
+                            <i class="bi bi-download me-2"></i>Exportar CSV
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ← REMOVIDO: Botón de configuración (ya está en el menú) -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Gráfico de roles
+const rolesCtx = document.getElementById('rolesChart').getContext('2d');
+new Chart(rolesCtx, {
+    type: 'doughnut',
+    data: {
+        labels: ['Administradores', 'Pacientes', 'Profesionales'],
+        datasets: [{
+            data: [
+                {{ stats.distribucion_roles.administradores }},
+                {{ stats.distribucion_roles.pacientes }},
+                {{ stats.distribucion_roles.profesionales }}
+            ],
+            backgroundColor: ['#dc3545', '#28a745', '#17a2b8']
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false
+    }
+});
+
+// Gráfico de registros
+const registrosCtx = document.getElementById('registrosChart').getContext('2d');
+new Chart(registrosCtx, {
+    type: 'line',
+    data: {
+        labels: [
+            {% for mes in stats.usuarios_por_mes %}
+                '{{ mes.mes }}'{{ ',' if not loop.last }}
+            {% endfor %}
+        ],
+        datasets: [{
+            label: 'Nuevos Usuarios',
+            data: [
+                {% for mes in stats.usuarios_por_mes %}
+                    {{ mes.count }}{{ ',' if not loop.last }}
+                {% endfor %}
+            ],
+            borderColor: '#007bff',
+            backgroundColor: 'rgba(0, 123, 255, 0.1)',
+            tension: 0.1
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

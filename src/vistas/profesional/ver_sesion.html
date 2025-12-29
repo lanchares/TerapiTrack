@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+
+{% block title %}Detalle de Sesión - TerapiTrack{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>
+        <i class="bi bi-calendar-event me-2"></i>Sesión #{{ sesion.Id }}
+        <span class="badge 
+            {% if sesion.Estado == 'PENDIENTE' %}bg-warning
+            {% elif sesion.Estado == 'COMPLETADA' %}bg-success
+            {% elif sesion.Estado == 'CANCELADA' %}bg-danger
+            {% else %}bg-secondary{% endif %}">
+            {{ sesion.Estado }}
+        </span>
+    </h2>
+    <div>
+        {% if sesion.Estado == 'PENDIENTE' %}
+        <a href="{{ url_for('profesional.ejecutar_sesion', sesion_id=sesion.Id) }}" 
+           class="btn btn-primary">
+            <i class="bi bi-play me-1"></i>Iniciar Sesión
+        </a>
+        {% elif sesion.Estado == 'COMPLETADA' %}
+        <a href="{{ url_for('profesional.evaluar_sesion', sesion_id=sesion.Id) }}" 
+           class="btn btn-success">
+            <i class="bi bi-clipboard-check me-1"></i>Evaluar Sesión
+        </a>
+        {% endif %}
+        <a href="{{ url_for('profesional.listar_sesiones') }}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left me-1"></i>Volver
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 fw-bold text-primary">Información General</h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Paciente:</span>
+                        <strong>{{ sesion.paciente.usuario.Nombre }} {{ sesion.paciente.usuario.Apellidos }}</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Condición:</span>
+                        <strong>{{ sesion.paciente.Condicion_Medica or 'No especificada' }}</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Fecha Programada:</span>
+                        <strong>{{ sesion.Fecha_Programada|datetimeformat }}</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Estado:</span>
+                        <strong>{{ sesion.Estado }}</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Fecha de Creación:</span>
+                        <strong>{{ sesion.Fecha_Asignacion|datetimeformat('%d/%m/%Y') }}</strong>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 mb-4">
+        <div class="card shadow">
+            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                <h6 class="m-0 fw-bold text-primary">Ejercicios Asignados</h6>
+                <span class="badge bg-primary">{{ ejercicios|length }}</span>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    {% for ejercicio_sesion in ejercicios %}
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ ejercicio_sesion.ejercicio.Nombre }}</h6>
+                            <small class="text-muted">{{ ejercicio_sesion.ejercicio.Duracion }}s</small>
+                        </div>
+                        <p class="mb-1">{{ ejercicio_sesion.ejercicio.Descripcion }}</p>
+                        <small class="text-muted">Tipo: {{ ejercicio_sesion.ejercicio.Tipo }}</small>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if sesion.Estado == 'COMPLETADA' %}
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                <h6 class="m-0 fw-bold text-success">
+                    <i class="bi bi-star-fill me-2"></i>Evaluaciones de la Sesión
+                </h6>
+                <span class="badge bg-success">
+                    {{ ejercicios|selectattr('evaluacion')|list|length }}/{{ ejercicios|length }} evaluados
+                </span>
+            </div>
+            <div class="card-body">
+                {% set evaluaciones_existentes = ejercicios|selectattr('evaluacion')|list %}
+                {% if evaluaciones_existentes %}
+                <div class="row">
+                    {% for ejercicio in ejercicios %}
+                    <div class="col-lg-6 mb-3">
+                        <div class="card border-{% if ejercicio.evaluacion %}success{% else %}warning{% endif %}">
+                            <div class="card-header py-2 bg-{% if ejercicio.evaluacion %}success{% else %}warning{% endif %} bg-opacity-10">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h6 class="mb-0">{{ ejercicio.ejercicio.Nombre }}</h6>
+                                    {% if ejercicio.evaluacion %}
+                                    <span class="badge bg-success">
+                                        {{ ejercicio.evaluacion.Puntuacion }}/5
+                                    </span>
+                                    {% else %}
+                                    <span class="badge bg-warning">Sin evaluar</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="card-body py-2">
+                                {% if ejercicio.evaluacion %}
+                                <div class="mb-2">
+                                    <strong>Puntuación:</strong>
+                                    <div class="text-warning">
+                                        {% for i in range(1, 6) %}
+                                            {% if i <= ejercicio.evaluacion.Puntuacion %}
+                                                <i class="bi bi-star-fill"></i>
+                                            {% else %}
+                                                <i class="bi bi-star"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="mb-2">
+                                    <strong>Comentarios:</strong>
+                                    <p class="mb-1 text-muted">{{ ejercicio.evaluacion.Comentarios or 'Sin comentarios adicionales' }}</p>
+                                </div>
+                                <small class="text-muted">
+                                    <i class="bi bi-calendar3 me-1"></i>
+                                    Evaluado el {{ ejercicio.evaluacion.Fecha_Evaluacion|datetimeformat('%d/%m/%Y %H:%M') }}
+                                </small>
+                                <div class="mt-2">
+                                    <a href="{{ url_for('profesional.ver_evaluacion', ejercicio_sesion_id=ejercicio.Id) }}" 
+                                       class="btn btn-info w-100">
+                                        <i class="bi bi-eye me-1"></i>Ver Evaluación
+                                    </a>
+                                </div>
+                                {% else %}
+                                <div class="text-center py-2">
+                                    <p class="text-muted mb-2">Este ejercicio aún no ha sido evaluado</p>
+                                    <a href="{{ url_for('profesional.evaluar_ejercicio', ejercicio_sesion_id=ejercicio.Id) }}" 
+                                       class="btn btn-sm btn-warning">
+                                        <i class="bi bi-star me-1"></i>Evaluar ahora
+                                    </a>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Resumen de evaluaciones -->
+                {% if evaluaciones_existentes %}
+                <div class="mt-4 p-3 bg-light rounded">
+                    <h6 class="fw-bold mb-3">Resumen de la Sesión</h6>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <h4 class="text-primary mb-1">
+                                    {{ (evaluaciones_existentes|sum(attribute='evaluacion.Puntuacion') / evaluaciones_existentes|length)|round(1) }}
+                                </h4>
+                                <small class="text-muted">Puntuación media</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <h4 class="text-success mb-1">{{ evaluaciones_existentes|length }}</h4>
+                                <small class="text-muted">Ejercicios evaluados</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <h4 class="text-warning mb-1">{{ ejercicios|length - evaluaciones_existentes|length }}</h4>
+                                <small class="text-muted">Pendientes de evaluar</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="bi bi-clipboard-x display-4 text-muted"></i>
+                    <h5 class="mt-3">Sesión sin evaluar</h5>
+                    <p class="text-muted">Los ejercicios de esta sesión aún no han sido evaluados.</p>
+                    <a href="{{ url_for('profesional.evaluar_sesion', sesion_id=sesion.Id) }}" 
+                       class="btn btn-success">
+                        <i class="bi bi-star-fill me-1"></i>Comenzar Evaluación
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Configuración del Sistema - TerapiTrack{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-gear me-2"></i>Configuración del Sistema</h2>
+    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left me-1"></i>Menu
+    </a>
+</div>
+
+<div class="row">
+    <!-- Panel principal completo -->
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 fw-bold text-primary">
+                    <i class="bi bi-save me-2"></i>Configuración Guardada
+                </h6>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            {{ form.retencion_videos.label(class="form-label fw-bold") }}
+                            {{ form.retencion_videos(class="form-select") }}
+                            <div class="form-text">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Actual: {{ config_actual.get('retencion_videos', '30') }} días
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.limite_almacenamiento.label(class="form-label fw-bold") }}
+                            {{ form.limite_almacenamiento(class="form-select") }}
+                            <div class="form-text">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Actual: {{ config_actual.get('limite_almacenamiento', '5') }} GB
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            {{ form.notificaciones_email.label(class="form-label fw-bold") }}
+                            {{ form.notificaciones_email(class="form-select") }}
+                            <div class="form-text">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Estado: {{ config_actual.get('notificaciones_email', 'Habilitadas') }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.backup_automatico.label(class="form-label fw-bold") }}
+                            {{ form.backup_automatico(class="form-select") }}
+                            <div class="form-text">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Frecuencia: {{ config_actual.get('backup_automatico', 'daily') }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="bi bi-save me-2"></i>Guardar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

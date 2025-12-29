@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block title %}Mis Sesiones - TerapiTrack{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-calendar-week me-2"></i>Mis Sesiones</h2>
+    <a href="{{ url_for('profesional.crear_sesion') }}" class="btn btn-success">
+        <i class="bi bi-plus-circle me-1"></i>Nueva Sesión
+    </a>
+</div>
+
+<!-- ✅ FORMULARIO DE FILTROS COMPLETO -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 fw-bold text-primary">Filtros</h6>
+    </div>
+    <div class="card-body">
+        <form method="GET" class="row g-3">
+            <div class="col-md-3">
+                <label for="estado" class="form-label">Estado:</label>
+                <select name="estado" id="estado" class="form-select">
+                    <option value="">Todos los estados</option>
+                    <option value="PENDIENTE" {% if estado_filter == 'PENDIENTE' %}selected{% endif %}>Pendiente</option>
+                    <option value="COMPLETADA" {% if estado_filter == 'COMPLETADA' %}selected{% endif %}>Completada</option>
+                    <option value="CANCELADA" {% if estado_filter == 'CANCELADA' %}selected{% endif %}>Cancelada</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="paciente" class="form-label">Paciente:</label>
+                <select name="paciente" id="paciente" class="form-select">
+                    <option value="">Todos los pacientes</option>
+                    {% for paciente in pacientes %}
+                    <option value="{{ paciente.Usuario_Id }}" 
+                            {% if paciente_filter == paciente.Usuario_Id|string %}selected{% endif %}>
+                        {{ paciente.usuario.Nombre }} {{ paciente.usuario.Apellidos }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label for="fecha_desde" class="form-label">Desde:</label>
+                <input type="date" name="fecha_desde" id="fecha_desde" class="form-control" 
+                       value="{{ fecha_desde }}">
+            </div>
+            <div class="col-md-2">
+                <label for="fecha_hasta" class="form-label">Hasta:</label>
+                <input type="date" name="fecha_hasta" id="fecha_hasta" class="form-control" 
+                       value="{{ fecha_hasta }}">
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-funnel"></i> Filtrar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Tabla de sesiones -->
+<div class="card shadow">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Paciente</th>
+                        <th>Fecha Programada</th>
+                        <th>Estado</th>
+                        <th>Evaluación</th>
+                        <th>Fecha Creación</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sesion in sesiones %}
+                    <tr class="{% if sesion.estado_evaluacion == 'COMPLETAMENTE_EVALUADA' %}table-success{% elif sesion.estado_evaluacion == 'PARCIALMENTE_EVALUADA' %}table-warning{% elif sesion.estado_evaluacion == 'SIN_EVALUAR' and sesion.Estado == 'COMPLETADA' %}table-danger{% endif %}">
+                        <td>{{ sesion.paciente.usuario.Nombre }} {{ sesion.paciente.usuario.Apellidos }}</td>
+                        <td>{{ sesion.Fecha_Programada|datetimeformat }}</td>
+                        <td>
+                            <span class="badge bg-{% if sesion.Estado == 'COMPLETADA' %}success{% elif sesion.Estado == 'PENDIENTE' %}warning{% else %}danger{% endif %}">
+                                {{ sesion.Estado }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if sesion.Estado == 'COMPLETADA' %}
+                            <div class="d-flex align-items-center">
+                                <!-- ✅ CORREGIDO: Incluir caso NO_EVALUABLE -->
+                                {% if sesion.estado_evaluacion == 'COMPLETAMENTE_EVALUADA' %}
+                                <span class="badge bg-success me-2">
+                                    <i class="bi bi-check-circle-fill me-1"></i>Evaluada
+                                </span>
+                                {% elif sesion.estado_evaluacion == 'PARCIALMENTE_EVALUADA' %}
+                                <span class="badge bg-warning me-2">
+                                    <i class="bi bi-clock-fill me-1"></i>Parcial
+                                </span>
+                                {% elif sesion.estado_evaluacion == 'SIN_EVALUAR' %}
+                                <span class="badge bg-danger me-2">
+                                    <i class="bi bi-exclamation-circle-fill me-1"></i>Pendiente
+                                </span>
+                                {% elif sesion.estado_evaluacion == 'NO_EVALUABLE' %}
+                                <span class="badge bg-secondary me-2">
+                                    <i class="bi bi-x-circle-fill me-1"></i>Sin video
+                                </span>
+                                {% endif %}
+                                
+                                <!-- Barra de progreso solo si es evaluable -->
+                                {% if sesion.estado_evaluacion != 'NO_EVALUABLE' %}
+                                <div class="progress" style="width: 60px; height: 8px;">
+                                    <div class="progress-bar bg-{% if sesion.porcentaje_evaluacion == 100 %}success{% elif sesion.porcentaje_evaluacion > 0 %}warning{% else %}danger{% endif %}" 
+                                         style="width: {{ sesion.porcentaje_evaluacion }}%">
+                                    </div>
+                                </div>
+                                <small class="ms-1 text-muted">{{ sesion.porcentaje_evaluacion|round|int }}%</small>
+                                {% endif %}
+                            </div>
+                            {% else %}
+                            <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ sesion.Fecha_Asignacion|datetimeformat('%d/%m/%Y') }}</td>
+                        <td>
+                            <a href="{{ url_for('profesional.ver_sesion', sesion_id=sesion.Id) }}" 
+                               class="btn btn-sm btn-info">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            {% if sesion.Estado == 'PENDIENTE' %}
+                            <a href="{{ url_for('profesional.ejecutar_sesion', sesion_id=sesion.Id) }}" 
+                               class="btn btn-sm btn-primary">
+                                <i class="bi bi-play"></i> Iniciar
+                            </a>
+                            {% elif sesion.Estado == 'COMPLETADA' %}
+                                {% if sesion.estado_evaluacion == 'COMPLETAMENTE_EVALUADA' %}
+                                <a href="{{ url_for('profesional.ver_sesion', sesion_id=sesion.Id) }}" 
+                                   class="btn btn-sm btn-success">
+                                    <i class="bi bi-check-circle"></i> Ver
+                                </a>
+                                {% elif sesion.estado_evaluacion == 'NO_EVALUABLE' %}
+                                <span class="btn btn-sm btn-secondary disabled">
+                                    <i class="bi bi-x-circle"></i> No evaluable
+                                </span>
+                                {% else %}
+                                <a href="{{ url_for('profesional.evaluar_sesion', sesion_id=sesion.Id) }}" 
+                                   class="btn btn-sm btn-warning">
+                                    <i class="bi bi-clipboard-check"></i> Evaluar
+                                </a>
+                                {% endif %}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center py-4">
+                            <i class="bi bi-calendar-x fs-1 text-muted"></i>
+                            <h5 class="mt-3">No hay sesiones que coincidan</h5>
+                            <p>Prueba a cambiar los filtros de búsqueda</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- ✅ LEYENDA COMPLETA -->
+<div class="row mt-3">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body py-2">
+                <small class="text-muted">
+                    <strong>Leyenda:</strong>
+                    <span class="badge bg-success ms-2">Evaluada</span> = Todos los ejercicios con video evaluados
+                    <span class="badge bg-warning ms-2">Parcial</span> = Algunos ejercicios evaluados
+                    <span class="badge bg-danger ms-2">Pendiente</span> = Con videos sin evaluar
+                    <span class="badge bg-secondary ms-2">Sin video</span> = No evaluable (sin ejercicios o sin videos)
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.table-success {
+    background-color: rgba(25, 135, 84, 0.1) !important;
+    border-left: 4px solid #198754;
+}
+
+.table-warning {
+    background-color: rgba(255, 193, 7, 0.1) !important;
+    border-left: 4px solid #ffc107;
+}
+
+.table-danger {
+    background-color: rgba(220, 53, 69, 0.1) !important;
+    border-left: 4px solid #dc3545;
+}
+
+.progress {
+    border-radius: 4px;
+}
+</style>
+{% endblock %}
