@@ -1,0 +1,47 @@
+Qué funciones faltan y por qué dejarlas así
+paciente_controlador.init_snes_controller (prints de error y excepción): son solo mensajes de logging ante hardware no disponible o fallos raros de inicialización. Testear esto implicaría simular hardware y excepciones de una librería externa, sin aportar valor real al TFG.
+
+paciente_controlador.get_video_path (dos returns de rutas estáticas): son rutas derivadas de un filename, sin lógica compleja. Cualquier bug ahí se vería al reproducir vídeos; el riesgo es muy bajo.
+
+admin_controlador.ver_usuario (flash "Acceso denegado" + redirect a login): en la práctica esa rama no se ejecuta porque el decorador de rol ya devuelve 403 antes. Ya tienes tests de permisos que cubren el comportamiento real.
+
+profesional_controlador.listar_sesiones (bloque except ValueError: pass de fecha_hasta): ya cubres fecha_desde inválido; cubrir también fecha_hasta inválido sería casi idéntico y no cambia la lógica principal.
+
+profesional_controlador.crear_sesion (form.paciente_id.data = paciente_id_preseleccionado): es solo el “rellenar por defecto” del select de paciente en el GET; la funcionalidad importante (crear sesión) ya está bien testeada.
+
+
+
+Cómo describirlo en la memoria (instalación)
+En la memoria/README, lo adecuado es explicar los pasos de instalación de forma independiente del problema de ExecutionPolicy (eso es un detalle de tu PC). Un bloque típico podría ser:
+
+Clonar el repositorio:
+
+bash
+git clone https://github.com/lanchares/TerapiTrack.git
+cd TerapiTrack
+Crear entorno virtual (ejemplo en Windows):
+
+bash
+python -m venv venv
+Activar entorno virtual:
+
+En Windows (PowerShell):
+
+powershell
+.\venv\Scripts\Activate.ps1
+En Windows (cmd):
+
+text
+venv\Scripts\activate.bat
+En Linux/macOS:
+
+bash
+source venv/bin/activate
+Instalar dependencias:
+
+bash
+pip install -r requirements.txt
+Ejecutar la aplicación (según tu entrypoint, por ejemplo):
+
+bash
+python src/app.py
