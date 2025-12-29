@@ -80,7 +80,6 @@ src/static/uploads/respuestas/*.avi
 !src/static/videos/.gitkeep
 
 # Documentación LaTeX temporal
-# Documentación LaTeX temporal
 doc/**/*.aux
 doc/**/*.log
 doc/**/*.out

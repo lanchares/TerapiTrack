@@ -1,3 +1,9 @@
+"""
+Punto de entrada principal de la aplicación TerapiTrack.
+
+Este módulo inicializa la aplicación Flask, configura extensiones,
+registra blueprints y define filtros personalizados de Jinja2.
+"""
 from datetime import datetime
 from flask import Flask
 from src.extensiones import init_extensions, db
@@ -5,6 +11,18 @@ from src.config import Config
 
 
 def create_app():
+    """
+    Factory para crear y configurar la aplicación Flask.
+    
+    Configura:
+        - Extensiones (SQLAlchemy, Flask-Login, CSRF, Bcrypt)
+        - Blueprints (auth, admin, profesional, paciente)
+        - Filtros de plantilla personalizados
+        - Base de datos
+    
+    Returns:
+        Flask: Instancia de la aplicación configurada
+    """
     app = Flask(__name__, template_folder='src/vistas', static_folder='src/static')
     app.config.from_object(Config)
     app.config['UPLOAD_FOLDER'] = 'src/static/uploads'
@@ -26,6 +44,16 @@ def create_app():
     # Filtro para formatear fechas
     @app.template_filter('datetimeformat')
     def datetimeformat_filter(value, format='%d/%m/%Y %H:%M'):
+        """
+        Filtro Jinja2 para formatear fechas.
+        
+        Args:
+            value: Fecha (datetime, str o None)
+            format: Formato de salida (por defecto: día/mes/año hora:minuto)
+            
+        Returns:
+            str: Fecha formateada o cadena vacía si es None
+        """
         if value is None:
             return ""
         if isinstance(value, str):
@@ -38,6 +66,15 @@ def create_app():
     # Filtro para formatear duración de ejercicios (segundos -> Xm Ys)
     @app.template_filter('formatear_duracion')
     def formatear_duracion(segundos):
+        """
+        Filtro Jinja2 para convertir segundos a formato legible.
+        
+        Args:
+            segundos: Duración en segundos (int)
+            
+        Returns:
+            str: Duración formateada (ej. "3m 45s" o "30s")
+        """
         try:
             segundos = int(segundos or 0)
         except (TypeError, ValueError):
@@ -47,12 +84,13 @@ def create_app():
         if minutos > 0:
             return f"{minutos}m {resto}s"
         return f"{resto}s"
+    
 
+    # Crear tablas si no existen
     with app.app_context():
         db.create_all()
 
     return app
-
 
 app = create_app()
 

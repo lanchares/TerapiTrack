@@ -1,4 +1,23 @@
 #!/usr/bin/env python3
+"""
+Script de población de la base de datos con datos de prueba.
+
+Crea automáticamente:
+    - 1 administrador del sistema
+    - 5 profesionales sanitarios (médico, terapeuta, psicólogo, enfermero)
+    - 15 pacientes con enfermedad de Parkinson en diferentes estadios
+    - 14 ejercicios específicos para rehabilitación neurológica
+    - Sesiones de ejemplo (completadas y pendientes)
+    - Evaluaciones con puntuaciones aleatorias
+    - Vídeos de respuesta de ejemplo
+
+Uso:
+    python poblar_bd.py
+
+Advertencia:
+    Este script ELIMINA todos los datos existentes en la base de datos
+    antes de poblarla con datos nuevos.
+"""
 
 import sys
 import os
@@ -24,6 +43,16 @@ from src.modelos.evaluacion import Evaluacion
 
 
 def create_app():
+    """
+        Crea instancia de Flask para contexto de base de datos.
+        
+        Configura automáticamente la BD según el entorno:
+            - SQLite para desarrollo local
+            - PostgreSQL para Heroku (mediante variable DATABASE_URL)
+        
+        Returns:
+            Flask: Instancia de aplicación Flask configurada
+        """
     app = Flask(__name__)
 
     # Usar DATABASE_URL de Heroku si existe, sino SQLite local
@@ -41,11 +70,23 @@ def create_app():
 
 
 def poblar_datos():
-    print("🔄 Limpiando base de datos...")
+    """
+        Puebla la base de datos con datos de prueba.
+        
+        Proceso:
+            1. Elimina todos los datos existentes
+            2. Crea usuarios (admin, profesionales, pacientes)
+            3. Crea ejercicios terapéuticos
+            4. Vincula pacientes con profesionales
+            5. Crea sesiones de ejemplo
+            6. Asigna ejercicios a sesiones
+            7. Genera evaluaciones y vídeos de prueba
+        """
+    print("Limpiando base de datos...")
     db.drop_all()
     db.create_all()
 
-    print("👥 Creando 20 usuarios (5 profesionales + 15 pacientes con Parkinson)...")
+    print("Creando 20 usuarios (5 profesionales + 15 pacientes con Parkinson)...")
     usuarios_data = [
         # 1 Administrador
         {'nombre': 'Admin', 'apellidos': 'Sistema', 'email': 'admin@terapitrack.com', 'rol': 0, 'password': 'admin123'},
@@ -110,6 +151,7 @@ def poblar_datos():
          'condicion': 'Parkinson - Estadio II', 'notas': 'Distonía focal'}
     ]
 
+    # Crear usuarios y guardar referencias
     usuarios = []
     for udata in usuarios_data:
         u = Usuario(
@@ -124,9 +166,9 @@ def poblar_datos():
         db.session.flush()
         usuarios.append((u, udata))
 
-    # Crear profesionales
+    # Crear registros de profesionales
     for u, data in usuarios:
-        if u.Rol_Id == 2:
+        if u.Rol_Id == 2:   # Rol de profesional
             p = Profesional(
                 Usuario_Id=u.Id,
                 Especialidad=data['especialidad'],
@@ -134,9 +176,9 @@ def poblar_datos():
             )
             db.session.add(p)
 
-    # Crear pacientes
+    # Crear registros de pacientes
     for u, data in usuarios:
-        if u.Rol_Id == 1:
+        if u.Rol_Id == 1:   # Rol de paciente
             p = Paciente(
                 Usuario_Id=u.Id,
                 Fecha_Nacimiento=data['fecha_nac'],
@@ -145,7 +187,7 @@ def poblar_datos():
             )
             db.session.add(p)
 
-    print("🏃‍♂️ Creando ejercicios específicos para Parkinson...")
+    print("Creando ejercicios específicos para Parkinson...")
     ejercicios_data = [
         {'nombre': 'Flexión de codo asistida', 'descripcion': 'Dobla el codo con ayuda de la otra mano. Sentado o tumbado.', 'tipo': 'Fortalecimiento', 'video': 'flexion_codo.mp4', 'duracion': 43},
         {'nombre': 'Rotación de muñeca', 'descripcion': 'Rota suavemente la muñeca en círculos, apoyando el antebrazo.', 'tipo': 'Movilidad', 'video': 'rotacion_muneca.mp4', 'duracion': 105},
@@ -163,6 +205,7 @@ def poblar_datos():
         {'nombre': 'Aplausos rítmicos', 'descripcion': 'Aplaudir siguiendo diferentes ritmos y velocidades.', 'tipo': 'Movilidad', 'video': 'aplausos_ritmicos.mp4', 'duracion': 185}
     ]
 
+    # Crear ejercicios en la base de datos
     ejercicios = []
     for edata in ejercicios_data:
         e = Ejercicio(
@@ -180,10 +223,12 @@ def poblar_datos():
     for e in ejercicios:
         print(e.Id, "-", e.Nombre)
 
-    print("🔗 Asociando ejercicios con profesionales...")
+    print("Asociando ejercicios con profesionales...")
+    # Todos los profesionales tienen acceso a todos los ejercicios
     profesionales_objs = [u for u, d in usuarios if u.Rol_Id == 2]
     for profesional in profesionales_objs:
         for ejercicio in ejercicios:
+            # Verificar que no exista ya la asociación
             existe = Ejercicio_Profesional.query.filter_by(
                 Profesional_Id=profesional.Id,
                 Ejercicio_Id=ejercicio.Id
@@ -195,12 +240,14 @@ def poblar_datos():
                 )
                 db.session.add(asociacion)
 
-    print("🔗 Creando vinculaciones paciente-profesional...")
+    print("Creando vinculaciones paciente-profesional...")
+    # Asignar cada paciente a un profesional de forma equilibrada
     pacientes_objs = [u for u, d in usuarios if u.Rol_Id == 1]
     profesionales_objs = [u for u, d in usuarios if u.Rol_Id == 2]
     vinculaciones = []
 
     for i, paciente in enumerate(pacientes_objs):
+        # Distribución circular de pacientes entre profesionales
         profesional = profesionales_objs[i % len(profesionales_objs)]
         v = Paciente_Profesional(
             Paciente_Id=paciente.Id,
@@ -210,13 +257,15 @@ def poblar_datos():
         db.session.add(v)
         vinculaciones.append((paciente.Id, profesional.Id))
 
-    print("📅 Creando múltiples sesiones (pendientes y completadas)...")
+    print("Creando múltiples sesiones (pendientes y completadas)...")
     sesiones = []
 
+    # Crear sesiones para cada vinculación paciente-profesional
     for pid, prid in vinculaciones:
         num_sesiones = random.randint(6, 10)
 
         for j in range(num_sesiones):
+            # 50% sesiones completadas (pasadas), 50% pendientes (futuras)
             if j < num_sesiones * 0.5:
                 estado = 'COMPLETADA'
                 fecha_programada = date.today() - timedelta(days=random.randint(5, 90))
@@ -235,18 +284,20 @@ def poblar_datos():
             db.session.flush()
             sesiones.append(s)
 
-    print("🏃‍♂️ Asignando ejercicios a sesiones...")
+    print("Asignando ejercicios a sesiones...")
+    # Limpiar tablas relacionadas antes de crear nuevas relaciones
     Evaluacion.query.delete()
     VideoRespuesta.query.delete()
     Ejercicio_Sesion.query.delete()
     db.session.commit()
 
+    # Asignar 2-4 ejercicios aleatorios a cada sesión
     for s in sesiones:
         num_ejercicios = random.randint(2, 4)
         selected_ej = random.sample(ejercicios, num_ejercicios)
 
         for ej in selected_ej:
-            # Evitar duplicados Sesion_Id / Ejercicio_Id
+            # Evitar duplicados (misma sesión con mismo ejercicio)
             existe = Ejercicio_Sesion.query.filter_by(
                 Sesion_Id=s.Id,
                 Ejercicio_Id=ej.Id
@@ -259,16 +310,19 @@ def poblar_datos():
                 Ejercicio_Id=ej.Id
             )
             db.session.add(es)
-            db.session.flush()  # ← es.Id ya no es None
+            db.session.flush()  
 
+            # Para sesiones completadas, generar vídeos y evaluaciones de ejemplo
             if s.Estado == 'COMPLETADA':
+                # Crear vídeo de respuesta ficticio (URL de ejemplo)
                 video_resp = VideoRespuesta(
                     Ejercicio_Sesion_Id=es.Id,
-                    Ruta_Almacenamiento="cloudinary://<438427374897353>:<jlQrF-JJ4yAMoScxwDj78J_W3k8>@dck4l5hfp",
+                    Ruta_Almacenamiento="https://res.cloudinary.com/demo/video/upload/sample.mp4",
                     Fecha_Expiracion=date.today() + timedelta(days=30)
                 )
                 db.session.add(video_resp)
 
+                # 70% de probabilidad de tener evaluación
                 if random.random() < 0.7:
                     evaluacion = Evaluacion(
                         Ejercicio_Sesion_Id=es.Id,
@@ -288,17 +342,16 @@ def poblar_datos():
 
     db.session.commit()
 
-    print(f"✅ Base de datos poblada exitosamente:")
-    print(f"   👥 Usuarios totales: {len(usuarios)}")
-    print(f"   🏥 Profesionales: {len(profesionales_objs)}")
-    print(f"   🤒 Pacientes con Parkinson: {len(pacientes_objs)}")
-    print(f"   🏃‍♂️ Ejercicios específicos: {len(ejercicios)}")
-    print(f"   🔗 Vinculaciones: {len(vinculaciones)}")
-    print(f"   📅 Sesiones totales: {len(sesiones)}")
-    print(f"   ✅ Sesiones completadas: {len([s for s in sesiones if s.Estado == 'COMPLETADA'])}")
-    print(f"   ⏳ Sesiones pendientes: {len([s for s in sesiones if s.Estado == 'PENDIENTE'])}")
-
-
+    # Mostrar resumen de datos creados
+    print(f"Base de datos poblada exitosamente:")
+    print(f"   Usuarios totales: {len(usuarios)}")
+    print(f"   Profesionales: {len(profesionales_objs)}")
+    print(f"   Pacientes con Parkinson: {len(pacientes_objs)}")
+    print(f"   Ejercicios específicos: {len(ejercicios)}")
+    print(f"   Vinculaciones: {len(vinculaciones)}")
+    print(f"   Sesiones totales: {len(sesiones)}")
+    print(f"   Sesiones completadas: {len([s for s in sesiones if s.Estado == 'COMPLETADA'])}")
+    print(f"   Sesiones pendientes: {len([s for s in sesiones if s.Estado == 'PENDIENTE'])}")
 
 
 if __name__ == "__main__":
@@ -306,9 +359,9 @@ if __name__ == "__main__":
     with app.app_context():
         try:
             poblar_datos()
-            print("🎉 ¡Base de datos poblada correctamente!")
+            print("¡Base de datos poblada correctamente!")
         except Exception as e:
-            print(f"❌ Error al poblar la base de datos: {e}")
+            print(f"Error al poblar la base de datos: {e}")
             import traceback
             traceback.print_exc()
             db.session.rollback()
