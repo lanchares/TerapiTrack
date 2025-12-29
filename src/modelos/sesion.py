@@ -1,5 +1,5 @@
 from src.extensiones import db
-from datetime import date
+from datetime import datetime
 
 class Sesion(db.Model):
     __tablename__ = 'Sesion'
@@ -7,9 +7,9 @@ class Sesion(db.Model):
     Id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     Paciente_Id = db.Column(db.Integer, db.ForeignKey('Paciente.Usuario_Id'), nullable=False)
     Profesional_Id = db.Column(db.Integer, db.ForeignKey('Profesional.Usuario_Id'), nullable=False)
-    Fecha_Asignacion = db.Column(db.Date, nullable=False, default=date.today)
+    Fecha_Asignacion = db.Column(db.DateTime, nullable=False, default=datetime.now)
     Estado = db.Column(db.String(20), nullable=False)
-    Fecha_Programada = db.Column(db.Date, nullable=False)
+    Fecha_Programada = db.Column(db.DateTime, nullable=False)
     
     __table_args__ = (
         db.CheckConstraint(
@@ -43,7 +43,9 @@ class Sesion(db.Model):
         
     def fecha_programada_legible(self):
         return self.Fecha_Programada.strftime('%d/%m/%Y') if self.Fecha_Programada else ""
-
+    
+    def hora_programada_legible(self):
+        return self.Fecha_Programada.strftime('%H:%M') if self.Fecha_Programada else ""
 
     def __repr__(self):
         """Representación legible para depuración."""

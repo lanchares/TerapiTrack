@@ -1,4 +1,4 @@
-from src.app import create_app
+from app import create_app
 from src.extensiones import db
 from src.modelos.ejercicio import Ejercicio
 from src.modelos.paciente import Paciente
