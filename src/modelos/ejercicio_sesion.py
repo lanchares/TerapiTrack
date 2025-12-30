@@ -1,6 +1,10 @@
 from src.extensiones import db
 
 class Ejercicio_Sesion(db.Model):
+    """
+    Modelo de relación entre Ejercicio y Sesión.
+    Tabla intermedia que vincula ejercicios específicos con sesiones programadas.
+    """
     __tablename__ = 'Ejercicio_Sesion'
     
     Id = db.Column(db.Integer, primary_key=True, autoincrement=True)

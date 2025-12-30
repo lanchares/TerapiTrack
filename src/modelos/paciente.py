@@ -2,6 +2,10 @@ from src.extensiones import db
 from datetime import date
 
 class Paciente(db.Model):
+    """
+    Modelo de Paciente.
+    Representa pacientes con condiciones médicas que requieren seguimiento terapéutico.
+    """
     __tablename__ = 'Paciente'
     
     Usuario_Id = db.Column(db.Integer, db.ForeignKey('Usuario.Id'), primary_key=True)

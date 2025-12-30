@@ -2,6 +2,10 @@ from src.extensiones import db
 from datetime import date, datetime
 
 class VideoRespuesta(db.Model):
+    """
+    Modelo de Video de Respuesta.
+    Almacena videos grabados por pacientes durante sesiones terapéuticas.
+    """
     __tablename__ = 'Video_Respuesta'
     
     Ejercicio_Sesion_Id = db.Column(db.Integer, db.ForeignKey('Ejercicio_Sesion.Id'), primary_key=True)

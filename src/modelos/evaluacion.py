@@ -2,6 +2,10 @@ from src.extensiones import db
 from datetime import date
 
 class Evaluacion(db.Model):
+    """
+    Modelo de Evaluación de Ejercicio.
+    Almacena la puntuación y comentarios del profesional sobre la ejecución del paciente.
+    """
     __tablename__ = 'Evaluacion'
     
     Ejercicio_Sesion_Id = db.Column(db.Integer, db.ForeignKey('Ejercicio_Sesion.Id'), primary_key=True)

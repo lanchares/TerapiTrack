@@ -1,6 +1,10 @@
 from src.extensiones import db
 
 class Ejercicio(db.Model):
+    """
+    Modelo de Ejercicio Terapéutico.
+    Representa ejercicios con video demostrativo para rehabilitación.
+    """
     __tablename__ = 'Ejercicio'
     
     Id = db.Column(db.Integer, primary_key=True, autoincrement=True)

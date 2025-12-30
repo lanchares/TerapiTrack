@@ -2,6 +2,10 @@ from src.extensiones import db
 from datetime import datetime
 
 class Sesion(db.Model):
+    """
+    Modelo de Sesión Terapéutica.
+    Representa una sesión programada con ejercicios asignados a un paciente.
+    """
     __tablename__ = 'Sesion'
     
     Id = db.Column(db.Integer, primary_key=True, autoincrement=True)

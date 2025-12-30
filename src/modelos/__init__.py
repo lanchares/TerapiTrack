@@ -1,3 +1,8 @@
+"""
+Módulo de modelos de datos de TerapiTrack.
+Define las entidades del sistema y sus relaciones mediante SQLAlchemy.
+"""
+
 from .usuario import Usuario
 from .paciente import Paciente
 from .profesional import Profesional

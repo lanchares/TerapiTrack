@@ -1,6 +1,10 @@
 from src.extensiones import db
 
 class Profesional(db.Model):
+    """
+    Modelo de Profesional Sanitario.
+    Representa médicos, terapeutas, psicólogos y enfermeros del sistema.
+    """
     __tablename__ = 'Profesional'
     
     Usuario_Id = db.Column(db.Integer, db.ForeignKey('Usuario.Id'), primary_key=True)

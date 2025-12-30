@@ -3,6 +3,10 @@ from datetime import date
 from flask_login import UserMixin
 
 class Usuario(db.Model, UserMixin):
+    """
+    Modelo de Usuario del sistema.
+    Representa usuarios con roles: Administrador (0), Paciente (1), Profesional (2).
+    """
     __tablename__ = 'Usuario'
 
     Id = db.Column(db.Integer, primary_key=True, autoincrement=True)

@@ -2,7 +2,10 @@ from src.extensiones import db
 from datetime import date
 
 class Paciente_Profesional(db.Model):
-    """Tabla intermedia N:M entre Paciente y Profesional"""
+    """
+    Tabla intermedia N:M entre Paciente y Profesional.
+    Permite vincular pacientes con sus profesionales sanitarios responsables.
+    """
     __tablename__ = 'Paciente_Profesional'
     
     Paciente_Id = db.Column(db.Integer, db.ForeignKey('Paciente.Usuario_Id'), primary_key=True)
@@ -21,7 +24,10 @@ class Paciente_Profesional(db.Model):
 
 
 class Ejercicio_Profesional(db.Model):
-    """Tabla intermedia N:M entre Ejercicio y Profesional"""
+    """
+    Tabla intermedia N:M entre Ejercicio y Profesional.
+    Permite asociar ejercicios creados o asignados por profesionales.
+    """
     __tablename__ = 'Ejercicio_Profesional'
     
     Profesional_Id = db.Column(db.Integer, db.ForeignKey('Profesional.Usuario_Id'), primary_key=True)
