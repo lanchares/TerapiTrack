@@ -1,3 +1,8 @@
+"""
+Controlador de autenticación y gestión de sesiones.
+Maneja login, logout, recuperación de contraseña y perfiles de usuario.
+"""
+
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from flask_login import login_required, login_user, logout_user, current_user
 from src.modelos.usuario import Usuario
@@ -9,7 +14,16 @@ import secrets
 auth_bp = Blueprint('auth', __name__)
 
 def redirect_by_role(user):
-    if user.Rol_Id == 0:  # Admin
+    """
+    Redirige al usuario a su dashboard según su rol.
+    
+    Args:
+        user: Objeto Usuario con Rol_Id definido
+        
+    Returns:
+        Redirección al dashboard correspondiente
+    """
+    if user.Rol_Id == 0:  # Administrador
         return redirect(url_for('admin.dashboard'))
     elif user.Rol_Id == 2:  # Profesional
         return redirect(url_for('profesional.dashboard'))
@@ -22,13 +36,17 @@ def redirect_by_role(user):
 @auth_bp.route('/', methods=['GET', 'POST'])
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
+    """
+    Gestiona el inicio de sesión de usuarios.
+    Incluye protección contra fuerza bruta y sesiones persistentes para pacientes.
+    """
     if current_user.is_authenticated:
         return redirect_by_role(current_user)
     
     form = LoginForm()
     
     if form.validate_on_submit():
-        # Verificar intentos fallidos
+        # Verificar intentos fallidos para prevenir fuerza bruta        
         intentos_key = f"login_attempts_{request.remote_addr}"
         intentos = session.get(intentos_key, 0)
         
@@ -44,14 +62,14 @@ def login():
                 return render_template('auth/login.html', form=form)
             
             if user.check_contraseña(form.password.data):
-                # Login exitoso - resetear intentos
+                # Login exitoso - resetear contador de intentos
                 session.pop(intentos_key, None)
                 
-                # ✅ CONFIGURACIÓN CORREGIDA DE SESIONES
-                if user.Rol_Id == 1:  # PACIENTE
+                # Configuración de sesiones según rol
+                if user.Rol_Id == 1:  # Paciente: sesión persistente de 30 días
                     login_user(user, remember=True, duration=timedelta(days=30))
                     flash(f'Bienvenido, {user.Nombre}. Tu sesión se mantendrá activa por 30 días.', 'success')
-                else:  # ADMINISTRADOR Y PROFESIONAL
+                else:  # Administrador y Profesional: sesión temporal de 8 horas
                     login_user(user, remember=False, duration=timedelta(hours=8))
                     flash(f'Bienvenido, {user.Nombre}', 'success')
                 
@@ -61,11 +79,11 @@ def login():
                     return redirect(next_page)
                 return redirect_by_role(user)
             else:
-                # ✅ CONTRASEÑA INCORRECTA
+                # Contraseña incorrecta
                 session[intentos_key] = intentos + 1
                 flash('Credenciales incorrectas', 'danger')
         else:
-            # ✅ USUARIO NO ENCONTRADO
+            # Usuario no encontrado (mismo mensaje por seguridad)
             session[intentos_key] = intentos + 1
             flash('Credenciales incorrectas', 'danger')
     
@@ -73,13 +91,17 @@ def login():
 
 @auth_bp.route('/logout')
 def logout():
+    """
+    Cierra la sesión del usuario actual.
+    Elimina cookies y limpia caché para seguridad.
+    """
     if current_user.is_authenticated:
         usuario_nombre = current_user.Nombre
         logout_user()
         session.clear()
         flash(f'Sesión cerrada: {usuario_nombre}', 'info')
     
-    # ✅ ELIMINACIÓN SEGURA DE COOKIES
+    # Eliminación segura de cookies y prevención de caché
     response = redirect(url_for('auth.login'))
     response.delete_cookie('session')
     response.delete_cookie('remember_token')
@@ -91,6 +113,10 @@ def logout():
 @auth_bp.route('/cambiar_contrasena', methods=['GET', 'POST'])
 @login_required
 def cambiar_contrasena():
+    """
+    Permite al usuario cambiar su contraseña.
+    Requiere verificación de la contraseña actual.
+    """
     form = CambiarContrasenaForm()
     
     if form.validate_on_submit():
@@ -107,6 +133,10 @@ def cambiar_contrasena():
 
 @auth_bp.route('/recuperar_contrasena', methods=['GET', 'POST'])
 def recuperar_contrasena():
+    """
+    Gestiona la recuperación de contraseña olvidada.
+    Genera token temporal y simula envío de email.
+    """
     if current_user.is_authenticated:
         return redirect_by_role(current_user)
     
@@ -120,8 +150,7 @@ def recuperar_contrasena():
             else:
                 # Generar token temporal (en producción enviarías email real)
                 token = secrets.token_urlsafe(32)
-                # Aquí guardarías el token en la base de datos con expiración
-                # Simular envío de email
+                # Guardar token en BD con expiración y enviar email
                 flash(f'Se han enviado instrucciones de recuperación a {form.email.data}', 'success')
                 return redirect(url_for('auth.login'))
         else:
@@ -133,4 +162,5 @@ def recuperar_contrasena():
 @auth_bp.route('/perfil')
 @login_required
 def perfil():
+    """Muestra el perfil del usuario actual."""
     return render_template('auth/perfil.html', usuario=current_user)

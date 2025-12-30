@@ -1,3 +1,8 @@
+"""
+Controlador de funcionalidades para pacientes.
+Gestiona dashboard, sesiones, ejercicios y progreso del paciente.
+"""
+
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_required, current_user
 from src.controladores.decoradores import paciente_required
@@ -11,7 +16,15 @@ paciente_bp = Blueprint('paciente', __name__, url_prefix='/paciente')
 
 
 def get_video_path(video_filename):
-    """Detecta si el video está en uploads/ejercicios o en videos"""
+    """
+    Detecta la ubicación correcta del video (uploads/ejercicios o videos).
+    
+    Args:
+        video_filename: Nombre del archivo de video
+        
+    Returns:
+        str: Ruta relativa del video para usar en templates
+    """
     from flask import current_app
     
     uploads_path = os.path.join(current_app.static_folder, 'uploads', 'ejercicios', video_filename)
@@ -29,6 +42,10 @@ def get_video_path(video_filename):
 @login_required
 @paciente_required
 def dashboard():
+    """
+    Dashboard principal del paciente.
+    Muestra sesiones próximas y estadísticas básicas.
+    """
     sesiones_proximas = Sesion.query.filter(
         Sesion.Paciente_Id == current_user.Id,
         Sesion.Estado == 'PENDIENTE',
@@ -38,7 +55,6 @@ def dashboard():
     stats = {
         'sesiones_pendientes': len(sesiones_proximas),
         'nombre_completo': f"{current_user.Nombre} {current_user.Apellidos}",
-        # El mando ahora se gestiona en el navegador, así que aquí siempre False o lo quitas
         'mando_conectado': False
     }
 
@@ -53,6 +69,10 @@ def dashboard():
 @login_required
 @paciente_required
 def mis_sesiones():
+    """
+    Muestra todas las sesiones programadas del paciente.
+    Incluye sesiones de las próximas 3 semanas.
+    """
     fecha_inicio = datetime.now()
     fecha_fin = fecha_inicio + timedelta(weeks=3)
     
@@ -87,6 +107,10 @@ def mis_sesiones():
 @login_required
 @paciente_required
 def ejecutar_sesion(sesion_id):
+    """
+    Ejecuta una sesión terapéutica específica.
+    Muestra los ejercicios asignados para que el paciente los realice.
+    """
     sesion = Sesion.query.get_or_404(sesion_id)
     if sesion.Paciente_Id != current_user.Id:
         flash('No tienes permisos para esta sesión', 'error')
@@ -119,6 +143,10 @@ def ejecutar_sesion(sesion_id):
 @login_required
 @paciente_required
 def ejercicios():
+    """
+    Muestra la biblioteca de ejercicios asignados al paciente.
+    Filtra ejercicios únicos de todas sus sesiones.
+    """
     ejercicios_asignados = (
         db.session.query(Ejercicio_Sesion)
         .join(Sesion)
@@ -147,6 +175,10 @@ def ejercicios():
 @login_required
 @paciente_required
 def progreso():
+    """
+    Muestra el progreso del paciente con evaluaciones y estadísticas.
+    Incluye gráficos de evolución temporal.
+    """
     evaluaciones = (
         db.session.query(Evaluacion)
         .join(Ejercicio_Sesion)
@@ -217,6 +249,7 @@ def progreso():
 @login_required
 @paciente_required
 def ayuda():
+    """Muestra la página de ayuda para pacientes."""
     return render_template('paciente/ayuda.html')
 
 
@@ -224,6 +257,12 @@ def ayuda():
 @login_required
 @paciente_required
 def session_info():
+    """
+    Devuelve información de la sesión actual del paciente.
+    
+    Returns:
+        JSON con datos del usuario y estado de conexión
+    """
     return jsonify({
         'usuario': current_user.Nombre,
         'rol': 'Paciente',

@@ -1,3 +1,20 @@
+"""
+Controlador de funcionalidades para profesionales sanitarios.
+Gestiona pacientes, ejercicios, sesiones, evaluaciones y seguimiento.
+
+Estructura del archivo:
+1. Configuración de Cloudinary y estado en tiempo real
+2. API de sincronización de sesiones
+3. Dashboard profesional
+4. Gestión de pacientes
+5. Biblioteca de ejercicios
+6. Gestión de sesiones
+7. Evaluación de ejercicios
+8. Seguimiento y progreso
+9. Gestión de videos
+"""
+
+
 from flask import Blueprint, current_app, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_required, current_user
 from src.controladores.decoradores import profesional_required
@@ -14,40 +31,41 @@ from src.config import Config
 from collections import defaultdict
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import or_
-
 try:
     from moviepy.editor import VideoFileClip
 except Exception:
     VideoFileClip = None
 
-
-
-
 profesional_bp = Blueprint('profesional', __name__, url_prefix='/profesional')
 
+# Configuración de Cloudinary para almacenamiento de videos
 cloudinary.config(
     cloud_name=os.environ.get('CLOUDINARY_CLOUD_NAME'),
     api_key=os.environ.get('CLOUDINARY_API_KEY'),
     api_secret=os.environ.get('CLOUDINARY_API_SECRET')
 )
 
-# ---------------------------
-# Estado en tiempo real sesión
-# ---------------------------
 
-# Todo el estado va en memoria, no en los modelos
-estado_sesiones_tiempo_real = {}   # {sesion_id: ejercicio_activo_id o None}
-estado_sesion_terminada = set()    # {sesion_id}
-
+# Estado en tiempo real de sesiones (en memoria)
+estado_sesiones_tiempo_real = {}
+estado_sesion_terminada = set()
 ultimo_cambio_sesion = {}
-MIN_INTERVAL_CAMBIO = 6  # segundos mínimo entre cambios de ejercicio
+MIN_INTERVAL_CAMBIO = 6  # Segundos mínimo entre cambios de ejercicio
 
 @profesional_bp.route('/api/sesion/<int:sesion_id>/estado', methods=['GET', 'POST'])
 @login_required
 def estado_sesion(sesion_id):
     """
-    GET: paciente y profesional consultan el estado en memoria.
-    POST: solo el profesional actualiza ejercicio_activo_id y/o terminada.
+    API para gestionar el estado en tiempo real de sesiones activas.
+    
+    GET: Consulta el estado actual (usado por paciente y profesional).
+    POST: Actualiza ejercicio activo y marca sesión como terminada (solo profesional).
+    
+    Args:
+        sesion_id: ID de la sesión
+        
+    Returns:
+        JSON con estado actual: ejercicio_activo_id y terminada
     """
     sesion = Sesion.query.get_or_404(sesion_id)
 
@@ -129,14 +147,18 @@ def estado_sesion(sesion_id):
         "terminada": sesion_id in estado_sesion_terminada
     })
 
-
 # ---------------------------
 # Dashboard profesional
 # ---------------------------
+
 @profesional_bp.route('/dashboard')
 @login_required
 @profesional_required
 def dashboard():
+    """
+    Dashboard principal del profesional.
+    Muestra estadísticas de pacientes, sesiones pendientes y evaluaciones.
+    """
     profesional = Profesional.query.filter_by(Usuario_Id=current_user.Id).first()
     if not profesional:
         flash('No se encontró el profesional asociado', 'error')
@@ -186,10 +208,15 @@ def dashboard():
 # ---------------------------
 # Gestión de pacientes
 # ---------------------------
+
 @profesional_bp.route('/pacientes')
 @login_required
 @profesional_required
 def listar_pacientes():
+    """
+    Lista todos los pacientes vinculados al profesional.
+    Incluye filtros por búsqueda, condición médica y rango de edad.
+    """
     search = request.args.get('search', '')
     condicion_filter = request.args.get('condicion', '')
     edad_filter = request.args.get('edad', '')
@@ -230,10 +257,15 @@ def listar_pacientes():
 # ---------------------------
 # Biblioteca de ejercicios
 # ---------------------------
+
 @profesional_bp.route('/ejercicios')
 @login_required
 @profesional_required
 def listar_ejercicios():
+    """
+    Muestra la biblioteca de ejercicios disponibles.
+    Incluye filtros por tipo y búsqueda por nombre.
+    """
     tipo = request.args.get('tipo', '')
     search = request.args.get('search', '')
 
@@ -254,6 +286,10 @@ def listar_ejercicios():
 @login_required
 @profesional_required
 def crear_ejercicio():
+    """
+    Crea un nuevo ejercicio terapéutico con video demostrativo.
+    Calcula automáticamente la duración del video usando MoviePy.
+    """
     form = CrearEjercicioForm()
 
     if form.validate_on_submit():
@@ -302,15 +338,20 @@ def crear_ejercicio():
 # ---------------------------
 # Gestión de sesiones
 # ---------------------------
+
 @profesional_bp.route('/sesiones/crear', methods=['GET', 'POST'])
 @login_required
 @profesional_required
 def crear_sesion():
-    """Crear sesión (CU5.1 + CU5.2 combinados)"""
+    """
+    Crea una sesión terapéutica y la asigna a un paciente.
+    Combina selección de ejercicios y programación de fecha.
+    Casos de uso: CU5.1 (crear sesión) + CU5.2 (asignar a paciente).
+    """
     paciente_id_preseleccionado = request.args.get('paciente_id', type=int)
     form = CrearSesionDirectaForm()
 
-    # ---------- Pacientes del profesional ----------
+    # Obtener pacientes del profesional    
     pacientes_ids = db.session.query(Paciente_Profesional.Paciente_Id).filter_by(
         Profesional_Id=current_user.Id
     ).distinct().all()
@@ -322,7 +363,7 @@ def crear_sesion():
     if paciente_id_preseleccionado is not None:
         form.paciente_id.data = paciente_id_preseleccionado
 
-    # ---------- Ejercicios: propios + demos ----------
+    # Obtener ejercicios (propios y demos del sistema)
     # Ids de ejercicios demo que deben ver todos los profesionales
     DEMO_IDS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]  # ajusta la lista a los demos que quieras
 
@@ -340,7 +381,7 @@ def crear_sesion():
 
     form.ejercicios.choices = [(e.Id, e.Nombre) for e in ejercicios]
 
-    # ---------- Crear sesión ----------
+    # Crear sesión con ejercicios seleccionados
     if form.validate_on_submit():
         nueva_sesion = Sesion(
             Paciente_Id=form.paciente_id.data,
@@ -370,7 +411,11 @@ def crear_sesion():
 @login_required
 @profesional_required
 def listar_sesiones():
-    """Consultar sesiones programadas (CU5.3)"""
+    """
+    Lista todas las sesiones del profesional con filtros.
+    Calcula el estado de evaluación de sesiones completadas.
+    Caso de uso: CU5.3 (consultar sesiones programadas).
+    """
     estado_filter = request.args.get('estado', '')
     paciente_filter = request.args.get('paciente', '')
     fecha_desde = request.args.get('fecha_desde', '')
@@ -450,7 +495,10 @@ def listar_sesiones():
 @login_required
 @profesional_required
 def ver_sesion(sesion_id):
-    """Ver detalle de sesión con verificación de permisos"""
+    """
+    Muestra el detalle de una sesión específica.
+    Incluye ejercicios asignados y evaluaciones realizadas.
+    """
     sesion = Sesion.query.get_or_404(sesion_id)
 
     if sesion.Profesional_Id != current_user.Id:
@@ -475,7 +523,11 @@ def ver_sesion(sesion_id):
 @login_required
 @profesional_required
 def ejecutar_sesion(sesion_id):
-    """Ejecutar sesión (CU6)"""
+    """
+    Ejecuta una sesión terapéutica en tiempo real.
+    Permite al profesional dirigir ejercicios mientras el paciente los realiza.
+    Caso de uso: CU6 (realizar sesión).
+    """
     sesion = Sesion.query.get_or_404(sesion_id)
 
     if sesion.Profesional_Id != current_user.Id:
@@ -496,6 +548,10 @@ def ejecutar_sesion(sesion_id):
 @login_required
 @profesional_required
 def finalizar_sesion(sesion_id):
+    """
+    Marca una sesión como completada.
+    Actualiza el estado en base de datos y en caché de tiempo real.
+    """
     sesion = Sesion.query.get_or_404(sesion_id)
     if sesion.Profesional_Id != current_user.Id:
         return jsonify(success=False, error='Sin permisos')
@@ -514,7 +570,11 @@ def finalizar_sesion(sesion_id):
 @login_required
 @profesional_required
 def evaluar_sesion(sesion_id):
-    """Evaluar sesión completa (CU8.1)"""
+    """
+    Muestra la interfaz de evaluación de una sesión completada.
+    Lista todos los ejercicios con videos y evaluaciones.
+    Caso de uso: CU8.1 (visualizar videos de respuesta).
+    """
     sesion = Sesion.query.get_or_404(sesion_id)
 
     if sesion.Profesional_Id != current_user.Id:
@@ -551,7 +611,10 @@ def evaluar_sesion(sesion_id):
 @login_required
 @profesional_required
 def evaluar_ejercicio(ejercicio_sesion_id):
-    """Evaluar ejercicio individual (CU8.2)"""
+    """
+    Evalúa un ejercicio individual con puntuación y comentarios.
+    Caso de uso: CU8.2 (registrar evaluación).
+    """
     form = EvaluacionForm()
     ejercicio_sesion = Ejercicio_Sesion.query.get_or_404(ejercicio_sesion_id)
 
@@ -585,11 +648,16 @@ def evaluar_ejercicio(ejercicio_sesion_id):
 # ---------------------------
 # Seguimiento y progreso
 # ---------------------------
+
 @profesional_bp.route('/progreso/<int:paciente_id>')
 @login_required
 @profesional_required
 def ver_progreso(paciente_id):
-    """Ver progreso de paciente (CU9.1)"""
+    """
+    Muestra el progreso detallado de un paciente.
+    Incluye historial de evaluaciones y gráficos de evolución.
+    Caso de uso: CU9.1 (ver historial de evaluaciones).
+    """
     paciente = Paciente.query.get_or_404(paciente_id)
 
     vinculacion = Paciente_Profesional.query.filter_by(
@@ -656,33 +724,37 @@ def ver_progreso(paciente_id):
 # ---------------------------
 # Gestión de videos
 # ---------------------------
+
 @profesional_bp.route('/guardar_video/<int:ejercicio_sesion_id>', methods=['POST'])
 @login_required
 @csrf.exempt
 def guardar_video(ejercicio_sesion_id):
-    """Guardar video de respuesta en Cloudinary (CU7). Garantiza solo 1 vídeo por ejercicio_sesion."""
+    """
+    Guarda video de respuesta del paciente en Cloudinary.
+    Previene duplicados garantizando solo 1 video por ejercicio_sesion.
+    Caso de uso: CU7 (grabar respuesta de ejercicio).
+    """
     try:
         ejercicio_sesion = Ejercicio_Sesion.query.get_or_404(ejercicio_sesion_id)
         sesion = ejercicio_sesion.sesion
         paciente = sesion.paciente
 
-        # 1) Permisos: solo el paciente dueño puede subir
+        # Permisos: solo el paciente dueño puede subir
         if paciente.Usuario_Id != current_user.Id:
             return jsonify({'success': False, 'error': 'Sin permisos'}), 403
 
-        # 2) Comprobar si ya existe un vídeo para este ejercicio_sesion
+        # Comprobar si ya existe un vídeo para este ejercicio_sesion
         video_respuesta_existente = VideoRespuesta.query.filter_by(
             Ejercicio_Sesion_Id=ejercicio_sesion_id
         ).first()
 
         if video_respuesta_existente:
-            # Ya hay vídeo guardado; no subir otro ni pisar el existente
             return jsonify({
                 'success': True,
                 'mensaje': 'Video ya existente, se ignora nueva subida'
             }), 200
 
-        # 3) Validar presencia de archivo
+        # Validar presencia de archivo
         if 'video' not in request.files:
             return jsonify({'success': False, 'error': 'No se encontró el archivo'}), 400
 
@@ -691,7 +763,7 @@ def guardar_video(ejercicio_sesion_id):
         if not video_file or video_file.filename == '':
             return jsonify({'success': False, 'error': 'Archivo vacío'}), 400
 
-        # 4) Subir a Cloudinary
+        # Subir a Cloudinary
         upload_result = cloudinary.uploader.upload(
             video_file,
             resource_type="video",
@@ -706,7 +778,7 @@ def guardar_video(ejercicio_sesion_id):
         if not video_url:
             return jsonify({'success': False, 'error': 'No se obtuvo URL del video'}), 500
 
-        # 5) Crear registro nuevo (ya sabemos que no existía en este proceso)
+        # Crear registro nuevo
         fecha_expiracion = datetime.now() + timedelta(days=30)
 
         try:
@@ -718,13 +790,13 @@ def guardar_video(ejercicio_sesion_id):
             db.session.add(video_respuesta)
             db.session.commit()
 
-            print(f"✅ Video guardado en Cloudinary: {video_url}")
+            print(f"Video guardado en Cloudinary: {video_url}")
             return jsonify({'success': True, 'mensaje': 'Video guardado correctamente'}), 200
 
         except IntegrityError:
             # Otra petición paralela insertó este registro justo antes del commit
             db.session.rollback()
-            print(f"ℹ️ Video ya existente (race) para ejercicio_sesion_id={ejercicio_sesion_id}")
+            print(f"Video ya existente (race) para ejercicio_sesion_id={ejercicio_sesion_id}")
             return jsonify({
                 'success': True,
                 'mensaje': 'Video ya existente (race), se ignora nueva subida'
@@ -732,7 +804,7 @@ def guardar_video(ejercicio_sesion_id):
 
     except Exception as e:
         db.session.rollback()
-        print(f"❌ Error al guardar video: {str(e)}")
+        print(f"Error al guardar video: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
@@ -741,7 +813,9 @@ def guardar_video(ejercicio_sesion_id):
 @login_required
 @profesional_required
 def ver_evaluacion(ejercicio_sesion_id):
-    """Ver evaluación existente"""
+    """
+    Muestra una evaluación existente con su video y comentarios.
+    """
     ejercicio_sesion = Ejercicio_Sesion.query.get_or_404(ejercicio_sesion_id)
 
     if ejercicio_sesion.sesion.Profesional_Id != current_user.Id:

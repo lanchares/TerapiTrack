@@ -1,3 +1,8 @@
+"""
+Controlador del administrador del sistema.
+Gestiona usuarios, vinculaciones, configuración y estadísticas.
+"""
+
 from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, make_response
 from flask_login import login_required, current_user
 from src.controladores.decoradores import admin_required
@@ -15,11 +20,16 @@ import os
 
 admin_bp = Blueprint('admin', __name__)
 
-# ← NUEVAS: Funciones para manejar configuración JSON
 def cargar_configuracion():
-    """Carga configuración desde archivo JSON"""
-    config_path = os.path.join('config', 'sistema.json')
+    """
+    Carga la configuración del sistema desde archivo JSON.
+    Si no existe, crea uno con valores por defecto.
     
+    Returns:
+        dict: Configuración del sistema
+    """
+    config_path = os.path.join('config', 'sistema.json')
+        
     config_default = {
         'retencion_videos': '30',
         'limite_almacenamiento': '2',
@@ -45,7 +55,15 @@ def cargar_configuracion():
         return config_default
 
 def guardar_configuracion(nueva_config):
-    """Guarda configuración en archivo JSON"""
+    """
+    Guarda la configuración del sistema en archivo JSON.
+    
+    Args:
+        nueva_config: Diccionario con la nueva configuración
+        
+    Returns:
+        bool: True si se guardó correctamente, False en caso de error
+    """
     config_path = os.path.join('config', 'sistema.json')
     
     try:
@@ -66,7 +84,7 @@ def guardar_configuracion(nueva_config):
 @login_required
 @admin_required
 def dashboard():
-    # ← CORREGIDO: Añadir llave de cierre faltante
+    """Dashboard principal del administrador con estadísticas generales."""
     stats = {
         'total_usuarios': Usuario.query.count(),
         'total_pacientes': Usuario.query.filter_by(Rol_Id=1, Estado=1).count(),
@@ -77,7 +95,7 @@ def dashboard():
         ).count(),
         'usuarios_activos_24h': 0,
         'total_vinculaciones': Paciente_Profesional.query.count()
-    }  # ← AÑADIDA LLAVE DE CIERRE
+    }
     
     usuarios_recientes = Usuario.query.order_by(
         Usuario.Fecha_Registro.desc()
@@ -94,6 +112,7 @@ def dashboard():
 @login_required
 @admin_required
 def listar_usuarios():
+    """Lista todos los usuarios con filtros de búsqueda, rol y estado."""
     search = request.args.get('search', '')
     rol_filter = request.args.get('rol', '')
     estado_filter = request.args.get('estado', '')
@@ -101,13 +120,12 @@ def listar_usuarios():
     query = Usuario.query
     
     if search:
-        # ← CORREGIDO: Añadir paréntesis de cierre
         query = query.filter(
             db.or_(
                 Usuario.Nombre.contains(search),
                 Usuario.Apellidos.contains(search),
                 Usuario.Email.contains(search)
-            )  # ← AÑADIDO PARÉNTESIS DE CIERRE
+            )  
         )
     
     if rol_filter:
@@ -124,12 +142,14 @@ def listar_usuarios():
                          rol_filter=rol_filter,
                          estado_filter=estado_filter)
 
-# ← CORREGIDO: Añadir parámetro user_id
 @admin_bp.route('/usuario/<int:user_id>')
 @login_required
 @admin_required
 def ver_usuario(user_id):
-
+    """
+    Muestra los detalles completos de un usuario específico.
+    Incluye información adicional según rol (paciente o profesional).
+    """
     if current_user.Rol_Id != 0:
         flash('Acceso denegado', 'error')
         return redirect(url_for('auth.login'))
@@ -168,11 +188,14 @@ def ver_usuario(user_id):
                          info_adicional=info_adicional,
                          vinculaciones=vinculaciones)
 
-# ← CORREGIDO: Añadir parámetro user_id
 @admin_bp.route('/editar_usuario/<int:user_id>', methods=['GET', 'POST'])
 @login_required
 @admin_required
 def editar_usuario(user_id):
+    """
+    Permite editar los datos de un usuario existente.
+    Actualiza información según el rol (paciente o profesional).
+    """
     usuario = Usuario.query.get_or_404(user_id)
     
     if usuario.Estado == 0:
@@ -238,11 +261,11 @@ def editar_usuario(user_id):
     
     return render_template('admin/editar_usuario.html', form=form, usuario=usuario)
 
-# ← CORREGIDO: Añadir parámetro user_id
 @admin_bp.route('/cambiar_estado/<int:user_id>')
 @login_required
 @admin_required
 def cambiar_estado_usuario(user_id):
+    """Activa o desactiva la cuenta de un usuario."""
     if user_id == current_user.Id:
         flash('No puedes cambiar el estado de tu propia cuenta', 'error')
         return redirect(url_for('admin.listar_usuarios'))
@@ -260,6 +283,10 @@ def cambiar_estado_usuario(user_id):
 @login_required
 @admin_required
 def crear_usuario():
+    """
+    Crea un nuevo usuario en el sistema.
+    Gestiona roles de administrador, paciente y profesional.
+    """
     form = CrearUsuarioForm()
     
     if form.validate_on_submit():
@@ -271,14 +298,13 @@ def crear_usuario():
                 flash('El email ya está registrado', 'error')
                 return render_template('admin/crear_usuario.html', form=form)
             
-            # ← CORREGIDO: Añadir paréntesis de cierre
             nuevo_usuario = Usuario(
                 Nombre=form.nombre.data,
                 Apellidos=form.apellidos.data,
                 Email=form.email.data,
                 Rol_Id=rol_id_int,
                 Estado=1
-            )  # ← AÑADIDO PARÉNTESIS DE CIERRE
+            ) 
             
             nuevo_usuario.set_contraseña(form.password.data)
             db.session.add(nuevo_usuario)
@@ -290,13 +316,12 @@ def crear_usuario():
                     db.session.rollback()
                     return render_template('admin/crear_usuario.html', form=form)
                 
-                # ← CORREGIDO: Añadir paréntesis de cierre
                 paciente = Paciente(
                     Usuario_Id=nuevo_usuario.Id,
                     Fecha_Nacimiento=form.fecha_nacimiento.data,
                     Condicion_Medica=form.condicion_medica.data or '',
                     Notas=form.notas.data or ''
-                )  # ← AÑADIDO PARÉNTESIS DE CIERRE
+                )  
                 db.session.add(paciente)
                 
             elif rol_id_int == 2:  # Profesional
@@ -305,12 +330,11 @@ def crear_usuario():
                     db.session.rollback()
                     return render_template('admin/crear_usuario.html', form=form)
                 
-                # ← CORREGIDO: Añadir paréntesis de cierre
                 profesional = Profesional(
                     Usuario_Id=nuevo_usuario.Id,
                     Especialidad=form.especialidad.data,
                     Tipo_Profesional=form.tipo_profesional.data
-                )  # ← AÑADIDO PARÉNTESIS DE CIERRE
+                ) 
                 db.session.add(profesional)
             
             db.session.commit()
@@ -329,6 +353,10 @@ def crear_usuario():
 @login_required
 @admin_required
 def vincular_paciente_profesional():
+    """
+    Crea vinculaciones entre pacientes y profesionales.
+    Establece relaciones terapéuticas directas.
+    """
     form = VincularPacienteProfesionalForm()
     
     pacientes = db.session.query(Usuario, Paciente).join(Paciente).filter(Usuario.Estado == 1).all()
@@ -346,12 +374,11 @@ def vincular_paciente_profesional():
         if existe:
             flash('Esta vinculación ya existe', 'error')
         else:
-            # ← CORREGIDO: Añadir paréntesis de cierre
             vinculacion = Paciente_Profesional(
                 Paciente_Id=form.paciente_id.data,
                 Profesional_Id=form.profesional_id.data,
                 Fecha_Asignacion=date.today()
-            )  # ← AÑADIDO PARÉNTESIS DE CIERRE
+            ) 
             db.session.add(vinculacion)
             db.session.commit()
             flash('Vinculación creada correctamente', 'success')
@@ -363,7 +390,10 @@ def vincular_paciente_profesional():
 @login_required
 @admin_required
 def ver_vinculaciones():
-    """Consultar vinculaciones paciente-profesional"""
+    """
+    Muestra todas las vinculaciones entre pacientes y profesionales.
+    Incluye filtros por búsqueda, profesional y rango de fechas.
+    """
     search = request.args.get('search', '')
     profesional_filter = request.args.get('profesional', '')
     fecha_desde = request.args.get('fecha_desde', '')
@@ -372,7 +402,7 @@ def ver_vinculaciones():
     # Consulta base
     query = db.session.query(Paciente_Profesional)
 
-    # Aplicar filtros
+    # Aplicar filtros de busqueda
     if search:
         query = query.join(Usuario, Usuario.Id == Paciente_Profesional.Paciente_Id) \
                      .join(Paciente, Paciente.Usuario_Id == Paciente_Profesional.Paciente_Id) \
@@ -397,7 +427,7 @@ def ver_vinculaciones():
 
     vinculaciones = query.order_by(Paciente_Profesional.Fecha_Asignacion.desc()).all()
 
-    # Preparar datos para la vista - CORREGIDO
+    # Preparar datos para la vista
     relaciones = []
     for vinculacion in vinculaciones:
         # Obtener datos del paciente
@@ -435,6 +465,13 @@ def ver_vinculaciones():
 @login_required
 @admin_required
 def desvincular_paciente_profesional(paciente_id, profesional_id):
+    """
+    Elimina la vinculación entre un paciente y un profesional.
+    
+    Args:
+        paciente_id: ID del paciente
+        profesional_id: ID del profesional
+    """
     try:
         vinculacion = Paciente_Profesional.query.filter_by(
             Paciente_Id=paciente_id,
@@ -458,7 +495,10 @@ def desvincular_paciente_profesional(paciente_id, profesional_id):
 @login_required
 @admin_required
 def estadisticas():
-    # ← CORREGIDO: Añadir llave de cierre faltante
+    """
+    Muestra estadísticas del sistema.
+    Incluye distribución de roles, usuarios por mes y vinculaciones.
+    """
     stats = {
         'usuarios_por_mes': [],
         'actividad_semanal': [],
@@ -468,7 +508,7 @@ def estadisticas():
             'profesionales': Usuario.query.filter_by(Rol_Id=2).count()
         },
         'total_vinculaciones': Paciente_Profesional.query.count()
-    }  # ← AÑADIDA LLAVE DE CIERRE
+    }
     
     for i in range(12):
         fecha_inicio = datetime.now().replace(day=1) - timedelta(days=30*i)
@@ -490,6 +530,12 @@ def estadisticas():
 @login_required
 @admin_required
 def exportar_usuarios():
+    """
+    Exporta la lista de usuarios a un archivo CSV.
+    
+    Returns:
+        Archivo CSV con datos de todos los usuarios del sistema
+    """
     usuarios = Usuario.query.all()
     
     output = StringIO()
@@ -518,14 +564,17 @@ def exportar_usuarios():
     
     return response
 
-# ← CORREGIDA: Función configuración completa con sistema JSON
 @admin_bp.route('/configuracion', methods=['GET', 'POST'])
 @login_required
 @admin_required
 def configuracion():
+    """
+    Gestiona la configuración global del sistema.
+    Permite modificar retención de videos, almacenamiento, notificaciones y backups.
+    """
     form = ConfiguracionForm()
     
-    # ← CRÍTICO: Cargar configuración actual
+    # Cargar configuración actual
     config_actual = cargar_configuracion()
     
     # Pre-llenar formulario con valores actuales
@@ -545,14 +594,13 @@ def configuracion():
             }
             
             if guardar_configuracion(nueva_config):
-                flash('✅ Configuración del sistema actualizada y guardada en archivo JSON', 'success')
+                flash('Configuración del sistema actualizada y guardada en archivo JSON', 'success')
             else:
-                flash('❌ Error al guardar la configuración', 'error')
+                flash('Error al guardar la configuración', 'error')
                 
             return redirect(url_for('admin.configuracion'))
             
         except Exception as e:
-            flash(f'❌ Error al procesar configuración: {str(e)}', 'error')
+            flash(f'Error al procesar configuración: {str(e)}', 'error')
     
-    # ← CRÍTICO: Pasar config_actual al template
     return render_template('admin/configuracion.html', form=form, config_actual=config_actual)
