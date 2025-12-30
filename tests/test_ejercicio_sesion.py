@@ -1,3 +1,8 @@
+"""
+Tests del modelo Ejercicio_Sesion.
+Prueba relaciones, restricciones UNIQUE y métodos auxiliares.
+"""
+
 import pytest
 from src.modelos.ejercicio_sesion import Ejercicio_Sesion
 from src.modelos.sesion import Sesion
@@ -8,7 +13,10 @@ from src.extensiones import db
 from datetime import date
 
 class TestEjercicioSesion:
+    """Suite de tests para el modelo Ejercicio_Sesion."""
+
     def test_creacion_y_relaciones(self, app):
+        """Prueba la creación y relaciones con Sesion y Ejercicio."""
         with app.app_context():
             ejercicio = Ejercicio(
                 Nombre="Flexión de codo",
@@ -36,6 +44,7 @@ class TestEjercicioSesion:
             assert ejercicio_sesion.ejercicio.Id == ejercicio.Id
 
     def test_unique_constraint(self, app):
+        """Prueba la restricción UNIQUE (Sesion_Id, Ejercicio_Id)."""
         with app.app_context():
             ejercicio = Ejercicio(
                 Nombre="Rotación de tobillo",
@@ -69,6 +78,7 @@ class TestEjercicioSesion:
                 db.session.rollback()
 
     def test_tiene_video_respuesta(self, app):
+        """Prueba el método tiene_video_respuesta()."""
         with app.app_context():
             ejercicio_sesion = Ejercicio_Sesion(
                 Sesion_Id=1,
@@ -88,6 +98,7 @@ class TestEjercicioSesion:
             assert ejercicio_sesion.tiene_video_respuesta() is True
 
     def test_tiene_evaluacion(self, app):
+        """Prueba el método tiene_evaluacion()."""
         with app.app_context():
             ejercicio_sesion = Ejercicio_Sesion(
                 Sesion_Id=1,
@@ -108,6 +119,7 @@ class TestEjercicioSesion:
             assert ejercicio_sesion.tiene_evaluacion() is True
 
     def test_obtener_puntuacion(self, app):
+        """Prueba el método obtener_puntuacion()."""
         with app.app_context():
             ejercicio_sesion = Ejercicio_Sesion(
                 Sesion_Id=1,
@@ -128,6 +140,7 @@ class TestEjercicioSesion:
             assert ejercicio_sesion.obtener_puntuacion() == 5
 
     def test_obtener_ruta_video(self, app):
+        """Prueba el método obtener_ruta_video()."""
         with app.app_context():
             ejercicio_sesion = Ejercicio_Sesion(
                 Sesion_Id=1,
@@ -147,6 +160,7 @@ class TestEjercicioSesion:
             assert ejercicio_sesion.obtener_ruta_video() == "videos/ej2.mp4"
 
     def test_repr(self, app):
+        """Prueba el método __repr__()."""
         with app.app_context():
             ejercicio_sesion = Ejercicio_Sesion(
                 Sesion_Id=10,
@@ -158,6 +172,7 @@ class TestEjercicioSesion:
             assert repr(ejercicio_sesion) == esperado
 
     def test_to_dict(self, app):
+        """Prueba la serialización a diccionario."""
         with app.app_context():
             ejercicio_sesion = Ejercicio_Sesion(
                 Sesion_Id=5,

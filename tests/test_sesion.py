@@ -1,3 +1,8 @@
+"""
+Tests del modelo Sesion.
+Prueba estados, relaciones, restricciones y métodos de formateo.
+"""
+
 import pytest
 from datetime import datetime, timedelta
 from src.modelos.sesion import Sesion
@@ -9,7 +14,10 @@ from src.extensiones import db
 
 
 class TestSesion:
+    """Suite de tests para el modelo Sesion."""
+
     def test_creacion_y_relaciones(self, app):
+        """Prueba la creación de sesión y relaciones con Paciente y Profesional."""
         with app.app_context():
             paciente = Paciente(
                 Usuario_Id=1,
@@ -40,6 +48,7 @@ class TestSesion:
             assert sesion.profesional.Usuario_Id == profesional.Usuario_Id
 
     def test_estados(self, app):
+        """Prueba los métodos es_pendiente(), es_completada() y es_cancelada()."""
         with app.app_context():
             ahora = datetime.now()
             sesion = Sesion(
@@ -56,6 +65,7 @@ class TestSesion:
             assert sesion.es_cancelada() is True
 
     def test_check_constraint_estado(self, app):
+        """Prueba la restricción CHECK de Estado (solo valores permitidos)."""
         with app.app_context():
             ahora = datetime.now()
             sesion = Sesion(
@@ -71,6 +81,7 @@ class TestSesion:
             db.session.rollback()
 
     def test_obtener_ejercicios(self, app):
+        """Prueba el método obtener_ejercicios() que cuenta ejercicios asignados."""
         with app.app_context():
             ejercicio = Ejercicio(
                 Nombre="Rotación de muñeca",
@@ -93,7 +104,6 @@ class TestSesion:
             db.session.add(sesion)
             db.session.commit()
 
-            # Sin ejercicios asociados
             assert sesion.obtener_ejercicios() == 0
 
             ejercicio_sesion = Ejercicio_Sesion(
@@ -107,6 +117,7 @@ class TestSesion:
             assert sesion.obtener_ejercicios() == 1
 
     def test_fecha_programada_legible(self, app):
+        """Prueba el formateo de fecha programada a formato dd/mm/aaaa."""
         with app.app_context():
             fecha = datetime(2025, 6, 17, 15, 5)
             sesion = Sesion(
@@ -122,6 +133,7 @@ class TestSesion:
             assert sesion.fecha_programada_legible() == ""
 
     def test_hora_programada_legible(self, app):
+        """Prueba el formateo de hora programada a formato HH:MM."""
         with app.app_context():
             fecha = datetime(2025, 6, 17, 15, 5)
             sesion = Sesion(
@@ -140,6 +152,7 @@ class TestSesion:
 
 
     def test_repr(self, app):
+        """Prueba el método __repr__()."""
         with app.app_context():
             fecha = datetime(2025, 6, 17, 15, 5)
             sesion = Sesion(
@@ -156,6 +169,7 @@ class TestSesion:
             assert repr(sesion) == esperado
 
     def test_to_dict(self, app):
+        """Prueba la serialización a diccionario."""
         with app.app_context():
             fecha = datetime(2025, 6, 17, 15, 5)
             sesion = Sesion(

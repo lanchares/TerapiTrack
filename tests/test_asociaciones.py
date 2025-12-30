@@ -1,10 +1,18 @@
+"""
+Tests de modelos de asociaciones (tablas intermedias N:M).
+Prueba Paciente_Profesional y Ejercicio_Profesional.
+"""
+
 import pytest
 from datetime import date, timedelta
 from src.modelos.asociaciones import Paciente_Profesional, Ejercicio_Profesional
 from src.extensiones import db
 
 class TestPacienteProfesional:
+    """Suite de tests para la tabla intermedia Paciente_Profesional."""
+
     def test_creacion_y_dict(self, app):
+        """Prueba creación, campos y serialización de vinculación paciente-profesional."""
         with app.app_context():
             hoy = date.today()
             asociacion = Paciente_Profesional(
@@ -28,6 +36,7 @@ class TestPacienteProfesional:
             assert repr(asociacion) == esperado
 
     def test_fecha_asignacion_default(self, app):
+        """Prueba que Fecha_Asignacion usa date.today() por defecto."""
         with app.app_context():
             asociacion = Paciente_Profesional(
                 Paciente_Id=3,
@@ -38,7 +47,10 @@ class TestPacienteProfesional:
             assert asociacion.Fecha_Asignacion == date.today()
 
 class TestEjercicioProfesional:
+    """Suite de tests para la tabla intermedia Ejercicio_Profesional."""
+
     def test_creacion_y_dict(self, app):
+        """Prueba creación, campos y serialización de asociación ejercicio-profesional."""
         with app.app_context():
             asociacion = Ejercicio_Profesional(
                 Profesional_Id=5,

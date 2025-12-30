@@ -1,3 +1,8 @@
+"""
+Tests del modelo VideoRespuesta.
+Prueba almacenamiento de videos, fechas de expiración y métodos auxiliares.
+"""
+
 import pytest
 from datetime import date, timedelta
 from src.modelos.videoRespuesta import VideoRespuesta
@@ -5,7 +10,10 @@ from src.modelos.ejercicio_sesion import Ejercicio_Sesion
 from src.extensiones import db
 
 class TestVideoRespuesta:
+    """Suite de tests para el modelo VideoRespuesta."""
+
     def test_creacion_y_relacion(self, app):
+        """Prueba la creación de video y relación con Ejercicio_Sesion."""
         with app.app_context():
             ejercicio_sesion = Ejercicio_Sesion(
                 Sesion_Id=1,
@@ -25,6 +33,7 @@ class TestVideoRespuesta:
             assert video.Fecha_Expiracion > date.today()
 
     def test_nombre_archivo(self, app):
+        """Prueba la extracción del nombre de archivo desde la ruta."""
         with app.app_context():
             video = VideoRespuesta(
                 Ejercicio_Sesion_Id=2,
@@ -34,6 +43,7 @@ class TestVideoRespuesta:
             assert video.nombre_archivo() == "ejercicio2.mp4"
 
     def test_repr(self, app):
+        """Prueba el método __repr__()."""
         with app.app_context():
             video = VideoRespuesta(
                 Ejercicio_Sesion_Id=3,
@@ -44,6 +54,7 @@ class TestVideoRespuesta:
             assert repr(video) == esperado
 
     def test_to_dict(self, app):
+        """Prueba la serialización a diccionario."""
         with app.app_context():
             fecha = date(2025, 6, 17)
             video = VideoRespuesta(

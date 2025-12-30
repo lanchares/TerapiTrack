@@ -1,9 +1,17 @@
+"""
+Tests del modelo Ejercicio.
+Prueba duración, tipos, videos y serialización.
+"""
+
 import pytest
 from src.modelos.ejercicio import Ejercicio
 from src.extensiones import db
 
 class TestEjercicio:
+    """Suite de tests para el modelo Ejercicio."""
+
     def test_duracion_legible_valor(self, app):
+        """Prueba conversión de segundos a formato legible (Xm Ys)."""
         with app.app_context():
             ejercicio = Ejercicio(
                 Nombre="Apretar una pelota blanda",
@@ -16,6 +24,7 @@ class TestEjercicio:
             assert ejercicio.duracion_legible() == "1 min 0 seg"
 
     def test_duracion_legible_none(self, app):
+        """Prueba que duracion_legible() maneja valores None correctamente."""
         with app.app_context():
             ejercicio = Ejercicio(
                 Nombre="Movimientos de dedos",
@@ -27,6 +36,7 @@ class TestEjercicio:
             assert ejercicio.duracion_legible() == "No especificada"
 
     def test_es_tipo(self, app):
+        """Prueba comparación de tipo de ejercicio (case-insensitive)."""
         with app.app_context():
             ejercicio = Ejercicio(
                 Nombre="Flexión de tobillo asistida",
@@ -39,6 +49,7 @@ class TestEjercicio:
             assert ejercicio.es_tipo("fuerza") is False
 
     def test_tiene_video(self, app):
+        """Prueba detección de presencia de video."""
         with app.app_context():
             ejercicio = Ejercicio(
                 Nombre="Giro de cabeza lateral",
@@ -52,6 +63,7 @@ class TestEjercicio:
             assert ejercicio.tiene_video() is False
 
     def test_repr(self, app):
+        """Prueba el método __repr__()."""
         with app.app_context():
             ejercicio = Ejercicio(
                 Nombre="Levantamiento de brazo con ayuda",
@@ -64,6 +76,7 @@ class TestEjercicio:
             assert repr(ejercicio) == esperado
 
     def test_to_dict(self, app):
+        """Prueba la serialización a diccionario."""
         with app.app_context():
             ejercicio = Ejercicio(
                 Nombre="Rotación de muñeca",

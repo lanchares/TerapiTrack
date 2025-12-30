@@ -1,3 +1,8 @@
+"""
+Tests del modelo Profesional.
+Prueba creación, relaciones, restricciones y métodos auxiliares.
+"""
+
 import pytest
 from src.modelos.profesional import Profesional
 from src.modelos.usuario import Usuario
@@ -5,8 +10,10 @@ from src.modelos.paciente import Paciente
 from src.extensiones import db
 
 class TestProfesional:
+    """Suite de tests para el modelo Profesional."""
 
     def test_creacion_y_relacion_usuario(self, app):
+        """Prueba la creación de profesional y su relación 1:1 con Usuario."""
         with app.app_context():
             usuario = Usuario(
                 Nombre="Carlos",
@@ -29,6 +36,7 @@ class TestProfesional:
             assert profesional.Tipo_Profesional == "TERAPEUTA"
 
     def test_total_pacientes(self, app):
+        """Prueba el método total_pacientes() que cuenta pacientes vinculados."""
         with app.app_context():
             profesional = Profesional(
                 Usuario_Id=1,
@@ -51,6 +59,7 @@ class TestProfesional:
             assert profesional.total_pacientes() == 2
 
     def test_check_constraint_tipo_profesional(self, app):
+        """Prueba la restricción CHECK de Tipo_Profesional (solo valores permitidos)."""
         with app.app_context():
             profesional = Profesional(
                 Usuario_Id=4,
@@ -63,6 +72,7 @@ class TestProfesional:
                 db.session.rollback()
 
     def test_repr(self, app):
+        """Prueba el método __repr__()."""
         with app.app_context():
             profesional = Profesional(
                 Usuario_Id=5,
@@ -73,6 +83,7 @@ class TestProfesional:
             assert repr(profesional) == esperado
 
     def test_to_dict(self, app):
+        """Prueba la serialización a diccionario."""
         with app.app_context():
             profesional = Profesional(
                 Usuario_Id=6,
