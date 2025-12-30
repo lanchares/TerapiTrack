@@ -81,6 +81,16 @@ src/static/uploads/respuestas/*.avi
 !src/static/videos/.gitkeep
 
 # Documentación LaTeX temporal
+doc/*.aux
+doc/*.log
+doc/*.out
+doc/*.toc
+doc/*.synctex.gz
+doc/*.fdb_latexmk
+doc/*.fls
+doc/*.bbl
+doc/*.blg
+doc/*.lof
 doc/**/*.aux
 doc/**/*.log
 doc/**/*.out
@@ -90,6 +100,7 @@ doc/**/*.fdb_latexmk
 doc/**/*.fls
 doc/**/*.bbl
 doc/**/*.blg
+
 
 # PDFs generados (descomenta si NO quieres subirlos)
 # doc/*.pdf
