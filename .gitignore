@@ -91,6 +91,7 @@ doc/*.fls
 doc/*.bbl
 doc/*.blg
 doc/*.lof
+doc/*.lot
 doc/**/*.aux
 doc/**/*.log
 doc/**/*.out
@@ -100,6 +101,9 @@ doc/**/*.fdb_latexmk
 doc/**/*.fls
 doc/**/*.bbl
 doc/**/*.blg
+doc/**/*.lof
+doc/**/*.lot
+
 
 
 # PDFs generados (descomenta si NO quieres subirlos)
