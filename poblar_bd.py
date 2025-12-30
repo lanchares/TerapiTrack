@@ -44,15 +44,15 @@ from src.modelos.evaluacion import Evaluacion
 
 def create_app():
     """
-        Crea instancia de Flask para contexto de base de datos.
-        
-        Configura automáticamente la BD según el entorno:
-            - SQLite para desarrollo local
-            - PostgreSQL para Heroku (mediante variable DATABASE_URL)
-        
-        Returns:
-            Flask: Instancia de aplicación Flask configurada
-        """
+    Crea instancia de Flask para contexto de base de datos.
+    
+    Configura automáticamente la BD según el entorno:
+        - SQLite para desarrollo local
+        - PostgreSQL para Heroku (mediante variable DATABASE_URL)
+    
+    Returns:
+        Flask: Instancia de aplicación Flask configurada
+    """
     app = Flask(__name__)
 
     # Usar DATABASE_URL de Heroku si existe, sino SQLite local
@@ -71,17 +71,17 @@ def create_app():
 
 def poblar_datos():
     """
-        Puebla la base de datos con datos de prueba.
-        
-        Proceso:
-            1. Elimina todos los datos existentes
-            2. Crea usuarios (admin, profesionales, pacientes)
-            3. Crea ejercicios terapéuticos
-            4. Vincula pacientes con profesionales
-            5. Crea sesiones de ejemplo
-            6. Asigna ejercicios a sesiones
-            7. Genera evaluaciones y vídeos de prueba
-        """
+    Puebla la base de datos con datos de prueba.
+    
+    Proceso:
+        1. Elimina todos los datos existentes
+        2. Crea usuarios (admin, profesionales, pacientes)
+        3. Crea ejercicios terapéuticos
+        4. Vincula pacientes con profesionales
+        5. Crea sesiones de ejemplo
+        6. Asigna ejercicios a sesiones
+        7. Genera evaluaciones y vídeos de prueba
+    """
     print("Limpiando base de datos...")
     db.drop_all()
     db.create_all()
