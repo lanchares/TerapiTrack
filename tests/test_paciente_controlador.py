@@ -1,3 +1,8 @@
+"""
+Tests del controlador de paciente.
+Prueba dashboard, sesiones, ejercicios, progreso y utilidades.
+"""
+
 import json
 from datetime import datetime, timedelta
 
@@ -14,9 +19,7 @@ from src.modelos.ejercicio_sesion import Ejercicio_Sesion
 from src.modelos.evaluacion import Evaluacion
 from src.controladores import paciente_controlador
 
-
-# --------- helpers / fixtures específicos paciente ---------
-
+# Fixtures específicos
 
 @pytest.fixture
 def paciente_user(user_factory):
@@ -32,7 +35,6 @@ def paciente_user(user_factory):
     db.session.commit()
     return user
 
-
 @pytest.fixture
 def profesional_user(user_factory):
     """Crea un usuario profesional + registro en Profesional."""
@@ -46,24 +48,20 @@ def profesional_user(user_factory):
     db.session.commit()
     return user
 
-
 @pytest.fixture
 def login_paciente(login_user_fixture, paciente_user):
     """Loguea al paciente para tests de rutas protegidas."""
     return login_user_fixture(paciente_user)
 
-
-# ---------------------- dashboard -------------------------
-
+# Tests de dashboard
 
 def test_dashboard_paciente_sin_sesiones(client, paciente_user, login_paciente):
+    """Prueba dashboard de paciente sin sesiones pendientes."""
     resp = client.get("/paciente/dashboard")
     assert resp.status_code == 200
 
-
-def test_dashboard_paciente_con_sesion_futura(
-    client, paciente_user, profesional_user, login_paciente
-):
+def test_dashboard_paciente_con_sesion_futura(client, paciente_user, profesional_user, login_paciente):
+    """Prueba dashboard con sesión futura programada."""
     sesion = Sesion(
         Paciente_Id=paciente_user.Id,
         Profesional_Id=profesional_user.Id,
@@ -77,14 +75,10 @@ def test_dashboard_paciente_con_sesion_futura(
     resp = client.get("/paciente/dashboard")
     assert resp.status_code == 200
     
+# Tests de mis_sesiones
 
-
-# ---------------------- mis_sesiones ----------------------
-
-
-def test_mis_sesiones_rango_tres_semanas(
-    client, paciente_user, profesional_user, login_paciente
-):
+def test_mis_sesiones_rango_tres_semanas(client, paciente_user, profesional_user, login_paciente):
+    """Prueba que mis_sesiones muestra solo sesiones de las próximas 3 semanas."""
     # una sesión dentro del rango
     sesion1 = Sesion(
         Paciente_Id=paciente_user.Id,
@@ -93,7 +87,7 @@ def test_mis_sesiones_rango_tres_semanas(
         Fecha_Programada=datetime.now() + timedelta(days=3),
         Estado="PENDIENTE",
     )
-    # una sesión fuera del rango (muy en el futuro)
+    # una sesión fuera del rango
     sesion2 = Sesion(
         Paciente_Id=paciente_user.Id,
         Profesional_Id=profesional_user.Id,
@@ -106,19 +100,13 @@ def test_mis_sesiones_rango_tres_semanas(
 
     resp = client.get("/paciente/mis_sesiones")
     assert resp.status_code == 200
-    # debería aparecer la más cercana en el HTML (fecha programada)
     assert sesion1.Fecha_Programada.strftime("%Y-%m-%d").encode() in resp.data
-    # la que está fuera de 3 semanas no debería estar
     assert sesion2.Fecha_Programada.strftime("%Y-%m-%d").encode() not in resp.data
 
+# Tests de ejecutar_sesion
 
-# -------------------- ejecutar_sesion ---------------------
-
-
-def test_ejecutar_sesion_ok(
-    client, paciente_user, profesional_user, login_paciente
-):
-    # crear sesión y ejercicios asociados directamente (ya hay app_context por el client)
+def test_ejecutar_sesion_ok(client, paciente_user, profesional_user, login_paciente):
+    """Prueba ejecución exitosa de sesión con ejercicios asignados."""
     sesion = Sesion(
         Paciente_Id=paciente_user.Id,
         Profesional_Id=profesional_user.Id,
@@ -128,7 +116,7 @@ def test_ejecutar_sesion_ok(
     )
     db.session.add(sesion)
     db.session.commit()
-    sesion_id = sesion.Id  # guardar el id antes de que se “desenganche”
+    sesion_id = sesion.Id  
 
     ej = Ejercicio(
         Nombre="Sentadillas",
@@ -151,12 +139,8 @@ def test_ejecutar_sesion_ok(
     assert resp.status_code == 200
     assert b"Sentadillas" in resp.data
 
-
-
-def test_ejecutar_sesion_otro_paciente_redirige_dashboard(
-    client, paciente_user, profesional_user, user_factory, login_paciente
-):
-    # sesión asignada a otro paciente
+def test_ejecutar_sesion_otro_paciente_redirige_dashboard(client, paciente_user, profesional_user, user_factory, login_paciente):
+    """Prueba que paciente no puede ejecutar sesión de otro paciente."""
     otro_pac = user_factory(Rol_Id=1, Email="otro@example.com")
     sesion = Sesion(
         Paciente_Id=otro_pac.Id,
@@ -172,14 +156,10 @@ def test_ejecutar_sesion_otro_paciente_redirige_dashboard(
     assert resp.status_code == 200
     assert b"No tienes permisos para esta sesi" in resp.data
 
+# Tests de ejercicios
 
-
-# ------------------------ ejercicios ----------------------
-
-
-def test_ejercicios_agrupa_y_cuenta(
-    client, paciente_user, profesional_user, login_paciente, app
-):
+def test_ejercicios_agrupa_y_cuenta(client, paciente_user, profesional_user, login_paciente, app):
+    """Prueba agrupación de ejercicios únicos y conteo de asignaciones."""
     with app.app_context():
         ej1 = Ejercicio(
             Nombre="Puente",
@@ -218,13 +198,10 @@ def test_ejercicios_agrupa_y_cuenta(
 
     resp = client.get("/paciente/ejercicios")
     assert resp.status_code == 200
-    # deben aparecer los nombres de los dos ejercicios
     assert b"Puente" in resp.data
     assert b"Estiramiento" in resp.data
 
-
-# ------------------------- progreso -----------------------
-
+# Tests de progreso
 
 def _crear_evaluacion_completa(paciente_id, profesional_id, ejercicio, puntuacion, dias_offset):
     """Helper para crear Sesion, Ejercicio_Sesion y Evaluacion relacionados."""
@@ -255,19 +232,14 @@ def _crear_evaluacion_completa(paciente_id, profesional_id, ejercicio, puntuacio
     db.session.commit()
     return ev
 
-
-def test_progreso_sin_evaluaciones(
-    client, paciente_user, login_paciente
-):
+def test_progreso_sin_evaluaciones(client, paciente_user, login_paciente):
+    """Prueba página de progreso sin evaluaciones previas."""
     resp = client.get("/paciente/progreso")
     assert resp.status_code == 200
-    # stats sin evaluaciones
-    assert b"0" in resp.data  # al menos algún cero de estadísticas
+    assert b"0" in resp.data  
 
-
-def test_progreso_con_evaluaciones(
-    client, paciente_user, profesional_user, login_paciente, app
-):
+def test_progreso_con_evaluaciones(client, paciente_user, profesional_user, login_paciente, app):
+    """Prueba cálculo de estadísticas con evaluaciones existentes."""
     with app.app_context():
         ej = Ejercicio(
             Nombre="Equilibrio",
@@ -279,23 +251,19 @@ def test_progreso_con_evaluaciones(
         db.session.add(ej)
         db.session.commit()
 
-        # tres evaluaciones en sesiones diferentes
         _crear_evaluacion_completa(paciente_user.Id, profesional_user.Id, ej, 3, 1)
         _crear_evaluacion_completa(paciente_user.Id, profesional_user.Id, ej, 5, 2)
         _crear_evaluacion_completa(paciente_user.Id, profesional_user.Id, ej, 4, 3)
 
     resp = client.get("/paciente/progreso")
     assert resp.status_code == 200
-    # comprobar que aparece el nombre del ejercicio
     assert b"Equilibrio" in resp.data
-    # se puede asumir que el promedio 4.0 aparecerá en algún lado
-    assert b"4.0" in resp.data or b"4," in resp.data  # según formato
+    assert b"4.0" in resp.data or b"4," in resp.data
 
-
-# ---------------------- ayuda / session_info --------------
-
+# Tests de ayuda y session_info
 
 def test_ayuda(client, paciente_user, login_paciente):
+    """Prueba acceso a página de ayuda."""
     resp = client.get("/paciente/ayuda")
     assert resp.status_code == 200
 
@@ -303,20 +271,16 @@ def test_ayuda(client, paciente_user, login_paciente):
 def test_session_info(
     client, paciente_user, login_paciente, monkeypatch
 ):
-    # quitar esta línea porque ya no existe snes_controller en el controlador
-    # monkeypatch.setattr(paciente_controlador, "snes_controller", None)
-
+    """Prueba endpoint JSON con información de sesión."""
     resp = client.get("/paciente/session_info")
     assert resp.status_code == 200
     data = json.loads(resp.data)
     assert data["usuario"] == "Pac"
     assert data["rol"] == "Paciente"
-    # esta sigue siendo válida porque tú devuelves False fijo
     assert data["mando_conectado"] is False
 
-
-
 def test_get_video_path_usa_uploads_si_existe(app, tmp_path):
+    """Prueba que get_video_path() detecta videos en uploads/ejercicios."""
     from src.controladores.paciente_controlador import get_video_path
     video_name = "demo.mp4"
 
@@ -331,8 +295,8 @@ def test_get_video_path_usa_uploads_si_existe(app, tmp_path):
 
     assert path == f"/static/uploads/ejercicios/{video_name}"
 
-
 def test_get_video_path_usa_videos_si_no_hay_uploads(app, tmp_path):
+    """Prueba que get_video_path() detecta videos en videos/ como fallback."""
     from src.controladores.paciente_controlador import get_video_path
     video_name = "demo2.mp4"
 

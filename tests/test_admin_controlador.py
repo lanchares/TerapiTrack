@@ -1,3 +1,9 @@
+"""
+Tests del controlador del administrador.
+Prueba todas las funcionalidades del panel de administrador:
+dashboard, gestión de usuarios, vinculaciones, configuración y exportación.
+"""
+
 import os
 import json
 import builtins
@@ -15,9 +21,7 @@ from src.modelos.profesional import Profesional
 from src.modelos.asociaciones import Paciente_Profesional
 from src.controladores import admin_controlador
 
-
-# --------- helpers / fixtures específicos admin ---------
-
+# Fixtures específicos para admin
 
 @pytest.fixture
 def admin_user(user_factory):
@@ -36,12 +40,10 @@ def login_admin(login_user_fixture, admin_user):
     """Loguea al admin para tests de rutas protegidas."""
     return login_user_fixture(admin_user)
 
-
-# ----------------- configuración JSON --------------------
-
+# Tests de configuración JSON
 
 def test_cargar_configuracion_crea_por_defecto(tmp_path, monkeypatch):
-    # Redefinir carpeta config a un directorio temporal
+    """Prueba que cargar_configuracion() crea archivo por defecto si no existe."""    
     config_dir = tmp_path / "config"
     monkeypatch.setattr(admin_controlador.os, "path", os.path)
     monkeypatch.setattr(admin_controlador.os, "makedirs", os.makedirs)
@@ -54,14 +56,13 @@ def test_cargar_configuracion_crea_por_defecto(tmp_path, monkeypatch):
 
 
 def test_guardar_configuracion_ok(tmp_path, monkeypatch, admin_user, login_admin, app):
+    """Prueba que guardar_configuracion() guarda correctamente en JSON."""
     monkeypatch.chdir(tmp_path)
 
-    # Partir de config por defecto
     config = admin_controlador.cargar_configuracion()
     config["retencion_videos"] = "60"
 
     with app.test_request_context():
-        # current_user dentro de guardar_configuracion
         from flask_login import login_user
 
         login_user(admin_user)
@@ -74,12 +75,11 @@ def test_guardar_configuracion_ok(tmp_path, monkeypatch, admin_user, login_admin
     assert loaded["modificado_por"] == admin_user.Id
 
 def test_guardar_configuracion_error(monkeypatch, tmp_path, app, admin_user):
-    # simulamos que open lanza una excepción
+    """Prueba manejo de error al guardar configuración."""
     def fake_open(*args, **kwargs):
         raise IOError("no se puede escribir")
 
     monkeypatch.chdir(tmp_path)
-    # parchear la función open global que usa admin_controlador
     monkeypatch.setattr(builtins, "open", fake_open)
 
     with app.test_request_context():
@@ -90,7 +90,7 @@ def test_guardar_configuracion_error(monkeypatch, tmp_path, app, admin_user):
     assert ok is False
 
 def test_cargar_configuracion_error_usa_default(monkeypatch, tmp_path):
-    # forzar error al abrir el JSON
+    """Prueba que cargar_configuracion() usa valores por defecto si hay error."""
     def fake_open(*args, **kwargs):
         raise IOError("no se puede leer")
 
@@ -100,19 +100,18 @@ def test_cargar_configuracion_error_usa_default(monkeypatch, tmp_path):
     config = admin_controlador.cargar_configuracion()
     assert config["retencion_videos"] == "30"
 
-# ---------------------- dashboard ------------------------
-
+# Tests de rutas del dashboard
 
 def test_dashboard_admin(client, admin_user, login_admin):
+    """Prueba acceso al dashboard del administrador."""
     resp = client.get("/admin/dashboard")
     assert resp.status_code == 200
     assert b"dashboard" in resp.data.lower()
 
-
-# ------------------- listar_usuarios ---------------------
-
+# Tests de listar usuarios
 
 def test_listar_usuarios_sin_filtros(client, admin_user, login_admin, user_factory):
+    """Prueba listado de usuarios sin filtros."""
     user_factory(Email="u1@example.com", Rol_Id=1)
     resp = client.get("/admin/usuarios")
     assert resp.status_code == 200
@@ -120,9 +119,9 @@ def test_listar_usuarios_sin_filtros(client, admin_user, login_admin, user_facto
 
 
 def test_listar_usuarios_con_filtros(client, admin_user, login_admin, user_factory):
+    """Prueba listado de usuarios con filtros de búsqueda, rol y estado."""
     user1 = user_factory(Email="pac@example.com", Rol_Id=1)
     user2 = user_factory(Email="pro@example.com", Rol_Id=2)
-    # filtro por texto y rol paciente activo
     resp = client.get(
         "/admin/usuarios?search=pac&rol=1&estado=1"
     )
@@ -130,13 +129,10 @@ def test_listar_usuarios_con_filtros(client, admin_user, login_admin, user_facto
     assert user1.Email.encode() in resp.data
     assert user2.Email.encode() not in resp.data
 
+# Tests de ver_usuario
 
-# -------------------- ver_usuario ------------------------
-
-
-def test_ver_usuario_no_admin_redirige_a_login(
-    client, user_factory, login_user_fixture
-):
+def test_ver_usuario_no_admin_redirige_a_login(client, user_factory, login_user_fixture):
+    """Prueba que usuarios no admin reciben error 403 al ver detalles."""
     user = user_factory(Rol_Id=1, Email="p@example.com")
     login_user_fixture(user)
     resp = client.get(f"/admin/usuario/{user.Id}", follow_redirects=False)
@@ -145,16 +141,15 @@ def test_ver_usuario_no_admin_redirige_a_login(
 
 
 def test_ver_usuario_inactivo_redirige_lista(client, admin_user, login_admin, user_factory):
+    """Prueba que ver usuario inactivo redirige a la lista."""
     u = user_factory(Email="inactivo@example.com", Estado=0)
     resp = client.get(f"/admin/usuario/{u.Id}", follow_redirects=False)
     assert resp.status_code == 302
     assert "/admin/usuarios" in resp.location
 
 
-def test_ver_usuario_paciente_muestra_detalle_y_vinculaciones(
-    client, admin_user, login_admin, user_factory
-):
-    # crear paciente + profesional y vinculación
+def test_ver_usuario_paciente_muestra_detalle_y_vinculaciones(client, admin_user, login_admin, user_factory):
+    """Prueba visualización de detalles de paciente con vinculaciones."""
     pac = user_factory(Email="pacv@example.com", Rol_Id=1)
     prof = user_factory(Email="profv@example.com", Rol_Id=2)
     paciente = Paciente(
@@ -184,9 +179,8 @@ def test_ver_usuario_paciente_muestra_detalle_y_vinculaciones(
     assert b"Cond" in resp.data
 
 
-def test_ver_usuario_profesional_muestra_detalle(
-    client, admin_user, login_admin, user_factory
-):
+def test_ver_usuario_profesional_muestra_detalle(client, admin_user, login_admin, user_factory):
+    """Prueba visualización de detalles de profesional."""
     prof = user_factory(Email="profd@example.com", Rol_Id=2)
     profesional = Profesional(
         Usuario_Id=prof.Id,
@@ -201,9 +195,8 @@ def test_ver_usuario_profesional_muestra_detalle(
     assert b"Fisio" in resp.data
 
 
-def test_editar_usuario_get_precarga_profesional(
-    client, admin_user, login_admin, user_factory
-):
+def test_editar_usuario_get_precarga_profesional(client, admin_user, login_admin, user_factory):
+    """Prueba que GET de editar_usuario precarga datos de profesional."""
     user = user_factory(Email="prof_pre@example.com", Rol_Id=2)
     prof = Profesional(
         Usuario_Id=user.Id,
@@ -217,13 +210,10 @@ def test_editar_usuario_get_precarga_profesional(
     assert resp.status_code == 200
     assert b"Cardio" in resp.data
 
+# Tests de editar_usuario
 
-# -------------------- editar_usuario ---------------------
-
-
-def test_editar_usuario_get_precarga(
-    client, admin_user, login_admin, user_factory
-):
+def test_editar_usuario_get_precarga(client, admin_user, login_admin, user_factory):
+    """Prueba que GET de editar_usuario precarga datos de paciente."""
     user = user_factory(Email="edit@example.com", Rol_Id=1)
     pac = Paciente(
         Usuario_Id=user.Id,
@@ -239,18 +229,16 @@ def test_editar_usuario_get_precarga(
     assert b"edit@example.com" in resp.data
 
 
-def test_editar_usuario_inactivo_redirige(
-    client, admin_user, login_admin, user_factory
-):
+def test_editar_usuario_inactivo_redirige(client, admin_user, login_admin, user_factory):
+    """Prueba que no se pueden editar usuarios inactivos."""
     user = user_factory(Email="edit_inactivo@example.com", Estado=0)
     resp = client.get(f"/admin/editar_usuario/{user.Id}", follow_redirects=False)
     assert resp.status_code == 302
     assert "/admin/usuarios" in resp.location
 
 
-def test_editar_usuario_email_duplicado(
-    client, admin_user, login_admin, user_factory
-):
+def test_editar_usuario_email_duplicado(client, admin_user, login_admin, user_factory):
+    """Prueba validación de email duplicado al editar."""
     user1 = user_factory(Email="orig@example.com")
     user2 = user_factory(Email="otro@example.com")
 
@@ -259,18 +247,17 @@ def test_editar_usuario_email_duplicado(
         data={
             "nombre": "Nuevo",
             "apellidos": "Ap",
-            "email": "orig@example.com",  # email de otro
+            "email": "orig@example.com", 
             "password": "",
         },
         follow_redirects=True,
     )
     assert resp.status_code == 200
-    assert b"ya est\xc3\xa1 en uso" in resp.data  # mensaje de error
+    assert b"ya est\xc3\xa1 en uso" in resp.data  
 
 
-def test_editar_usuario_paciente_actualiza(
-    client, admin_user, login_admin, user_factory
-):
+def test_editar_usuario_paciente_actualiza(client, admin_user, login_admin, user_factory):
+    """Prueba actualización exitosa de datos de paciente."""
     user = user_factory(Email="pac_edit@example.com", Rol_Id=1)
     pac = Paciente(
         Usuario_Id=user.Id,
@@ -300,9 +287,8 @@ def test_editar_usuario_paciente_actualiza(
     assert user.Nombre == "NuevoNombre"
 
 
-def test_editar_usuario_profesional_actualiza(
-    client, admin_user, login_admin, user_factory
-):
+def test_editar_usuario_profesional_actualiza(client, admin_user, login_admin, user_factory):
+    """Prueba actualización exitosa de datos de profesional."""
     user = user_factory(Email="prof_edit@example.com", Rol_Id=2)
     prof = Profesional(
         Usuario_Id=user.Id,
@@ -328,9 +314,8 @@ def test_editar_usuario_profesional_actualiza(
     db.session.refresh(prof)
     assert prof.Especialidad == "NuevaEsp"
 
-def test_editar_usuario_error_lanza_flash(
-    client, admin_user, login_admin, user_factory, monkeypatch
-):
+def test_editar_usuario_error_lanza_flash(client, admin_user, login_admin, user_factory, monkeypatch):
+    """Prueba manejo de errores al editar usuario."""
     user = user_factory(Email="edit_err@example.com", Rol_Id=1)
     pac = Paciente(
         Usuario_Id=user.Id,
@@ -361,40 +346,33 @@ def test_editar_usuario_error_lanza_flash(
     assert resp.status_code == 200
     assert b"Error al actualizar usuario" in resp.data
 
+# Tests de cambiar_estado_usuario
 
-# ---------------- cambiar_estado_usuario ------------------
-
-
-def test_cambiar_estado_usuario_no_puede_su_cuenta(
-    client, admin_user, login_admin
-):
+def test_cambiar_estado_usuario_no_puede_su_cuenta(client, admin_user, login_admin):
+    """Prueba que admin no puede cambiar estado de su propia cuenta."""
     resp = client.get(f"/admin/cambiar_estado/{admin_user.Id}", follow_redirects=False)
     assert resp.status_code == 302
     assert "/admin/usuarios" in resp.location
 
 
-def test_cambiar_estado_usuario_otro(
-    client, admin_user, login_admin, user_factory
-):
+def test_cambiar_estado_usuario_otro(client, admin_user, login_admin, user_factory):
+    """Prueba activar/desactivar cuenta de otro usuario."""
     user = user_factory(Email="estado@example.com", Estado=1)
     resp = client.get(f"/admin/cambiar_estado/{user.Id}", follow_redirects=False)
     assert resp.status_code == 302
     db.session.refresh(user)
-    assert user.Estado == 0  # cambiado a inactivo
+    assert user.Estado == 0  
 
-
-# -------------------- crear_usuario ----------------------
-
+# Tests de crear_usuario
 
 def test_crear_usuario_get(client, admin_user, login_admin):
+    """Prueba acceso al formulario de creación de usuario."""
     resp = client.get("/admin/crear_usuario")
     assert resp.status_code == 200
 
 
-def test_crear_usuario_email_duplicado(
-    client, admin_user, login_admin, user_factory
-):
-    # Usuario ya existente con ese email
+def test_crear_usuario_email_duplicado(client, admin_user, login_admin, user_factory):
+    """Prueba validación de email duplicado al crear usuario."""
     user_factory(Email="dup@example.com")
 
     resp = client.post(
@@ -411,12 +389,8 @@ def test_crear_usuario_email_duplicado(
     assert resp.status_code == 200
     assert Usuario.query.filter_by(Email="dup@example.com").count() == 1
 
-
-
-
-def test_crear_usuario_admin(
-    client, admin_user, login_admin
-):
+def test_crear_usuario_admin(client, admin_user, login_admin):
+    """Prueba creación exitosa de administrador."""
     resp = client.post(
         "/admin/crear_usuario",
         data={
@@ -432,9 +406,8 @@ def test_crear_usuario_admin(
     u = Usuario.query.filter_by(Email="adm2@example.com").first()
     assert u is not None and u.Rol_Id == 0
 
-
-
 def test_crear_paciente_sin_fecha_error(client, admin_user, login_admin):
+    """Prueba que crear paciente sin fecha de nacimiento muestra error."""
     resp = client.post(
         "/admin/crear_usuario",
         data={
@@ -448,14 +421,10 @@ def test_crear_paciente_sin_fecha_error(client, admin_user, login_admin):
         follow_redirects=True,
     )
     assert resp.status_code == 200
-    # no se crea usuario con ese email
     assert Usuario.query.filter_by(Email="pac_sin_fecha@example.com").first() is None
 
-
-
-
-
 def test_crear_paciente_ok(client, admin_user, login_admin):
+    """Prueba creación exitosa de paciente con todos los datos."""
     resp = client.post(
         "/admin/crear_usuario",
         data={
@@ -478,10 +447,8 @@ def test_crear_paciente_ok(client, admin_user, login_admin):
     assert pac is not None
     assert pac.Condicion_Medica == "Cond"
 
-
-
-
 def test_crear_profesional_sin_datos_error(client, admin_user, login_admin):
+    """Prueba que crear profesional sin especialidad/tipo muestra error."""
     resp = client.post(
         "/admin/crear_usuario",
         data={
@@ -490,17 +457,14 @@ def test_crear_profesional_sin_datos_error(client, admin_user, login_admin):
             "email": "prof_err@example.com",
             "password": "pass123",
             "rol_id": "2",
-            # sin especialidad ni tipo_profesional
         },
         follow_redirects=True,
     )
     assert resp.status_code == 200
     assert Usuario.query.filter_by(Email="prof_err@example.com").first() is None
 
-
-
-
 def test_crear_profesional_ok(client, admin_user, login_admin):
+    """Prueba creación exitosa de profesional con todos los datos."""
     resp = client.post(
         "/admin/crear_usuario",
         data={
@@ -523,11 +487,8 @@ def test_crear_profesional_ok(client, admin_user, login_admin):
     assert prof.Especialidad == "Fisio"
     assert prof.Tipo_Profesional == "TERAPEUTA"
 
-
-
-def test_crear_usuario_error_general_muestra_flash(
-    client, admin_user, login_admin, monkeypatch
-):
+def test_crear_usuario_error_general_muestra_flash(client, admin_user, login_admin, monkeypatch):
+    """Prueba manejo de errores generales al crear usuario."""
     def fake_commit():
         raise Exception("fallo al crear")
 
@@ -547,11 +508,10 @@ def test_crear_usuario_error_general_muestra_flash(
     assert resp.status_code == 200
     assert b"Error al crear usuario" in resp.data
 
-
-# ---------------- vincular / vinculaciones ----------------
-
+# Tests de vincular/vinculaciones
 
 def test_vincular_get_muestra_choices(client, admin_user, login_admin, user_factory):
+    """Prueba que formulario de vincular muestra pacientes y profesionales."""
     pac = user_factory(Email="v_pac@example.com", Rol_Id=1, Nombre="Pac", Apellidos="Uno")
     prof = user_factory(Email="v_prof@example.com", Rol_Id=2, Nombre="Prof", Apellidos="Dos")
     paciente = Paciente(
@@ -570,15 +530,10 @@ def test_vincular_get_muestra_choices(client, admin_user, login_admin, user_fact
 
     resp = client.get("/admin/vincular")
     assert resp.status_code == 200
-    # en la plantilla se muestran nombres/apellidos, no emails
     assert b"Pac Uno" in resp.data or b"Prof Dos" in resp.data
 
-
-
-
-def test_vincular_existente_muestra_error(
-    client, admin_user, login_admin, user_factory
-):
+def test_vincular_existente_muestra_error(client, admin_user, login_admin, user_factory):
+    """Prueba que vincular duplicado muestra mensaje de error."""
     pac = user_factory(Email="v2_pac@example.com", Rol_Id=1)
     prof = user_factory(Email="v2_prof@example.com", Rol_Id=2)
     db.session.add_all([
@@ -611,10 +566,8 @@ def test_vincular_existente_muestra_error(
     assert resp.status_code == 200
     assert b"ya existe" in resp.data
 
-
-def test_vincular_crea_nueva(
-    client, admin_user, login_admin, user_factory
-):
+def test_vincular_crea_nueva(client, admin_user, login_admin, user_factory):
+    """Prueba creación exitosa de vinculación paciente-profesional."""
     pac = user_factory(Email="v3_pac@example.com", Rol_Id=1)
     prof = user_factory(Email="v3_prof@example.com", Rol_Id=2)
     db.session.add_all([
@@ -643,10 +596,8 @@ def test_vincular_crea_nueva(
     ).first()
     assert vinc is not None
 
-
-def test_ver_vinculaciones_sin_filtros(
-    client, admin_user, login_admin, user_factory
-):
+def test_ver_vinculaciones_sin_filtros(client, admin_user, login_admin, user_factory):
+    """Prueba visualización de vinculaciones sin filtros."""
     pac = user_factory(Email="vv_pac@example.com", Rol_Id=1)
     prof = user_factory(Email="vv_prof@example.com", Rol_Id=2)
     db.session.add_all([
@@ -675,10 +626,8 @@ def test_ver_vinculaciones_sin_filtros(
     assert resp.status_code == 200
     assert b"Cond" in resp.data
 
-
-def test_desvincular_existente(
-    client, admin_user, login_admin, user_factory
-):
+def test_desvincular_existente(client, admin_user, login_admin, user_factory):
+    """Prueba eliminación exitosa de vinculación existente."""
     pac = user_factory(Email="dv_pac@example.com", Rol_Id=1)
     prof = user_factory(Email="dv_prof@example.com", Rol_Id=2)
     db.session.add_all([
@@ -712,19 +661,16 @@ def test_desvincular_existente(
         is None
     )
 
-
-def test_desvincular_no_existente(
-    client, admin_user, login_admin, user_factory
-):
+def test_desvincular_no_existente(client, admin_user, login_admin, user_factory):
+    """Prueba desvincular una vinculación inexistente."""
     pac = user_factory(Email="dv2_pac@example.com", Rol_Id=1)
     prof = user_factory(Email="dv2_prof@example.com", Rol_Id=2)
     resp = client.post(f"/admin/desvincular/{pac.Id}/{prof.Id}", follow_redirects=True)
     assert resp.status_code == 200  # se mantiene en la vista con flash
 
 
-def test_desvincular_lanza_error_bd(
-    client, admin_user, login_admin, user_factory, monkeypatch
-):
+def test_desvincular_lanza_error_bd(client, admin_user, login_admin, user_factory, monkeypatch):
+    """Prueba manejo de errores al desvincular."""
     pac = user_factory(Email="err_pac@example.com", Rol_Id=1)
     prof = user_factory(Email="err_prof@example.com", Rol_Id=2)
     db.session.add_all([
@@ -749,7 +695,6 @@ def test_desvincular_lanza_error_bd(
     db.session.add(vinc)
     db.session.commit()
 
-    # hacer que commit falle
     def fake_commit():
         raise Exception("fallo en BD")
 
@@ -760,9 +705,8 @@ def test_desvincular_lanza_error_bd(
     assert b"Error al desvincular" in resp.data
 
 
-def test_ver_vinculaciones_con_filtros(
-    client, admin_user, login_admin, user_factory
-):
+def test_ver_vinculaciones_con_filtros(client, admin_user, login_admin, user_factory):
+    """Prueba visualización de vinculaciones con filtros activos."""
     pac = user_factory(Email="busc_pac@example.com", Rol_Id=1, Nombre="Ana", Apellidos="Gomez")
     prof = user_factory(Email="busc_prof@example.com", Rol_Id=2, Nombre="Luis", Apellidos="Lopez")
     db.session.add_all([
@@ -798,32 +742,26 @@ def test_ver_vinculaciones_con_filtros(
     assert resp.status_code == 200
     assert b"Dolor espalda" in resp.data
 
-
-# ----------------- estadisticas / exportar ---------------
-
+# Tests de estadísticas/exportar
 
 def test_estadisticas(client, admin_user, login_admin):
+    """Prueba acceso a página de estadísticas."""
     resp = client.get("/admin/estadisticas")
     assert resp.status_code == 200
 
-
 def test_exportar_usuarios(client, admin_user, login_admin, user_factory):
+    """Prueba exportación de usuarios a CSV."""
     user_factory(Email="csv@example.com")
     resp = client.get("/admin/exportar_usuarios")
     assert resp.status_code == 200
     assert resp.headers["Content-Type"].startswith("text/csv")
     assert b"csv@example.com" in resp.data
 
+# Tests de configuración
 
-# ---------------------- configuracion ---------------------
-
-
-def test_configuracion_get_usa_config_actual(
-    client, admin_user, login_admin, tmp_path, monkeypatch
-):
-    # Trabajar en directorio temporal para el JSON
+def test_configuracion_get_usa_config_actual(client, admin_user, login_admin, tmp_path, monkeypatch):
+    """Prueba que GET de configuración carga valores actuales del JSON."""
     monkeypatch.chdir(tmp_path)
-    # Crear config previa
     conf = {
         "retencion_videos": "90",
         "limite_almacenamiento": "5",
@@ -838,14 +776,11 @@ def test_configuracion_get_usa_config_actual(
 
     resp = client.get("/admin/configuracion")
     assert resp.status_code == 200
-    assert b"90" in resp.data or b"5 GB" in resp.data  # según cómo se renderice
+    assert b"90" in resp.data or b"5 GB" in resp.data  
 
-
-def test_configuracion_post_actualiza_json(
-    client, admin_user, login_admin, tmp_path, monkeypatch
-):
+def test_configuracion_post_actualiza_json(client, admin_user, login_admin, tmp_path, monkeypatch):
+    """Prueba que POST de configuración actualiza el archivo JSON."""
     monkeypatch.chdir(tmp_path)
-    # config inicial
     admin_controlador.cargar_configuracion()
 
     resp = client.post(
@@ -864,9 +799,8 @@ def test_configuracion_post_actualiza_json(
         nueva = json.load(f)
     assert nueva["retencion_videos"] == "60"
 
-def test_configuracion_error_guardar_muestra_flash(
-    client, admin_user, login_admin, monkeypatch
-):
+def test_configuracion_error_guardar_muestra_flash(client, admin_user, login_admin, monkeypatch):
+    """Prueba manejo de error al guardar configuración."""
     def fake_guardar(conf):
         return False
 
@@ -885,9 +819,8 @@ def test_configuracion_error_guardar_muestra_flash(
     assert resp.status_code == 200
     assert b"Error al guardar la configuraci" in resp.data
 
-def test_configuracion_excepcion_muestra_flash(
-    client, admin_user, login_admin, monkeypatch
-):
+def test_configuracion_excepcion_muestra_flash(client, admin_user, login_admin, monkeypatch):
+    """Prueba manejo de excepciones al procesar configuración."""
     def fake_guardar_raise(conf):
         raise Exception("fallo inesperado")
 
@@ -905,6 +838,3 @@ def test_configuracion_excepcion_muestra_flash(
     )
     assert resp.status_code == 200
     assert b"Error al procesar configuraci" in resp.data
-
-
-

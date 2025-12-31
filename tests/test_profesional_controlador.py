@@ -1,3 +1,9 @@
+"""
+Tests del controlador de profesional.
+Prueba dashboard, gestión de pacientes, ejercicios, sesiones,
+evaluaciones, API de estado en tiempo real y gestión de videos.
+"""
+
 import io
 import json
 from datetime import datetime, timedelta
@@ -19,9 +25,7 @@ from src.modelos.asociaciones import Paciente_Profesional, Ejercicio_Profesional
 from src.controladores import profesional_controlador
 from src.config import Config
 
-
-# --------- helpers / fixtures específicos profesional ---------
-
+# Fixtures
 
 @pytest.fixture
 def profesional_user(user_factory):
@@ -41,12 +45,10 @@ def profesional_user(user_factory):
     db.session.commit()
     return user
 
-
 @pytest.fixture
 def login_profesional(login_user_fixture, profesional_user):
     """Loguea al profesional para tests de rutas protegidas."""
     return login_user_fixture(profesional_user)
-
 
 @pytest.fixture
 def paciente_user(user_factory):
@@ -67,12 +69,10 @@ def paciente_user(user_factory):
     db.session.commit()
     return user
 
-
-# ---------------------- dashboard -------------------------
-
+# Tests de dashboard
 
 def test_dashboard_ok(client, profesional_user, login_profesional, paciente_user):
-    # vincular un paciente y crear una sesión pendiente y una completada con video sin evaluar
+    """Prueba dashboard de profesional con estadísticas completas."""
     vinc = Paciente_Profesional(
         Paciente_Id=paciente_user.Id,
         Profesional_Id=profesional_user.Id,
@@ -129,23 +129,18 @@ def test_dashboard_ok(client, profesional_user, login_profesional, paciente_user
     resp = client.get("/profesional/dashboard")
     assert resp.status_code == 200
 
-
 def test_dashboard_sin_profesional_redirige(client, user_factory, login_user_fixture):
-    # usuario sin registro en Profesional
+    """Prueba que usuario sin registro Profesional es redirigido."""
     user = user_factory(Rol_Id=2, Email="sinprof@example.com")
     login_user_fixture(user)
     resp = client.get("/profesional/dashboard", follow_redirects=False)
     assert resp.status_code == 302
     assert "/login" in resp.location
 
+# Tests de listar_pacientes
 
-
-# ------------------- gestión de pacientes -----------------
-
-
-def test_listar_pacientes_filtrado_basico(
-    client, profesional_user, paciente_user, login_profesional
-):
+def test_listar_pacientes_filtrado_basico(client, profesional_user, paciente_user, login_profesional):
+    """Prueba listado de pacientes con filtros de búsqueda y condición."""
     vinc = Paciente_Profesional(
         Paciente_Id=paciente_user.Id,
         Profesional_Id=profesional_user.Id,
@@ -172,10 +167,8 @@ def test_listar_pacientes_filtrado_basico(
     resp4 = client.get("/profesional/pacientes?edad=x-y")
     assert resp4.status_code == 200
 
-
-def test_listar_pacientes_filtrado_por_edad_valida(
-    client, profesional_user, paciente_user, login_profesional
-):
+def test_listar_pacientes_filtrado_por_edad_valida(client, profesional_user, paciente_user, login_profesional):
+    """Prueba filtrado de pacientes por rango de edad."""
     vinc = Paciente_Profesional(
         Paciente_Id=paciente_user.Id,
         Profesional_Id=profesional_user.Id,
@@ -184,18 +177,14 @@ def test_listar_pacientes_filtrado_por_edad_valida(
     db.session.add(vinc)
     db.session.commit()
 
-    # Rango amplio que incluye la edad actual (~24-25 años según fecha de nacimiento)
     resp = client.get("/profesional/pacientes?edad=20-40")
     assert resp.status_code == 200
     assert b"Pac Test" in resp.data
 
+# Tests de listar_ejercicios
 
-# ----------------- biblioteca de ejercicios ---------------
-
-
-def test_listar_ejercicios_filtros(
-    client, profesional_user, login_profesional
-):
+def test_listar_ejercicios_filtros(client, profesional_user, login_profesional):
+    """Prueba listado de ejercicios con filtros de tipo y búsqueda."""
     ej1 = Ejercicio(
         Nombre="Puente",
         Descripcion="Desc",
@@ -225,22 +214,19 @@ def test_listar_ejercicios_filtros(
     assert resp_search.status_code == 200
     assert b"Estiramiento" in resp_search.data
 
-def test_crear_ejercicio_get_muestra_form(
-    client, profesional_user, login_profesional
-):
+# Tests de crear_ejercicio
+
+def test_crear_ejercicio_get_muestra_form(client, profesional_user, login_profesional):
+    """Prueba acceso al formulario de creación de ejercicio."""
     resp = client.get("/profesional/ejercicios/crear")
     assert resp.status_code == 200
     assert b"Crear" in resp.data or b"Nombre" in resp.data
 
-
-def test_crear_ejercicio_ok(
-    client, profesional_user, login_profesional, monkeypatch, tmp_path, app
-):
-    # configurar UPLOAD_FOLDER a un directorio temporal
+def test_crear_ejercicio_ok(client, profesional_user, login_profesional, monkeypatch, tmp_path, app):
+    """Prueba creación exitosa de ejercicio con video."""
     with app.app_context():
         app.config["UPLOAD_FOLDER"] = str(tmp_path)
 
-    # simular archivo subido
     data = {
         "nombre": "NuevoEj",
         "descripcion": "Desc",
@@ -262,13 +248,11 @@ def test_crear_ejercicio_ok(
     ).first()
     assert assoc is not None
 
-# ------------------- creación de ejercicios -----------------
-
 def test_crear_ejercicio_calcula_duracion(client, login_profesional, monkeypatch):
-    # Simular VideoFileClip para controlar la duración
+    """Prueba cálculo automático de duración con MoviePy."""
     class DummyClip:
         def __init__(self, path):
-            self.duration = 12  # segundos
+            self.duration = 12  
 
         def close(self):
             pass
@@ -277,7 +261,6 @@ def test_crear_ejercicio_calcula_duracion(client, login_profesional, monkeypatch
         profesional_controlador, "VideoFileClip", DummyClip, raising=True
     )
 
-    # Fichero de vídeo “fake” en memoria
     video_bytes = io.BytesIO(b"fake-video-content")
     video_bytes.name = "test.mp4"
 
@@ -294,16 +277,14 @@ def test_crear_ejercicio_calcula_duracion(client, login_profesional, monkeypatch
         content_type="multipart/form-data",
         follow_redirects=False,
     )
-    assert resp.status_code == 302  # redirección tras crear
+    assert resp.status_code == 302  
 
     ejercicio = Ejercicio.query.order_by(Ejercicio.Id.desc()).first()
     assert ejercicio is not None
     assert ejercicio.Duracion == 12
 
-# ------------------- creación de sesiones -----------------
-
-
 def _crear_ejercicios_para_profesional(profesional_id):
+    """Helper: crea ejercicios de prueba asociados a un profesional."""
     ej1 = Ejercicio(
         Nombre="Puente",
         Descripcion="Desc",
@@ -329,10 +310,10 @@ def _crear_ejercicios_para_profesional(profesional_id):
     db.session.commit()
     return ej1, ej2
 
+# Tests de crear_sesion
 
-def test_crear_sesion_get_muestra_form(
-    client, profesional_user, paciente_user, login_profesional
-):
+def test_crear_sesion_get_muestra_form(client, profesional_user, paciente_user, login_profesional):
+    """Prueba acceso al formulario de creación de sesión."""
     vinc = Paciente_Profesional(
         Paciente_Id=paciente_user.Id,
         Profesional_Id=profesional_user.Id,
@@ -348,9 +329,8 @@ def test_crear_sesion_get_muestra_form(
     assert b"Crear Sesi" in resp.data
 
 
-def test_crear_sesion_preseleccion_paciente(
-    client, profesional_user, paciente_user, login_profesional
-):
+def test_crear_sesion_preseleccion_paciente(client, profesional_user, paciente_user, login_profesional):
+    """Prueba preselección de paciente mediante parámetro GET."""
     vinc = Paciente_Profesional(
         Paciente_Id=paciente_user.Id,
         Profesional_Id=profesional_user.Id,
@@ -364,10 +344,8 @@ def test_crear_sesion_preseleccion_paciente(
     resp = client.get(f"/profesional/sesiones/crear?paciente_id={paciente_user.Id}")
     assert resp.status_code == 200
 
-
-def test_crear_sesion_post_ok(
-    client, profesional_user, paciente_user, login_profesional
-):
+def test_crear_sesion_post_ok(client, profesional_user, paciente_user, login_profesional):
+    """Prueba creación exitosa de sesión con ejercicios."""
     vinc = Paciente_Profesional(
         Paciente_Id=paciente_user.Id,
         Profesional_Id=profesional_user.Id,
@@ -396,14 +374,10 @@ def test_crear_sesion_post_ok(
     es_rel = Ejercicio_Sesion.query.filter_by(Sesion_Id=ses.Id).all()
     assert len(es_rel) == 2
 
+# Tests de listar_sesiones
 
-# ------------------- listar y ver sesiones ----------------
-
-
-def test_listar_sesiones_con_estados(
-    client, profesional_user, paciente_user, login_profesional
-):
-    # crear sesiones en distintos estados
+def test_listar_sesiones_con_estados(client, profesional_user, paciente_user, login_profesional):
+    """Prueba listado de sesiones con cálculo de estado de evaluación."""
     ses_pend = Sesion(
         Paciente_Id=paciente_user.Id,
         Profesional_Id=profesional_user.Id,
@@ -421,7 +395,6 @@ def test_listar_sesiones_con_estados(
     db.session.add_all([ses_pend, ses_comp])
     db.session.commit()
 
-    # completar con ejercicios+video+evaluación solo en ses_comp
     ej = Ejercicio(
         Nombre="Puente",
         Descripcion="Desc",
@@ -460,7 +433,7 @@ def test_listar_sesiones_con_estados(
     resp3 = client.get(f"/profesional/sesiones?paciente={paciente_user.Id}")
     assert resp3.status_code == 200
 
-    # filtros de fechas (incluye manejo de formato inválido)
+    # filtros de fechas 
     hoy = datetime.now().strftime("%Y-%m-%d")
     resp4 = client.get(f"/profesional/sesiones?fecha_desde={hoy}")
     assert resp4.status_code == 200
@@ -468,10 +441,10 @@ def test_listar_sesiones_con_estados(
     assert resp5.status_code == 200
 
 
-def test_listar_sesiones_estados_evaluacion_varios(
-    client, profesional_user, paciente_user, login_profesional
-):
-    # 1) COMPLETADA sin videos -> NO_EVALUABLE
+def test_listar_sesiones_estados_evaluacion_varios(client, profesional_user, paciente_user, login_profesional):
+    """Prueba cálculo de diferentes estados de evaluación en sesiones."""
+
+    # Caso 1: COMPLETADA sin videos - Estado: NO_EVALUABLE    
     ses_sin_video = Sesion(
         Paciente_Id=paciente_user.Id,
         Profesional_Id=profesional_user.Id,
@@ -480,7 +453,7 @@ def test_listar_sesiones_estados_evaluacion_varios(
         Estado="COMPLETADA",
     )
 
-    # 2) COMPLETADA con video pero sin evaluación -> SIN_EVALUAR
+    # Caso 2: COMPLETADA con video pero sin evaluación - Estado: SIN_EVALUAR
     ses_sin_eval = Sesion(
         Paciente_Id=paciente_user.Id,
         Profesional_Id=profesional_user.Id,
@@ -489,7 +462,7 @@ def test_listar_sesiones_estados_evaluacion_varios(
         Estado="COMPLETADA",
     )
 
-    # 3) COMPLETADA con dos videos y solo una evaluación -> PARCIALMENTE_EVALUADA
+    # Caso 3: COMPLETADA con 2 videos, 1 evaluado - Estado: PARCIALMENTE_EVALUADA
     ses_parcial = Sesion(
         Paciente_Id=paciente_user.Id,
         Profesional_Id=profesional_user.Id,
@@ -501,7 +474,7 @@ def test_listar_sesiones_estados_evaluacion_varios(
     db.session.add_all([ses_sin_video, ses_sin_eval, ses_parcial])
     db.session.commit()
 
-    # ejercicios base
+    # Crear ejercicios base
     ej1 = Ejercicio(
         Nombre="EvalTest1",
         Descripcion="Desc",
@@ -519,7 +492,7 @@ def test_listar_sesiones_estados_evaluacion_varios(
     db.session.add_all([ej1, ej2])
     db.session.commit()
 
-    # ses_sin_eval: 1 ejercicio + video, sin evaluación
+    # ses_sin_eval: 1 ejercicio + video con video, sin evaluación
     es1 = Ejercicio_Sesion(Sesion_Id=ses_sin_eval.Id, Ejercicio_Id=ej1.Id)
     db.session.add(es1)
     db.session.commit()
@@ -549,7 +522,7 @@ def test_listar_sesiones_estados_evaluacion_varios(
     db.session.add_all([vr2, vr3])
     db.session.commit()
 
-    # solo una evaluación (parcialmente evaluada)
+    # Evaluar solo es2 (1 de 2)
     ev_parcial = Evaluacion(
         Ejercicio_Sesion_Id=es2.Id,
         Puntuacion=3,
@@ -562,15 +535,13 @@ def test_listar_sesiones_estados_evaluacion_varios(
     resp = client.get("/profesional/sesiones")
     assert resp.status_code == 200
 
-def test_listar_sesiones_filtra_fecha_hasta(
-    client, profesional_user, paciente_user, login_profesional
-):
-    # Una sesión dentro del rango y otra fuera por fecha_hasta
+def test_listar_sesiones_filtra_fecha_hasta(client, profesional_user, paciente_user, login_profesional):
+    """Prueba filtro de fecha_hasta en listado de sesiones."""
     ses_in = Sesion(
         Paciente_Id=paciente_user.Id,
         Profesional_Id=profesional_user.Id,
         Fecha_Asignacion=datetime.now(),
-        Fecha_Programada=datetime.now(),  # hoy
+        Fecha_Programada=datetime.now(),  
         Estado="PENDIENTE",
     )
     ses_out = Sesion(
@@ -589,10 +560,8 @@ def test_listar_sesiones_filtra_fecha_hasta(
     assert ses_in.Fecha_Programada.strftime("%Y-%m-%d").encode() in resp.data
     assert ses_out.Fecha_Programada.strftime("%Y-%m-%d").encode() not in resp.data
 
-
-def test_listar_sesiones_fecha_hasta_invalida_no_revienta(
-    client, profesional_user, paciente_user, login_profesional
-):
+def test_listar_sesiones_fecha_hasta_invalida_no_revienta(client, profesional_user, paciente_user, login_profesional):
+    """Prueba que formato de fecha inválido no causa error."""
     ses = Sesion(
         Paciente_Id=paciente_user.Id,
         Profesional_Id=profesional_user.Id,
@@ -606,11 +575,10 @@ def test_listar_sesiones_fecha_hasta_invalida_no_revienta(
     resp = client.get("/profesional/sesiones?fecha_hasta=xxxx")
     assert resp.status_code == 200
 
+# Tests de ver_sesion
 
-
-def test_ver_sesion_permisos_y_detalle(
-    client, profesional_user, paciente_user, login_profesional
-):
+def test_ver_sesion_permisos_y_detalle(client, profesional_user, paciente_user, login_profesional):
+    """Prueba visualización de detalle de sesión con permisos correctos."""
     ses = Sesion(
         Paciente_Id=paciente_user.Id,
         Profesional_Id=profesional_user.Id,
@@ -676,10 +644,10 @@ def test_ver_sesion_permisos_y_detalle(
     assert resp2.status_code == 200
     assert b"No tienes permisos para ver esta sesi" in resp2.data
 
+# Tests de ejecutar_sesion
 
-def test_ejecutar_sesion_sin_ejercicios_redirige(
-    client, profesional_user, paciente_user, login_profesional
-):
+def test_ejecutar_sesion_sin_ejercicios_redirige(client, profesional_user, paciente_user, login_profesional):
+    """Prueba que sesión sin ejercicios muestra advertencia."""
     ses = Sesion(
         Paciente_Id=paciente_user.Id,
         Profesional_Id=profesional_user.Id,
@@ -694,10 +662,8 @@ def test_ejecutar_sesion_sin_ejercicios_redirige(
     assert resp.status_code == 200
     assert b"no tiene ejercicios" in resp.data.lower()
 
-
-def test_ejecutar_sesion_con_ejercicios(
-    client, profesional_user, paciente_user, login_profesional
-):
+def test_ejecutar_sesion_con_ejercicios(client, profesional_user, paciente_user, login_profesional):
+    """Prueba ejecución exitosa de sesión con ejercicios."""
     ses = Sesion(
         Paciente_Id=paciente_user.Id,
         Profesional_Id=profesional_user.Id,
@@ -725,10 +691,8 @@ def test_ejecutar_sesion_con_ejercicios(
     assert resp.status_code == 200
     assert b"Puente" in resp.data
 
-
-def test_ejecutar_sesion_sin_permiso_redirige(
-    client, profesional_user, paciente_user, user_factory, login_profesional
-):
+def test_ejecutar_sesion_sin_permiso_redirige(client, profesional_user, paciente_user, user_factory, login_profesional):
+    """Prueba que profesional no puede ejecutar sesión de otro profesional."""
     otro = user_factory(Rol_Id=2, Email="otropro_ejecutar@example.com")
     ses = Sesion(
         Paciente_Id=paciente_user.Id,
@@ -746,11 +710,10 @@ def test_ejecutar_sesion_sin_permiso_redirige(
     assert resp.status_code == 200
     assert b"No tienes permisos para ejecutar esta sesi" in resp.data
 
+# Tests de finalizar_sesion
 
-
-def test_finalizar_sesion_ok(
-    client, profesional_user, paciente_user, login_profesional
-):
+def test_finalizar_sesion_ok(client, profesional_user, paciente_user, login_profesional):
+    """Prueba finalización exitosa de sesión."""
     ses = Sesion(
         Paciente_Id=paciente_user.Id,
         Profesional_Id=profesional_user.Id,
@@ -766,10 +729,8 @@ def test_finalizar_sesion_ok(
     data = json.loads(resp.data)
     assert data["success"] is True
 
-
-def test_finalizar_sesion_sin_permiso(
-    client, profesional_user, paciente_user, user_factory, login_profesional
-):
+def test_finalizar_sesion_sin_permiso(client, profesional_user, paciente_user, user_factory, login_profesional):
+    """Prueba que solo el profesional dueño puede finalizar sesión."""
     otro = user_factory(Rol_Id=2, Email="otropro2@example.com")
     ses = Sesion(
         Paciente_Id=paciente_user.Id,
@@ -785,13 +746,10 @@ def test_finalizar_sesion_sin_permiso(
     data = json.loads(resp.data)
     assert data["success"] is False
 
+# Tests de API estado_sesion
 
-# ------------- API estado de sesión tiempo real ----------
-
-
-def test_obtener_estado_sesion(
-    client, profesional_user, paciente_user, login_profesional
-):
+def test_obtener_estado_sesion(client, profesional_user, paciente_user, login_profesional):
+    """Prueba consulta GET del estado de sesión en tiempo real."""
     ses = Sesion(
         Paciente_Id=paciente_user.Id,
         Profesional_Id=profesional_user.Id,
@@ -802,7 +760,6 @@ def test_obtener_estado_sesion(
     db.session.add(ses)
     db.session.commit()
 
-    # setear estado global
     profesional_controlador.estado_sesiones_tiempo_real[ses.Id] = 5
     profesional_controlador.estado_sesion_terminada.add(ses.Id)
 
@@ -812,10 +769,8 @@ def test_obtener_estado_sesion(
     assert data["ejercicio_activo_id"] == 5
     assert data["terminada"] is True
 
-
-def test_actualizar_estado_sesion_ok(
-    client, profesional_user, paciente_user, login_profesional
-):
+def test_actualizar_estado_sesion_ok(client, profesional_user, paciente_user, login_profesional):
+    """Prueba actualización POST del ejercicio activo."""
     ses = Sesion(
         Paciente_Id=paciente_user.Id,
         Profesional_Id=profesional_user.Id,
@@ -837,10 +792,8 @@ def test_actualizar_estado_sesion_ok(
     assert data["ok"] is True
     assert profesional_controlador.estado_sesiones_tiempo_real[ses.Id] == 10
 
-
-def test_actualizar_estado_sesion_sin_permiso(
-    client, profesional_user, paciente_user, user_factory, login_profesional
-):
+def test_actualizar_estado_sesion_sin_permiso(client, profesional_user, paciente_user, user_factory, login_profesional):
+    """Prueba que solo el profesional dueño puede actualizar estado."""
     otro = user_factory(Rol_Id=2, Email="otropro3@example.com")
     ses = Sesion(
         Paciente_Id=paciente_user.Id,
@@ -860,10 +813,8 @@ def test_actualizar_estado_sesion_sin_permiso(
     )
     assert resp.status_code == 403
 
-
-def test_actualizar_estado_sesion_sin_ejercicio_id(
-    client, profesional_user, paciente_user, login_profesional
-):
+def test_actualizar_estado_sesion_sin_ejercicio_id(client, profesional_user, paciente_user, login_profesional):
+    """Prueba POST sin ejercicio_activo_id no rompe el endpoint."""
     ses = Sesion(
         Paciente_Id=paciente_user.Id,
         Profesional_Id=profesional_user.Id,
@@ -874,7 +825,6 @@ def test_actualizar_estado_sesion_sin_ejercicio_id(
     db.session.add(ses)
     db.session.commit()
 
-    # primero fijamos un estado conocido
     payload = {"ejercicio_activo_id": 10}
     resp1 = client.post(
         f"/profesional/api/sesion/{ses.Id}/estado",
@@ -886,7 +836,6 @@ def test_actualizar_estado_sesion_sin_ejercicio_id(
     assert data1["ok"] is True
     assert data1["ejercicio_activo_id"] == 10
 
-    # luego mandamos un POST vacío: no debería romper ni cambiar nada
     resp2 = client.post(
         f"/profesional/api/sesion/{ses.Id}/estado",
         data=json.dumps({}),
@@ -895,14 +844,10 @@ def test_actualizar_estado_sesion_sin_ejercicio_id(
     assert resp2.status_code == 200
     data2 = json.loads(resp2.data)
     assert data2["ok"] is True
-    # se mantiene el último ejercicio activo
     assert data2["ejercicio_activo_id"] == 10
-    # assert data2["terminada"] is False
 
-
-def test_estado_sesion_reset_a_none(
-    client, profesional_user, paciente_user, login_profesional
-):
+def test_estado_sesion_reset_a_none(client, profesional_user, paciente_user, login_profesional):
+    """Prueba que se puede resetear ejercicio_activo_id a None explícitamente."""
     ses = Sesion(
         Paciente_Id=paciente_user.Id,
         Profesional_Id=profesional_user.Id,
@@ -913,6 +858,7 @@ def test_estado_sesion_reset_a_none(
     db.session.add(ses)
     db.session.commit()
 
+    # Establecer ejercicio activo en 10
     payload1 = {"ejercicio_activo_id": 10}
     resp1 = client.post(
         f"/profesional/api/sesion/{ses.Id}/estado",
@@ -921,6 +867,7 @@ def test_estado_sesion_reset_a_none(
     )
     assert resp1.status_code == 200
 
+    # Resetear a None (sin ejercicio activo)
     payload2 = {"ejercicio_activo_id": None}
     resp2 = client.post(
         f"/profesional/api/sesion/{ses.Id}/estado",
@@ -932,10 +879,8 @@ def test_estado_sesion_reset_a_none(
     assert data2["ok"] is True
     assert data2["ejercicio_activo_id"] is None
 
-
-def test_estado_sesion_antirebote(
-    client, profesional_user, paciente_user, login_profesional, monkeypatch
-):
+def test_estado_sesion_antirebote(client, profesional_user, paciente_user, login_profesional, monkeypatch):
+    """Prueba mecanismo anti-rebote que evita cambios demasiado rápidos."""
     ses = Sesion(
         Paciente_Id=paciente_user.Id,
         Profesional_Id=profesional_user.Id,
@@ -967,10 +912,8 @@ def test_estado_sesion_antirebote(
     assert data2["ok"] is False
     assert data2["ejercicio_activo_id"] == 10
 
-
-def test_estado_sesion_terminada_flag_varias_veces(
-    client, profesional_user, paciente_user, login_profesional
-):
+def test_estado_sesion_terminada_flag_varias_veces(client, profesional_user, paciente_user, login_profesional):
+    """Prueba marcado múltiple de sesión terminada."""
     ses = Sesion(
         Paciente_Id=paciente_user.Id,
         Profesional_Id=profesional_user.Id,
@@ -1002,10 +945,8 @@ def test_estado_sesion_terminada_flag_varias_veces(
     assert data2["ok"] is True
     assert data2["terminada"] is True
 
-
-def test_estado_sesion_marcar_y_desmarcar_terminada(
-    client, profesional_user, paciente_user, login_profesional
-):
+def test_estado_sesion_marcar_y_desmarcar_terminada(client, profesional_user, paciente_user, login_profesional):
+    """Prueba marcar y desmarcar terminada mediante API."""
     ses = Sesion(
         Paciente_Id=paciente_user.Id,
         Profesional_Id=profesional_user.Id,
@@ -1016,7 +957,6 @@ def test_estado_sesion_marcar_y_desmarcar_terminada(
     db.session.add(ses)
     db.session.commit()
 
-    # marcar terminada
     resp1 = client.post(
         f"/profesional/api/sesion/{ses.Id}/estado",
         data=json.dumps({"terminada": True}),
@@ -1025,7 +965,6 @@ def test_estado_sesion_marcar_y_desmarcar_terminada(
     assert resp1.status_code == 200
     assert ses.Id in profesional_controlador.estado_sesion_terminada
 
-    # desmarcar terminada
     resp2 = client.post(
         f"/profesional/api/sesion/{ses.Id}/estado",
         data=json.dumps({"terminada": False}),
@@ -1034,10 +973,8 @@ def test_estado_sesion_marcar_y_desmarcar_terminada(
     assert resp2.status_code == 200
     assert ses.Id not in profesional_controlador.estado_sesion_terminada
 
-
-def test_estado_sesion_marcar_terminada_desde_api(
-    client, profesional_user, paciente_user, login_profesional
-):
+def test_estado_sesion_marcar_terminada_desde_api(client, profesional_user, paciente_user, login_profesional):
+    """Prueba marcado de terminada mediante POST."""
     ses = Sesion(
         Paciente_Id=paciente_user.Id,
         Profesional_Id=profesional_user.Id,
@@ -1048,7 +985,6 @@ def test_estado_sesion_marcar_terminada_desde_api(
     db.session.add(ses)
     db.session.commit()
 
-    # llamamos al endpoint solo con terminada=True
     resp = client.post(
         f"/profesional/api/sesion/{ses.Id}/estado",
         data=json.dumps({"terminada": True}),
@@ -1058,16 +994,12 @@ def test_estado_sesion_marcar_terminada_desde_api(
     data = json.loads(resp.data)
     assert data["ok"] is True
     assert data["terminada"] is True
-    # comprueba que se ha añadido en la caché
     assert ses.Id in profesional_controlador.estado_sesion_terminada
 
+# Helper para tests de evaluación
 
-# ----------------- evaluación de ejercicios ---------------
-
-
-def _crear_sesion_completada_con_video(
-    paciente_id, profesional_id, puntuacion=None
-):
+def _crear_sesion_completada_con_video(paciente_id, profesional_id, puntuacion=None):
+    """Helper: crea Sesion COMPLETADA con Ejercicio_Sesion, VideoRespuesta y opcionalmente Evaluacion."""
     ses = Sesion(
         Paciente_Id=paciente_id,
         Profesional_Id=profesional_id,
@@ -1108,10 +1040,10 @@ def _crear_sesion_completada_con_video(
         db.session.commit()
     return ses, es, ev
 
+# Tests de evaluar_sesion
 
-def test_evaluar_sesion_ok(
-    client, profesional_user, paciente_user, login_profesional
-):
+def test_evaluar_sesion_ok(client, profesional_user, paciente_user, login_profesional):
+    """Prueba acceso a interfaz de evaluación de sesión completada."""
     ses, es, _ = _crear_sesion_completada_con_video(
         paciente_user.Id, profesional_user.Id, puntuacion=4
     )
@@ -1119,10 +1051,8 @@ def test_evaluar_sesion_ok(
     assert resp.status_code == 200
     assert b"EjPrueba" in resp.data
 
-
-def test_evaluar_sesion_sin_permiso(
-    client, profesional_user, paciente_user, user_factory, login_profesional
-):
+def test_evaluar_sesion_sin_permiso(client, profesional_user, paciente_user, user_factory, login_profesional):
+    """Prueba que solo el profesional dueño puede evaluar la sesión."""
     otro = user_factory(Rol_Id=2, Email="otropro4@example.com")
     ses, es, _ = _crear_sesion_completada_con_video(
         paciente_user.Id, otro.Id, puntuacion=4
@@ -1131,10 +1061,8 @@ def test_evaluar_sesion_sin_permiso(
     assert resp.status_code == 200
     assert b"No tienes permisos para evaluar esta sesi" in resp.data
 
-
-def test_evaluar_sesion_no_completada(
-    client, profesional_user, paciente_user, login_profesional
-):
+def test_evaluar_sesion_no_completada(client, profesional_user, paciente_user, login_profesional):
+    """Prueba que solo sesiones completadas pueden ser evaluadas."""
     ses = Sesion(
         Paciente_Id=paciente_user.Id,
         Profesional_Id=profesional_user.Id,
@@ -1149,18 +1077,16 @@ def test_evaluar_sesion_no_completada(
     assert resp.status_code == 200
     assert b"Solo se pueden evaluar sesiones completadas" in resp.data
 
+# Tests de evaluar_ejercicio
 
-def test_evaluar_ejercicio_get_y_post(
-    client, profesional_user, paciente_user, login_profesional
-):
+def test_evaluar_ejercicio_get_y_post(client, profesional_user, paciente_user, login_profesional):
+    """Prueba formulario de evaluación y registro de puntuación."""
     ses, es, _ = _crear_sesion_completada_con_video(
         paciente_user.Id, profesional_user.Id
     )
-    # GET
     resp = client.get(f"/profesional/evaluar/{es.Id}")
     assert resp.status_code == 200
 
-    # POST con datos válidos
     data = {"puntuacion": "5", "comentarios": "Muy bien"}
     resp2 = client.post(
         f"/profesional/evaluar/{es.Id}",
@@ -1171,10 +1097,8 @@ def test_evaluar_ejercicio_get_y_post(
     ev = Evaluacion.query.filter_by(Ejercicio_Sesion_Id=es.Id).first()
     assert ev is not None and ev.Puntuacion == 5
 
-
-def test_evaluar_ejercicio_sin_permiso(
-    client, profesional_user, paciente_user, user_factory, login_profesional
-):
+def test_evaluar_ejercicio_sin_permiso(client, profesional_user, paciente_user, user_factory, login_profesional):
+    """Prueba que solo el profesional dueño puede evaluar ejercicios."""
     otro = user_factory(Rol_Id=2, Email="otropro5@example.com")
     ses, es, _ = _crear_sesion_completada_con_video(
         paciente_user.Id, otro.Id
@@ -1183,13 +1107,10 @@ def test_evaluar_ejercicio_sin_permiso(
     assert resp.status_code == 200
     assert b"No tienes permisos para evaluar este ejercicio" in resp.data
 
+# Tests de ver_progreso
 
-# ----------------- progreso de paciente -------------------
-
-
-def test_ver_progreso_paciente_ok(
-    client, profesional_user, paciente_user, login_profesional
-):
+def test_ver_progreso_paciente_ok(client, profesional_user, paciente_user, login_profesional):
+    """Prueba visualización de progreso de paciente vinculado."""
     vinc = Paciente_Profesional(
         Paciente_Id=paciente_user.Id,
         Profesional_Id=profesional_user.Id,
@@ -1206,22 +1127,16 @@ def test_ver_progreso_paciente_ok(
     assert resp.status_code == 200
     assert b"EjPrueba" in resp.data
 
-
-def test_ver_progreso_sin_vinculacion(
-    client, profesional_user, paciente_user, login_profesional
-):
-    # sin Paciente_Profesional
+def test_ver_progreso_sin_vinculacion(client, profesional_user, paciente_user, login_profesional):
+    """Prueba que profesional no puede ver progreso de paciente no vinculado."""
     resp = client.get(f"/profesional/progreso/{paciente_user.Id}", follow_redirects=True)
     assert resp.status_code == 200
     assert b"No tienes permisos para ver este paciente" in resp.data
 
+# Tests de guardar_video
 
-# ----------------- gestión de videos y ver evaluación -----
-
-
-def test_guardar_video_ok(
-    client, profesional_user, paciente_user, login_user_fixture, tmp_path, monkeypatch
-):
+def test_guardar_video_ok(client, profesional_user, paciente_user, login_user_fixture, tmp_path, monkeypatch):
+    """Prueba subida exitosa de video a Cloudinary."""
     ses = Sesion(
         Paciente_Id=paciente_user.Id,
         Profesional_Id=profesional_user.Id,
@@ -1245,10 +1160,10 @@ def test_guardar_video_ok(
     db.session.add(es)
     db.session.commit()
 
-    # login como paciente (dueño del ejercicio_sesion)
+    # Login como paciente (dueño del ejercicio_sesion)
     login_user_fixture(paciente_user)
 
-    # opcional: mock de cloudinary para que no haga llamadas reales
+    # Mock de Cloudinary para evitar llamadas reales
     monkeypatch.setattr(
         "src.controladores.profesional_controlador.cloudinary.uploader.upload",
         lambda *args, **kwargs: {"secure_url": "https://example.com/video.mp4"},
@@ -1268,10 +1183,8 @@ def test_guardar_video_ok(
     vr = VideoRespuesta.query.filter_by(Ejercicio_Sesion_Id=es.Id).first()
     assert vr is not None
 
-
-def test_guardar_video_sin_archivo(
-    client, profesional_user, paciente_user, login_user_fixture
-):
+def test_guardar_video_sin_archivo(client, profesional_user, paciente_user, login_user_fixture):
+    """Prueba que guardar_video sin archivo devuelve error 400."""
     ses = Sesion(
         Paciente_Id=paciente_user.Id,
         Profesional_Id=profesional_user.Id,
@@ -1294,7 +1207,6 @@ def test_guardar_video_sin_archivo(
     db.session.add(es)
     db.session.commit()
 
-    # login como paciente, que es quien podría subir
     login_user_fixture(paciente_user)
 
     resp = client.post(f"/profesional/guardar_video/{es.Id}", data={})
@@ -1302,10 +1214,8 @@ def test_guardar_video_sin_archivo(
     data_json = json.loads(resp.data)
     assert data_json["success"] is False
 
-
-def test_guardar_video_archivo_vacio(
-    client, profesional_user, paciente_user, login_user_fixture
-):
+def test_guardar_video_archivo_vacio(client, profesional_user, paciente_user, login_user_fixture):
+    """Prueba que guardar_video con archivo vacío devuelve error 400."""
     ses = Sesion(
         Paciente_Id=paciente_user.Id,
         Profesional_Id=profesional_user.Id,
@@ -1341,11 +1251,8 @@ def test_guardar_video_archivo_vacio(
     assert data_json["success"] is False
     assert "Archivo vacío" in data_json["error"]
 
-
-
-def test_guardar_video_sin_permiso_devuelve_403(
-    client, profesional_user, paciente_user, login_profesional
-):
+def test_guardar_video_sin_permiso_devuelve_403(client, profesional_user, paciente_user, login_profesional):
+    """Prueba que solo el paciente dueño puede subir video."""
     ses = Sesion(
         Paciente_Id=paciente_user.Id,
         Profesional_Id=profesional_user.Id,
@@ -1373,11 +1280,8 @@ def test_guardar_video_sin_permiso_devuelve_403(
     data = json.loads(resp.data)
     assert data["success"] is False
 
-
-def test_guardar_video_ya_existente(
-    client, profesional_user, paciente_user, login_user_fixture
-):
-    # ya crea un VideoRespuesta, no añadas otro
+def test_guardar_video_ya_existente(client, profesional_user, paciente_user, login_user_fixture):
+    """Prueba que video duplicado es ignorado (retorna success)."""
     ses, es, _ = _crear_sesion_completada_con_video(
         paciente_user.Id, profesional_user.Id
     )
@@ -1397,10 +1301,8 @@ def test_guardar_video_ya_existente(
 
 
 
-def test_guardar_video_sin_url_cloudinary(
-    client, profesional_user, paciente_user, login_user_fixture, monkeypatch
-):
-    # crear sesion y ejercicio_sesion, pero sin VideoRespuesta
+def test_guardar_video_sin_url_cloudinary(client, profesional_user, paciente_user, login_user_fixture, monkeypatch):
+    """Prueba que falta de URL de Cloudinary devuelve error 500."""
     ses = Sesion(
         Paciente_Id=paciente_user.Id,
         Profesional_Id=profesional_user.Id,
@@ -1441,11 +1343,8 @@ def test_guardar_video_sin_url_cloudinary(
     assert data_json["success"] is False
     assert "No se obtuvo URL del video" in data_json["error"]
 
-
-
-def test_guardar_video_integrity_error(
-    client, profesional_user, paciente_user, login_user_fixture, monkeypatch
-):
+def test_guardar_video_integrity_error(client, profesional_user, paciente_user, login_user_fixture, monkeypatch):
+    """Prueba manejo de IntegrityError (race condition al insertar)."""
     ses, es, _ = _crear_sesion_completada_con_video(
         paciente_user.Id, profesional_user.Id
     )
@@ -1474,12 +1373,8 @@ def test_guardar_video_integrity_error(
     assert data_json["success"] is True
     assert "Video ya existente" in data_json["mensaje"]
 
-from sqlalchemy.exc import IntegrityError
-
-def test_guardar_video_integrity_error_race(
-    client, profesional_user, paciente_user, login_user_fixture, monkeypatch
-):
-    # sesión + ejercicio_sesion sin VideoRespuesta previo
+def test_guardar_video_integrity_error_race(client, profesional_user, paciente_user, login_user_fixture, monkeypatch):
+    """Prueba manejo de race condition al crear VideoRespuesta."""
     ses = Sesion(
         Paciente_Id=paciente_user.Id,
         Profesional_Id=profesional_user.Id,
@@ -1509,7 +1404,6 @@ def test_guardar_video_integrity_error_race(
         lambda *args, **kwargs: {"secure_url": "https://example.com/video.mp4"},
     )
 
-    # hacer que el commit de ese bloque concreto lance IntegrityError
     original_commit = db.session.commit
 
     def fake_commit():
@@ -1526,7 +1420,6 @@ def test_guardar_video_integrity_error_race(
         content_type="multipart/form-data",
     )
 
-    # restaurar commit por si acaso
     monkeypatch.setattr(
         "src.controladores.profesional_controlador.db.session.commit", original_commit
     )
@@ -1536,11 +1429,8 @@ def test_guardar_video_integrity_error_race(
     assert data_json["success"] is True
     assert "ya existente" in data_json["mensaje"]
 
-
-
-def test_guardar_video_excepcion_generica(
-    client, profesional_user, paciente_user, login_user_fixture, monkeypatch
-):
+def test_guardar_video_excepcion_generica(client, profesional_user, paciente_user, login_user_fixture, monkeypatch):
+    """Prueba manejo de excepción genérica al subir video."""
     ses = Sesion(
         Paciente_Id=paciente_user.Id,
         Profesional_Id=profesional_user.Id,
@@ -1584,25 +1474,20 @@ def test_guardar_video_excepcion_generica(
     assert data_json["success"] is False
     assert "fallo cloudinary" in data_json["error"]
 
+# Tests de ver_evaluacion
 
-
-def test_ver_evaluacion_ok(
-    client, profesional_user, paciente_user, login_profesional
-):
+def test_ver_evaluacion_ok(client, profesional_user, paciente_user, login_profesional):
+    """Prueba visualización de evaluación existente."""
     ses, es, ev = _crear_sesion_completada_con_video(
         paciente_user.Id, profesional_user.Id, puntuacion=3
     )
 
     resp = client.get(f"/profesional/ver_evaluacion/{es.Id}")
     assert resp.status_code == 200
-    # comprueba que aparece el comentario de la evaluación creada en el helper
     assert b"OK" in resp.data
 
-
-
-def test_ver_evaluacion_sin_permiso(
-    client, profesional_user, paciente_user, user_factory, login_profesional
-):
+def test_ver_evaluacion_sin_permiso(client, profesional_user, paciente_user, user_factory, login_profesional):
+    """Prueba que solo el profesional dueño puede ver evaluación."""
     otro = user_factory(Rol_Id=2, Email="otropro6@example.com")
     ses, es, _ = _crear_sesion_completada_con_video(
         paciente_user.Id, otro.Id, puntuacion=3
