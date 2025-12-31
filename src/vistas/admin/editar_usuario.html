@@ -4,6 +4,7 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2><i class="bi bi-pencil me-2"></i>Editar Usuario</h2>
+    <!-- Botón para volver a la vista de detalle del usuario -->
     <div class="btn-group">
         <a href="{{ url_for('admin.ver_usuario', user_id=usuario.Id) }}" class="btn btn-secondary">
             <i class="bi bi-arrow-left me-1"></i>Volver
@@ -13,6 +14,7 @@
 
 <div class="card shadow">
     <div class="card-header">
+        <!-- Cabecera con nombre del usuario y su rol -->
         <h5 class="mb-0">
             Editando: {{ usuario.Nombre }} {{ usuario.Apellidos }}
             <span class="badge bg-{{ 'danger' if usuario.Rol_Id == 0 else 'success' if usuario.Rol_Id == 1 else 'info' }}">
@@ -24,12 +26,14 @@
         </h5>
     </div>
     <div class="card-body">
+        <!-- Formulario de edición de datos del usuario -->
         <form method="POST">
             {{ form.hidden_tag() }}
             
+            <!-- Bloque de errores de validación -->
             {% if form.errors %}
             <div class="alert alert-danger">
-                <strong>❌ Errores en el formulario:</strong>
+                <strong> Errores en el formulario:</strong>
                 <ul class="mb-0">
                     {% for field, errors in form.errors.items() %}
                         {% for error in errors %}
@@ -40,6 +44,7 @@
             </div>
             {% endif %}
             
+            <!-- Datos básicos: nombre y apellidos -->
             <div class="row mb-3">
                 <div class="col-md-6">
                     {{ form.nombre.label(class="form-label") }}
@@ -51,6 +56,7 @@
                 </div>
             </div>
 
+            <!-- Datos de acceso: email y contraseña -->
             <div class="row mb-3">
                 <div class="col-md-6">
                     {{ form.email.label(class="form-label") }}
@@ -69,7 +75,9 @@
                 </div>
             </div>
 
+            <!-- Sección específica según el rol del usuario -->
             {% if usuario.Rol_Id == 1 %}
+            <!-- Información extra cuando el usuario es paciente -->
             <hr>
             <h5 class="mt-4 mb-3"><i class="bi bi-heart me-2"></i>Información del Paciente</h5>
             <div class="row mb-3">
@@ -84,6 +92,7 @@
             </div>
             
             {% elif usuario.Rol_Id == 2 %}
+            <!-- Información extra cuando el usuario es profesional -->
             <hr>
             <h5 class="mt-4 mb-3"><i class="bi bi-briefcase me-2"></i>Información del Profesional</h5>
             <div class="row mb-3">
@@ -98,6 +107,7 @@
             </div>
             {% endif %}
 
+            <!-- Acciones finales: cancelar o guardar cambios -->
             <div class="d-flex justify-content-end gap-2 mt-4">
                 <a href="{{ url_for('admin.ver_usuario', user_id=usuario.Id) }}" class="btn btn-secondary">
                     <i class="bi bi-x me-1"></i>Cancelar

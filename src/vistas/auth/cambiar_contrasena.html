@@ -5,13 +5,16 @@
 <div class="row justify-content-center">
     <div class="col-md-6">
         <div class="card shadow">
+            <!-- Cabecera del formulario de cambio de contraseña -->
             <div class="card-header text-center bg-warning text-dark">
                 <h4><i class="bi bi-key me-2"></i>Cambiar Contraseña</h4>
             </div>
             <div class="card-body">
+                <!-- Formulario de cambio de contraseña -->
                 <form method="POST">
                     {{ form.hidden_tag() }}
                     
+                    <!-- Listado genérico de errores de validación -->
                     {% if form.errors %}
                     <div class="alert alert-danger">
                         {% for field, errors in form.errors.items() %}
@@ -22,23 +25,27 @@
                     </div>
                     {% endif %}
                     
+                    <!-- Campo: contraseña actual -->
                     <div class="mb-3">
                         {{ form.contrasena_actual.label(class="form-label") }}
                         {{ form.contrasena_actual(class="form-control") }}
                         <div class="form-text">Introduce tu contraseña actual</div>
                     </div>
                     
+                    <!-- Campo: nueva contraseña -->
                     <div class="mb-3">
                         {{ form.nueva_contrasena.label(class="form-label") }}
                         {{ form.nueva_contrasena(class="form-control") }}
                         <div class="form-text">Mínimo 6 caracteres</div>
                     </div>
                     
+                    <!-- Campo: confirmar nueva contraseña -->
                     <div class="mb-4">
                         {{ form.confirmar_contrasena.label(class="form-label") }}
                         {{ form.confirmar_contrasena(class="form-control") }}
                     </div>
                     
+                    <!-- Acciones: guardar/cancelar -->
                     <div class="d-grid gap-2">
                         <button type="submit" class="btn btn-warning">
                             <i class="bi bi-shield-check me-2"></i>Actualizar Contraseña

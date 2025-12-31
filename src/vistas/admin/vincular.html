@@ -5,7 +5,7 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2><i class="bi bi-link me-2"></i>Vincular Paciente con Profesional</h2>
-    <!-- ✅ ACTUALIZAR ENLACE -->
+    <!-- Enlace de retorno a la pantalla de listado de vinculaciones -->
     <a href="{{ url_for('admin.ver_vinculaciones') }}" class="btn btn-secondary">
         <i class="bi bi-arrow-left me-1"></i>Volver a Vinculaciones
     </a>
@@ -18,11 +18,13 @@
                 <h6 class="m-0 fw-bold text-primary">Crear Nueva Vinculación</h6>
             </div>
             <div class="card-body">
+                <!-- Mensaje informativo sobre el propósito del formulario -->
                 <div class="alert alert-info">
                     <i class="bi bi-info-circle me-2"></i>
                     Selecciona un paciente y un profesional para establecer una relación terapéutica.
                 </div>
                 
+                <!-- Formulario para seleccionar paciente y profesional -->
                 <form method="POST">
                     {{ form.hidden_tag() }}
                     
@@ -51,6 +53,7 @@
                         </div>
                     </div>
 
+                    <!-- Botón principal para crear la vinculación -->
                     <div class="d-grid">
                         <button type="submit" class="btn btn-primary py-2">
                             <i class="bi bi-plus-circle me-2"></i>Crear Vinculación

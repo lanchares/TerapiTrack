@@ -3,6 +3,7 @@
 
 {% block content %}
 <div class="row">
+    <!-- Tarjeta con datos básicos del usuario -->
     <div class="col-md-8">
         <div class="card shadow">
             <div class="card-header">
@@ -30,12 +31,16 @@
                 </div>
                 <div class="row mb-3">
                     <div class="col-sm-3"><strong>Miembro desde:</strong></div>
-                    <div class="col-sm-9">{{ usuario.Fecha_Registro|datetimeformat('%d/%m/%Y') if usuario.Fecha_Registro else 'No disponible' }}</div>                </div>
-                <!-- ← CORREGIDO: Eliminar referencia a Ultimo_Login -->
+                    <div class="col-sm-9">
+                        {{ usuario.Fecha_Registro|datetimeformat('%d/%m/%Y') if usuario.Fecha_Registro else 'No disponible' }}
+                    </div>
+                </div>
+                {# Sin campo de último acceso: la app no lo guarda actualmente #}
             </div>
         </div>
     </div>
 
+    <!-- Tarjeta lateral con acciones rápidas del perfil -->
     <div class="col-md-4">
         <div class="card shadow">
             <div class="card-header">
@@ -43,9 +48,12 @@
             </div>
             <div class="card-body">
                 <div class="d-grid gap-2">
+                    <!-- Cambio de contraseña -->
                     <a href="{{ url_for('auth.cambiar_contrasena') }}" class="btn btn-warning">
                         <i class="bi bi-key me-2"></i>Cambiar Contraseña
                     </a>
+
+                    <!-- Enlace al menú principal según rol -->
                     {% if current_user.Rol_Id == 0 %}
                     <a href="{{ url_for('admin.dashboard') }}" class="btn btn-primary">
                         <i class="bi bi-speedometer2 me-2"></i>Menu
@@ -59,6 +67,8 @@
                         <i class="bi bi-briefcase me-2"></i>Menu
                     </a>
                     {% endif %}
+
+                    <!-- Cerrar sesión -->
                     <a href="{{ url_for('auth.logout') }}" class="btn btn-danger">
                         <i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión
                     </a>

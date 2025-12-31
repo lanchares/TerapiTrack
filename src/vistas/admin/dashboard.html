@@ -13,7 +13,7 @@
 </div>
 
 <div class="row">
-    <!-- Tarjeta: Total Usuarios -->
+    <!-- Tarjeta: total de usuarios registrados -->
     <div class="col-xl-3 col-md-6 mb-4">
         <a href="{{ url_for('admin.listar_usuarios') }}" class="text-decoration-none">
             <div class="card border-start-primary shadow h-100 py-2 hover-card">
@@ -32,7 +32,7 @@
         </a>
     </div>
     
-    <!-- Tarjeta: Total Pacientes -->
+    <!-- Tarjeta: pacientes activos -->
     <div class="col-xl-3 col-md-6 mb-4">
         <a href="{{ url_for('admin.listar_usuarios') }}?rol=1" class="text-decoration-none">
             <div class="card border-start-success shadow h-100 py-2 hover-card">
@@ -51,7 +51,7 @@
         </a>
     </div>
     
-    <!-- Tarjeta: Total Profesionales -->
+    <!-- Tarjeta: profesionales registrados -->
     <div class="col-xl-3 col-md-6 mb-4">
         <a href="{{ url_for('admin.listar_usuarios') }}?rol=2" class="text-decoration-none">
             <div class="card border-start-info shadow h-100 py-2 hover-card">
@@ -70,7 +70,7 @@
         </a>
     </div>
     
-    <!-- Tarjeta: Usuarios Inactivos -->
+    <!-- Tarjeta: usuarios inactivos -->
     <div class="col-xl-3 col-md-6 mb-4">
         <a href="{{ url_for('admin.listar_usuarios') }}?estado=0" class="text-decoration-none">
             <div class="card border-start-warning shadow h-100 py-2 hover-card">
@@ -91,6 +91,7 @@
 </div>
 
 <div class="row mt-4">
+    <!-- Bloque de acciones rápidas de administración -->
     <div class="col-lg-8">
         <div class="card shadow mb-4">
             <div class="card-header py-3">
@@ -98,24 +99,28 @@
             </div>
             <div class="card-body">
                 <div class="row">
+                    <!-- Ir al listado completo de usuarios -->
                     <div class="col-md-6 mb-2">
                         <a href="{{ url_for('admin.listar_usuarios') }}" class="btn btn-icon-split btn-info w-100">
                             <span class="icon"><i class="bi bi-list-ul"></i></span>
                             <span class="text">Ver Todos los Usuarios</span>
                         </a>
                     </div>
+                    <!-- Crear relación paciente-profesional -->
                     <div class="col-md-6 mb-2">
                         <a href="{{ url_for('admin.vincular_paciente_profesional') }}" class="btn btn-icon-split btn-warning w-100">
                             <span class="icon"><i class="bi bi-link-45deg"></i></span>
                             <span class="text">Vincular Paciente-Profesional</span>
                         </a>
                     </div>
+                    <!-- Ver listado de vinculaciones -->
                     <div class="col-md-6 mb-2">
                         <a href="{{ url_for('admin.ver_vinculaciones') }}" class="btn btn-icon-split btn-secondary w-100">
                             <span class="icon"><i class="bi bi-diagram-3"></i></span>
                             <span class="text">Ver Vinculaciones Existentes</span>
                         </a>
                     </div>
+                    <!-- Acceso rápido a creación de usuario -->
                     <div class="col-md-6 mb-2">
                         <a href="{{ url_for('admin.crear_usuario') }}" class="btn btn-icon-split btn-success w-100">
                             <span class="icon"><i class="bi bi-person-plus"></i></span>

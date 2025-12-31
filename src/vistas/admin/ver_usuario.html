@@ -4,6 +4,7 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2><i class="bi bi-person me-2"></i>Detalles del Usuario</h2>
+    <!-- Acciones rápidas sobre el usuario: editar y volver al listado -->
     <div class="btn-group">
         <a href="{{ url_for('admin.editar_usuario', user_id=usuario.Id) }}" class="btn btn-warning">
             <i class="bi bi-pencil me-1"></i>Editar
@@ -15,22 +16,26 @@
 </div>
 
 <div class="row">
+    <!-- Columna principal con los datos del usuario -->
     <div class="col-md-8">
         <div class="card shadow">
             <div class="card-header">
                 <h5 class="mb-0">Información General</h5>
             </div>
             <div class="card-body">
+                <!-- Nombre completo -->
                 <div class="row mb-3">
                     <div class="col-sm-3"><strong>Nombre:</strong></div>
                     <div class="col-sm-9">{{ usuario.Nombre }} {{ usuario.Apellidos }}</div>
                 </div>
+                <!-- Correo electrónico -->
                 <div class="row mb-3">
                     <div class="col-sm-3"><strong>Email:</strong></div>
                     <div class="col-sm-9">
                         <i class="bi bi-envelope me-1"></i>{{ usuario.Email }}
                     </div>
                 </div>
+                <!-- Rol con badge e icono -->
                 <div class="row mb-3">
                     <div class="col-sm-3"><strong>Rol:</strong></div>
                     <div class="col-sm-9">
@@ -45,6 +50,7 @@
                         </span>
                     </div>
                 </div>
+                <!-- Estado activo / inactivo -->
                 <div class="row mb-3">
                     <div class="col-sm-3"><strong>Estado:</strong></div>
                     <div class="col-sm-9">
@@ -54,8 +60,9 @@
                         </span>
                     </div>
                 </div>
+                <!-- Fecha de registro -->
                 <div class="row mb-3">
-                    <div class="col-sm-3"><strong>{{ usuario.Fecha_Registro|datetimeformat('%d/%m/%Y') }}</strong></div>
+                    <div class="col-sm-3"><strong>Fecha Registro:</strong></div>
                     <div class="col-sm-9">
                         <i class="bi bi-calendar me-1"></i>
                         {{ usuario.Fecha_Registro.strftime('%d/%m/%Y') if usuario.Fecha_Registro else 'No disponible' }}
@@ -64,6 +71,7 @@
             </div>
         </div>
 
+        <!-- Información específica según el rol (si existe info adicional) -->
         {% if info_adicional %}
         <div class="card shadow mt-4">
             <div class="card-header">
@@ -71,6 +79,7 @@
             </div>
             <div class="card-body">
                 {% if usuario.Rol_Id == 1 %}
+                    <!-- Datos adicionales para pacientes -->
                     <div class="row mb-3">
                         <div class="col-sm-3"><strong>Fecha Nacimiento:</strong></div>
                         <div class="col-sm-9">
@@ -86,6 +95,7 @@
                         <div class="col-sm-9">{{ info_adicional.Notas or 'Sin notas' }}</div>
                     </div>
                 {% elif usuario.Rol_Id == 2 %}
+                    <!-- Datos adicionales para profesionales -->
                     <div class="row mb-3">
                         <div class="col-sm-3"><strong>Especialidad:</strong></div>
                         <div class="col-sm-9">{{ info_adicional.Especialidad }}</div>
@@ -101,6 +111,7 @@
         </div>
         {% endif %}
 
+        <!-- Listado de vinculaciones (profesionales o pacientes según rol) -->
         {% if vinculaciones %}
         <div class="card shadow mt-4">
             <div class="card-header">
@@ -134,6 +145,7 @@
         {% endif %}
     </div>
 
+    <!-- Columna lateral con acciones y navegación -->
     <div class="col-md-4">
         <div class="card shadow">
             <div class="card-header">
@@ -141,12 +153,12 @@
             </div>
             <div class="card-body">
                 <div class="d-grid gap-2">
-                    <a href="{{ url_for('admin.editar_usuario', user_id=usuario.Id) }}" class="btn btn-warning">
+                    <a href="{{ url_for('admin.editar_usuario', user_id=usuario.Id) }}"" class="btn btn-warning">
                         <i class="bi bi-pencil me-2"></i>Editar Usuario
                     </a>
                     
                     {% if usuario.Id != current_user.Id %}
-                    <!-- ← CORREGIDO: Usar cambiar_estado en lugar de eliminar_usuario -->
+                    <!-- Botón para activar/desactivar el usuario (abre modal de confirmación) -->
                     <button type="button" 
                             class="btn btn-{{ 'danger' if usuario.Estado == 1 else 'success' }}" 
                             data-bs-toggle="modal" 
@@ -159,6 +171,7 @@
             </div>
         </div>
 
+        <!-- Bloque de navegación rápida a otras secciones de administración -->
         <div class="card shadow mt-4">
             <div class="card-header">
                 <h5 class="mb-0">Navegación</h5>
@@ -180,7 +193,7 @@
     </div>
 </div>
 
-<!-- ← CORREGIDO: Modal para cambiar estado (no eliminar) -->
+<!-- Modal de confirmación para cambio de estado del usuario -->
 {% if usuario.Id != current_user.Id %}
 <div class="modal fade" id="cambiarEstadoModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
@@ -211,8 +224,7 @@
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="bi bi-x me-1"></i>Cancelar
                 </button>
-                
-                <!-- ← CORREGIDO: Link a cambiar_estado_usuario -->
+                <!-- Acción final: redirección al endpoint que cambia el estado -->
                 <a href="{{ url_for('admin.cambiar_estado_usuario', user_id=usuario.Id) }}" 
                    class="btn btn-{{ 'danger' if usuario.Estado == 1 else 'success' }}">
                     <i class="bi bi-{{ 'toggle-off' if usuario.Estado == 1 else 'toggle-on' }} me-2"></i>

@@ -4,12 +4,13 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2><i class="bi bi-people me-2"></i>Gestión de Usuarios</h2>
+    <!-- Botón para crear un nuevo usuario desde el listado -->
     <a href="{{ url_for('admin.crear_usuario') }}" class="btn btn-primary">
         <i class="bi bi-person-plus me-1"></i>Nuevo Usuario
     </a>
 </div>
 
-<!-- Filtros de búsqueda -->
+<!-- Filtros de búsqueda y segmentación del listado -->
 <div class="card shadow mb-4">
     <div class="card-body">
         <form method="GET" class="row g-3">
@@ -48,6 +49,7 @@
 </div>
 
 {% if usuarios %}
+<!-- Tabla principal de resultados -->
 <div class="card shadow">
     <div class="card-header">
         <h5 class="mb-0">Lista de Usuarios ({{ usuarios|length }} usuarios)</h5>
@@ -68,6 +70,7 @@
                 </thead>
                 <tbody>
                     {% for usuario in usuarios %}
+                    <!-- Fila resaltada si el usuario está inactivo -->
                     <tr class="{{ 'table-secondary' if usuario.Estado == 0 else '' }}">
                         <td>{{ usuario.Id }}</td>
                         <td>
@@ -75,6 +78,7 @@
                         </td>
                         <td>{{ usuario.Email }}</td>
                         <td>
+                            <!-- Insignia con rol del usuario -->
                             <span class="badge bg-{{ 'danger' if usuario.Rol_Id == 0 else 'success' if usuario.Rol_Id == 1 else 'info' }}">
                                 {% if usuario.Rol_Id == 0 %}
                                     <i class="bi bi-shield me-1"></i>Administrador
@@ -86,6 +90,7 @@
                             </span>
                         </td>
                         <td>
+                            <!-- Insignia con estado activo/inactivo -->
                             <span class="badge bg-{{ 'success' if usuario.Estado == 1 else 'danger' }}">
                                 <i class="bi bi-{{ 'check-circle' if usuario.Estado == 1 else 'x-circle' }} me-1"></i>
                                 {{ 'Activo' if usuario.Estado == 1 else 'Inactivo' }}
@@ -93,8 +98,9 @@
                         </td>
                         <td>{{ usuario.Fecha_Registro|datetimeformat('%d/%m/%Y') }}</td>
                         <td>
+                            <!-- Grupo de acciones sobre cada usuario -->
                             <div class="btn-group" role="group">
-                                <!-- ← NUEVO: Solo mostrar "Ver" y "Editar" si está activo -->
+                                <!-- Ver y editar solo disponibles cuando el usuario está activo -->
                                 {% if usuario.Estado == 1 %}
                                 <a href="{{ url_for('admin.ver_usuario', user_id=usuario.Id) }}" 
                                    class="btn btn-sm btn-outline-info" title="Ver detalles">
@@ -107,7 +113,7 @@
                                 </a>
                                 {% endif %}
                                 
-                                <!-- Cambiar estado (siempre disponible) -->
+                                <!-- Acción para cambiar el estado del usuario (no sobre sí mismo) -->
                                 {% if usuario.Id != current_user.Id %}
                                 <a href="{{ url_for('admin.cambiar_estado_usuario', user_id=usuario.Id) }}" 
                                    class="btn btn-sm btn-outline-{{ 'danger' if usuario.Estado == 1 else 'success' }}" 
@@ -116,7 +122,7 @@
                                 </a>
                                 {% endif %}
                                 
-                                <!-- ← NUEVO: Mostrar mensaje para usuarios inactivos -->
+                                <!-- Indicador visual cuando el usuario está inactivo -->
                                 {% if usuario.Estado == 0 %}
                                 <span class="btn btn-sm btn-outline-secondary disabled" title="Usuario inactivo">
                                     <i class="bi bi-lock"></i>
@@ -133,6 +139,7 @@
 </div>
 
 {% else %}
+<!-- Mensaje cuando no hay resultados para los filtros actuales -->
 <div class="alert alert-info text-center">
     <i class="bi bi-info-circle me-2"></i>
     No se encontraron usuarios que coincidan con los criterios de búsqueda.

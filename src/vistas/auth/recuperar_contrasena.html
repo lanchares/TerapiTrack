@@ -5,10 +5,12 @@
 <div class="row justify-content-center">
     <div class="col-md-6">
         <div class="card shadow">
+            <!-- Cabecera del formulario de recuperación -->
             <div class="card-header text-center bg-info text-white">
                 <h4><i class="bi bi-envelope-at me-2"></i>Recuperar Contraseña</h4>
             </div>
             <div class="card-body">
+                <!-- Texto explicativo -->
                 <div class="text-center mb-4">
                     <p class="text-muted">
                         <i class="bi bi-info-circle me-1"></i>
@@ -16,9 +18,11 @@
                     </p>
                 </div>
                 
+                <!-- Formulario de solicitud de recuperación -->
                 <form method="POST">
                     {{ form.hidden_tag() }}
                     
+                    <!-- Errores de validación del formulario -->
                     {% if form.errors %}
                     <div class="alert alert-danger">
                         {% for field, errors in form.errors.items() %}
@@ -29,6 +33,7 @@
                     </div>
                     {% endif %}
                     
+                    <!-- Campo: email de recuperación -->
                     <div class="mb-4">
                         {{ form.email.label(class="form-label") }}
                         <div class="input-group">
@@ -37,6 +42,7 @@
                         </div>
                     </div>
                     
+                    <!-- Acciones: enviar / volver al login -->
                     <div class="d-grid gap-2">
                         <button type="submit" class="btn btn-info">
                             <i class="bi bi-send me-2"></i>Enviar Instrucciones

@@ -5,12 +5,13 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2><i class="bi bi-diagram-3 me-2"></i>Vinculaciones Paciente-Profesional</h2>
+    <!-- Acceso rápido para crear una nueva vinculación -->
     <a href="{{ url_for('admin.vincular_paciente_profesional') }}" class="btn btn-success">
         <i class="bi bi-link-45deg me-1"></i>Nueva Vinculación
     </a>
 </div>
 
-<!-- Filtros -->
+<!-- Bloque de filtros de búsqueda de relaciones -->
 <div class="card shadow mb-4">
     <div class="card-header py-3">
         <h6 class="m-0 fw-bold text-primary">Filtros</h6>
@@ -54,7 +55,7 @@
     </div>
 </div>
 
-<!-- Tabla de relaciones -->
+<!-- Tabla principal de relaciones paciente-profesional -->
 <div class="card shadow">
     <div class="card-body">
         <div class="table-responsive">
@@ -72,10 +73,12 @@
                     {% for relacion in relaciones %}
                     {% set modal_id = 'desvincularModal-' ~ relacion.vinculacion.Paciente_Id ~ '-' ~ relacion.vinculacion.Profesional_Id %}
                     <tr>
+                        <!-- Información del paciente vinculado -->
                         <td>
                             <strong>{{ relacion.paciente_usuario.Nombre }} {{ relacion.paciente_usuario.Apellidos }}</strong><br>
                             <small class="text-muted">{{ relacion.paciente.Condicion_Medica or 'Sin condición especificada' }}</small>
                         </td>
+                        <!-- Información del profesional vinculado -->
                         <td>
                             <strong>{{ relacion.profesional_usuario.Nombre }} {{ relacion.profesional_usuario.Apellidos }}</strong><br>
                             <span class="badge bg-info">{{ relacion.profesional.Tipo_Profesional }}</span>
@@ -83,7 +86,7 @@
                         <td>{{ relacion.profesional.Especialidad }}</td>
                         <td>{{ relacion.vinculacion.Fecha_Asignacion|datetimeformat('%d/%m/%Y') }}</td>
                         <td>
-                            <!-- Botón que abre el modal -->
+                            <!-- Botón que abre el modal de confirmación de desvinculación -->
                             <button type="button"
                                     class="btn btn-sm btn-danger"
                                     data-bs-toggle="modal"
@@ -91,7 +94,7 @@
                                 <i class="bi bi-unlink"></i> Desvincular
                             </button>
 
-                            <!-- Modal de confirmación -->
+                            <!-- Modal de confirmación de desvinculación -->
                             <div class="modal fade" id="{{ modal_id }}" tabindex="-1" aria-hidden="true">
                                 <div class="modal-dialog">
                                     <div class="modal-content">
@@ -113,10 +116,11 @@
                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                                                 Cancelar
                                             </button>
+                                            <!-- Formulario de confirmación (con CSRF) -->
                                             <form method="POST"
                                                   action="{{ url_for('admin.desvincular_paciente_profesional',
-                                                  paciente_id=relacion.vinculacion.Paciente_Id,
-                                                  profesional_id=relacion.vinculacion.Profesional_Id) }}"
+                                                        paciente_id=relacion.vinculacion.Paciente_Id,
+                                                        profesional_id=relacion.vinculacion.Profesional_Id) }}"
                                                   class="d-inline">
                                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                                 <button type="submit" class="btn btn-danger">
@@ -130,6 +134,7 @@
                         </td>
                     </tr>
                     {% else %}
+                    <!-- Mensaje cuando no hay relaciones para los filtros actuales -->
                     <tr>
                         <td colspan="5" class="text-center py-4">
                             <i class="bi bi-diagram-3 fs-1 text-muted"></i>

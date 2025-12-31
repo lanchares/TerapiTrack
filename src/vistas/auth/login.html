@@ -1,21 +1,27 @@
 <!-- src/vistas/auth/login.html -->
 {% extends "base.html" %}
+
 {% block content %}
 <div class="row justify-content-center mt-5">
   <div class="col-md-6">
     <div class="card shadow">
+      <!-- Cabecera del formulario de acceso -->
       <div class="card-header bg-primary text-white">
         <h4 class="mb-0"><i class="bi bi-lock me-2"></i>Acceso a TerapiTrack</h4>
       </div>
+
       <div class="card-body">
-        <!-- ✅ CORREGIDO: Mensaje actualizado según las nuevas sesiones -->
+        <!-- Mensaje informativo inicial -->
         <div class="alert alert-info">
           <i class="bi bi-info-circle me-2"></i>
           <strong>Bienvenido:</strong> Inicia sesión para acceder a tu espacio personalizado.
         </div>
         
+        <!-- Formulario de login -->
         <form method="POST" novalidate>
           {{ form.hidden_tag() }}
+
+          <!-- Campo: Email -->
           <div class="mb-3">
             {{ form.email.label(class="form-label") }}
             {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else "")) }}
@@ -25,6 +31,8 @@
               </div>
             {% endif %}
           </div>
+
+          <!-- Campo: Contraseña -->
           <div class="mb-3">
             {{ form.password.label(class="form-label") }}
             {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else "")) }}
@@ -34,11 +42,13 @@
               </div>
             {% endif %}
           </div>
+
+          <!-- Botón de envío -->
           <button type="submit" class="btn btn-primary w-100 mb-3">
             <i class="bi bi-box-arrow-in-right me-2"></i>Ingresar
           </button>
           
-          <!-- Enlace a recuperar contraseña -->
+          <!-- Enlace a recuperación de contraseña -->
           <div class="text-center">
             <a href="{{ url_for('auth.recuperar_contrasena') }}" class="text-muted small">
               <i class="bi bi-key me-1"></i>¿Olvidaste tu contraseña?
