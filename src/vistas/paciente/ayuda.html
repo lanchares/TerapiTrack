@@ -5,14 +5,14 @@
 {% block content %}
 <div class="container-fluid vh-100" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 2rem 0;">
     
-    <!-- Botón de regreso VERDE -->
+    <!-- Botón de regreso VERDE (asociado al botón Y del mando) -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <a href="{{ url_for('paciente.dashboard') }}" class="btn btn-outline-light btn-lg snes-back-btn" id="btn-back">
             <span class="snes-letter">Y</span>
             <i class="bi bi-arrow-left me-2"></i>Volver al Inicio
         </a>
         
-        <!-- Ayuda inmediata -->
+        <!-- Tarjeta pequeña de ayuda inmediata (teléfono) -->
         <div class="help-contact-small">
             <div class="card bg-danger text-white">
                 <div class="card-body py-2 px-3 text-center">
@@ -24,6 +24,7 @@
         </div>
     </div>
 
+    <!-- Título principal de la sección de ayuda -->
     <div class="text-center mb-4">
         <h1 class="display-5 fw-bold text-white mb-3">
             <i class="bi bi-question-circle me-2"></i>Guía de Uso
@@ -34,7 +35,7 @@
     <div class="row justify-content-center">
         <div class="col-md-10">
             
-            <!-- Mando SNES visual -->
+            <!-- Mando SNES representado de forma visual -->
             <div class="card bg-white bg-opacity-95 mb-4">
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0"><i class="bi bi-controller me-2"></i>Tu Mando SNES</h5>
@@ -43,7 +44,7 @@
                     <div class="snes-controller-help">
                         <div class="controller-visual">
                             <div class="controller-body">
-                                <!-- Cruceta direccional (izquierda) -->
+                                <!-- Cruceta direccional (lado izquierdo del mando) -->
                                 <div class="dpad-section">
                                     <div class="dpad-container">
                                         <div class="dpad">
@@ -61,7 +62,7 @@
                                     </div>
                                 </div>
                                 
-                                <!-- Botones de acción (derecha) -->
+                                <!-- Botones de acción (lado derecho del mando) -->
                                 <div class="action-section">
                                     <div class="action-buttons">
                                         <div class="btn-x help-btn-x">X</div>
@@ -79,7 +80,7 @@
                 </div>
             </div>
 
-            <!-- Instrucciones por botón - SIN REPETICIÓN -->
+            <!-- Explicación de la función de cada botón del mando -->
             <div class="row g-4 mb-4">
                 <div class="col-md-6">
                     <div class="card h-100 border-primary">
@@ -129,7 +130,7 @@
                 </div>
             </div>
 
-            <!-- Navegación con el Mando centrada -->
+            <!-- Bloque de instrucciones de navegación con el mando -->
             <div class="card bg-light">
                 <div class="card-header bg-info text-white">
                     <h5 class="mb-0"><i class="bi bi-arrow-left-right me-2"></i>Navegación con el Mando</h5>
@@ -148,6 +149,7 @@
                         </div>
                     </div>
 
+                    <!-- Recordatorio fijo de controles básicos -->
                     <div class="navigation-help">
                         <strong>🎮 Navegación:</strong><br>
                         ↑ ↓ : Bajar/Subir en la pantalla<br>
@@ -160,7 +162,7 @@
 </div>
 
 <style>
-/* Botón verde como el mando */
+/* Botón verde tipo botón Y del mando */
 .snes-back-btn {
     position: relative;
     border: 3px solid rgba(255,255,255,0.8);
@@ -173,6 +175,7 @@
     color: white;
 }
 
+/* Circulito con la letra Y dentro del botón de volver */
 .snes-letter {
     position: absolute;
     top: -5px;
@@ -189,12 +192,12 @@
     justify-content: center;
 }
 
-/* Ayuda de contacto pequeña */
+/* Tarjeta de contacto de ayuda pequeña (esquina) */
 .help-contact-small {
     max-width: 200px;
 }
 
-/* Controlador visual */
+/* Contenedor general del mando dibujado */
 .controller-visual {
     padding: 2rem 0;
 }
@@ -211,7 +214,7 @@
     box-shadow: 0 10px 30px rgba(0,0,0,0.3);
 }
 
-/* D-pad */
+/* Sección de cruceta direccional */
 .dpad-section {
     display: flex;
     flex-direction: column;
@@ -224,6 +227,7 @@
     padding: 8px;
 }
 
+/* Rejilla de la cruceta (arriba, abajo, izquierda, derecha) */
 .dpad {
     display: grid;
     grid-template-areas: 
@@ -267,11 +271,12 @@
     background: #333; 
 }
 
+/* Para que left/center/right ocupen la fila central */
 .dpad-horizontal {
     display: contents;
 }
 
-/* Botones de acción */
+/* Sección de botones de acción (X,Y,A,B) */
 .action-section {
     display: flex;
     flex-direction: column;
@@ -299,7 +304,7 @@
     border: 3px solid rgba(255,255,255,0.8);
 }
 
-/* Posiciones correctas */
+/* Posiciones y colores de los botones como en el mando original */
 .btn-x { 
     top: 0; 
     left: 50%; 
@@ -326,7 +331,7 @@
     color: #000;
 }
 
-/* Botones de demostración */
+/* Versión grande de los botones para las tarjetas explicativas */
 .help-btn-large {
     width: 80px;
     height: 80px;
@@ -346,7 +351,7 @@
 .help-btn-a-large { background: linear-gradient(145deg, #DC143C, #B22222); }
 .help-btn-b-large { background: linear-gradient(145deg, #FFD700, #DAA520); color: #000; }
 
-/* Demo de navegación */
+/* Bloque pequeño que representa la cruceta en modo demo */
 .dpad-demo {
     width: 80px;
     height: 50px;
@@ -361,20 +366,7 @@
     font-weight: bold;
 }
 
-.help-btn-demo-a {
-    width: 50px;
-    height: 50px;
-    background: linear-gradient(145deg, #DC143C, #B22222);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto;
-    border-radius: 50%;
-    font-size: 1.5rem;
-    font-weight: bold;
-}
-
+/* Caja fija con recordatorio rápido de controles */
 .navigation-help {
     position: fixed;
     bottom: 20px;
@@ -394,19 +386,23 @@
 document.addEventListener('DOMContentLoaded', function() {
     const backBtn = document.getElementById('btn-back');
     let gamepadIndex = null;
+    // Guardamos el último estado para detectar solo pulsaciones nuevas
     let lastButtonStates = { Y: false, up: false, down: false };
 
+    // Cuando se conecta un gamepad, empezamos a leer su estado
     window.addEventListener('gamepadconnected', (e) => {
         gamepadIndex = e.gamepad.index;
         console.log('🎮 Mando conectado (ayuda):', e.gamepad.id);
         requestAnimationFrame(pollGamepad);
     });
 
+    // Si se desconecta, dejamos de usarlo
     window.addEventListener('gamepaddisconnected', () => {
         console.log('🎮 Mando desconectado (ayuda)');
         gamepadIndex = null;
     });
 
+    // Bucle de lectura del mando para esta pantalla de ayuda
     function pollGamepad() {
         if (gamepadIndex === null) return;
 
@@ -417,19 +413,19 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Mapping estándar: 0=B, 1=X, 2=A, 3=Y
+        
         const btnY = gp.buttons[3]?.pressed || false;
         const up   = (gp.axes[1] || 0) < -0.5;
         const down = (gp.axes[1] || 0) >  0.5;
 
         const states = { Y: btnY, up, down };
 
-        // Y: volver (flanco de subida)
+        // Botón Y: volver atrás (solo en flanco de subida)
         if (states.Y && !lastButtonStates.Y) {
             backBtn.click();
         }
 
-        // Scroll ↑ ↓ (flanco de subida)
+        // Flechas arriba/abajo: hacer scroll en la página (también en flanco)
         if (states.up && !lastButtonStates.up) {
             window.scrollBy(0, -200);
         }

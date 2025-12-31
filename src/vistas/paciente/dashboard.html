@@ -5,7 +5,7 @@
 {% block content %}
 <div class="container-fluid" style="min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 2rem 0;">
     
-    <!-- ✅ Botón de logout discreto (no accesible con mando) -->
+    <!-- Botón de logout discreto (pensado para ratón/táctil, no para el mando) -->
     <div class="position-absolute top-0 end-0 p-3" style="z-index: 1000;">
         <div class="dropdown">
             <button class="btn btn-outline-light btn-sm opacity-25" 
@@ -26,7 +26,7 @@
                 </li>
                 <li><hr class="dropdown-divider"></li>
                 <li>
-                    <!-- ✅ Enlace directo sin JavaScript -->
+                    <!-- Enlace directo a logout (sin JS extra para ser robusto) -->
                     <a class="dropdown-item" href="{{ url_for('auth.logout') }}">
                         <i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión
                     </a>
@@ -35,12 +35,12 @@
         </div>
     </div>
 
-    <!-- Header -->
+    <!-- Cabecera de bienvenida y estado del mando -->
     <div class="text-center mb-5">
         <h1 class="display-4 fw-bold text-white mb-3">¡Hola, {{ current_user.Nombre }}!</h1>
         <p class="lead text-white">Bienvenido a tu espacio de terapia</p>
         
-        <!-- Estado del mando (solo visual, se actualiza desde JS) -->
+        <!-- Indicador del estado del mando SNES, solo informativo -->
         <div class="alert alert-light d-inline-block" id="gamepad-status">
             <i class="bi bi-controller me-2"></i>
             Mando SNES: 
@@ -48,11 +48,11 @@
         </div>
     </div>
 
-    <!-- Botones SNES con posiciones correctas según mando real -->
+    <!-- Distribución de botones imitando el mando SNES -->
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="snes-layout">
-                <!-- Fila superior: X (azul) - EJERCICIOS -->
+                <!-- X (arriba, azul): acceso a ejercicios -->
                 <div class="d-flex justify-content-center mb-4">
                     <a href="{{ url_for('paciente.ejercicios') }}" class="snes-btn snes-x" id="btn-ejercicios">
                         <div class="btn-inner">
@@ -63,9 +63,9 @@
                     </a>
                 </div>
                 
-                <!-- Fila media: Y (verde) y A (rojo) -->
+                <!-- Fila central: Y (izquierda, verde) y A (derecha, rojo) -->
                 <div class="d-flex justify-content-center align-items-center mb-4">
-                    <!-- Y (verde) - izquierda - MIS SESIONES -->
+                    <!-- Y: listado de sesiones del paciente -->
                     <a href="{{ url_for('paciente.mis_sesiones') }}" class="snes-btn snes-y me-5" id="btn-sesiones">
                         <div class="btn-inner">
                             <span class="btn-letter">Y</span>
@@ -76,7 +76,7 @@
                     
                     <div style="width: 100px;"></div>
                     
-                    <!-- A (rojo) - derecha - MI PROGRESO -->
+                    <!-- A: vista de progreso del paciente -->
                     <a href="{{ url_for('paciente.progreso') }}" class="snes-btn snes-a ms-5" id="btn-progreso">
                         <div class="btn-inner">
                             <span class="btn-letter">A</span>
@@ -86,7 +86,7 @@
                     </a>
                 </div>
                 
-                <!-- Fila inferior: B (amarillo) - AYUDA -->
+                <!-- B (abajo, amarillo): sección de ayuda -->
                 <div class="d-flex justify-content-center">
                     <a href="{{ url_for('paciente.ayuda') }}" class="snes-btn snes-b" id="btn-ayuda">
                         <div class="btn-inner">
@@ -100,7 +100,7 @@
         </div>
     </div>
 
-    <!-- Información de contacto -->
+    <!-- Tarjeta con datos de contacto de soporte -->
     <div class="row justify-content-center mt-5">
         <div class="col-md-6">
             <div class="card bg-white bg-opacity-90 shadow-lg">
@@ -113,7 +113,7 @@
         </div>
     </div>
 
-    <!-- Instrucciones de navegación -->
+    <!-- Leyenda fija con instrucciones de uso del mando -->
     <div class="navigation-help">
         <strong>🎮 Navegación:</strong><br>
         ↑ ↓ : Bajar/Subir en la pantalla<br>
@@ -122,12 +122,14 @@
 </div>
 
 <style>
+/* Contenedor general del layout SNES */
 .snes-layout {
     max-width: 500px;
     margin: 0 auto;
     padding: 2rem;
 }
 
+/* Estilo base de los botones circulares SNES */
 .snes-btn {
     display: block;
     width: 120px;
@@ -154,6 +156,7 @@
     transform: translateY(-2px) scale(0.98);
 }
 
+/* Contenido interno de cada botón (icono + texto) */
 .btn-inner {
     display: flex;
     flex-direction: column;
@@ -164,6 +167,7 @@
     padding: 10px;
 }
 
+/* Letra de botón (X, Y, A, B) en la esquina superior */
 .btn-letter {
     position: absolute;
     top: 8px;
@@ -173,13 +177,14 @@
     opacity: 0.9;
 }
 
+/* Etiqueta inferior con el nombre de la sección */
 .btn-label {
     font-size: 0.9rem;
     margin-top: 5px;
     font-weight: 600;
 }
 
-/* Colores correctos según posición del mando SNES */
+/* Colores según posición del mando SNES real */
 .snes-x {
     background: linear-gradient(145deg, #4169E1, #1E90FF);  /* X = Azul (arriba) */
 }
@@ -196,12 +201,13 @@
     background: linear-gradient(145deg, #228B22, #006400);  /* Y = Verde (izquierda) */
 }
 
-/* Efectos activos para el mando */
+/* Efecto visual cuando se pulsa desde el mando */
 .snes-btn.controller-active {
     transform: scale(0.95);
     box-shadow: 0 4px 12px rgba(0,0,0,0.4);
 }
 
+/* Pequeña animación cuando se selecciona una opción con el mando */
 .snes-btn.mando-selected {
     animation: pulseGlow 0.5s ease-in-out;
 }
@@ -212,7 +218,7 @@
     100% { box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
 }
 
-/* Instrucciones de navegación */
+/* Caja flotante con ayuda de navegación */
 .navigation-help {
     position: fixed;
     bottom: 20px;
@@ -230,6 +236,7 @@
 {% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+    // Mapeo visual de letras SNES a cada botón de la interfaz
     const buttons = {
         'X': document.getElementById('btn-ejercicios'),
         'Y': document.getElementById('btn-sesiones'),
@@ -239,8 +246,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const gamepadStatus = document.getElementById('gamepad-status');
     let gamepadIndex = null;
+    // Último estado conocido de los botones/ejes, para detectar flancos
     let lastButtonStates = { X: false, Y: false, A: false, B: false, up: false, down: false };
 
+    // Actualiza el badge de estado del mando
     function setStatus(text, klass) {
         if (!gamepadStatus) return;
         const badge = gamepadStatus.querySelector('span.badge');
@@ -248,6 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
         badge.className = 'badge ' + klass;
     }
 
+    // Evento cuando se conecta un gamepad compatible
     window.addEventListener('gamepadconnected', (e) => {
         gamepadIndex = e.gamepad.index;
         setStatus('Conectado', 'bg-success');
@@ -255,14 +265,16 @@ document.addEventListener('DOMContentLoaded', () => {
         requestAnimationFrame(pollGamepad);
     });
 
+    // Evento cuando se desconecta el gamepad
     window.addEventListener('gamepaddisconnected', () => {
         console.log('🎮 Mando desconectado');
         gamepadIndex = null;
         setStatus('Desconectado', 'bg-danger');
-        // quitar efectos visuales
+        // Limpia efectos activos sobre los botones
         Object.values(buttons).forEach(btn => btn && btn.classList.remove('controller-active'));
     });
 
+    // Navegación a una ruta usando el mando (añade animación y luego redirige)
     function navigateWithController(button) {
         const targetButton = buttons[button];
         if (!targetButton) return;
@@ -275,6 +287,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 300);
     }
 
+    // Bucle de lectura de estado del mando (Gamepad API)
     function pollGamepad() {
         if (gamepadIndex === null) return;
 
@@ -285,19 +298,18 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Mapping estándar: 0=X, 1=A, 2=B, 3=Y
-        // Lo adaptamos a tus letras SNES:
-        const btnX = gp.buttons[0]?.pressed || false; // A rojo
-        const btnA = gp.buttons[1]?.pressed || false; // B amarillo
-        const btnB = gp.buttons[2]?.pressed || false; // X azul
-        const btnY = gp.buttons[3]?.pressed || false; // Y verde
+        // Mapping adaptado: 0=X, 1=A, 2=B, 3=Y
+        const btnX = gp.buttons[0]?.pressed || false; // A rojo (bottom)
+        const btnA = gp.buttons[1]?.pressed || false; // B amarillo (right)
+        const btnB = gp.buttons[2]?.pressed || false; // X azul (left)
+        const btnY = gp.buttons[3]?.pressed || false; // Y verde (top)
 
         const up    = (gp.axes[1] || 0) < -0.5;
         const down  = (gp.axes[1] || 0) >  0.5;
 
         const states = { X: btnX, Y: btnY, A: btnA, B: btnB, up, down };
 
-        // Efectos visuales
+        // Marca visualmente los botones que se están pulsando
         Object.keys(buttons).forEach(letter => {
             const btnEl = buttons[letter];
             if (!btnEl) return;
@@ -305,7 +317,7 @@ document.addEventListener('DOMContentLoaded', () => {
             else btnEl.classList.remove('controller-active');
         });
 
-        // Scroll con ↑ ↓ (flanco de subida)
+        // Scroll vertical con la cruceta (solo en flanco de subida)
         if (states.up && !lastButtonStates.up) {
             window.scrollBy(0, -200);
         }
@@ -313,7 +325,7 @@ document.addEventListener('DOMContentLoaded', () => {
             window.scrollBy(0, 200);
         }
 
-        // Navegación por botones (flanco de subida)
+        // Acciones asociadas a cada botón SNES (solo flanco de subida)
         ['X','Y','A','B'].forEach(letter => {
             if (states[letter] && !lastButtonStates[letter]) {
                 navigateWithController(letter);
@@ -324,10 +336,8 @@ document.addEventListener('DOMContentLoaded', () => {
         requestAnimationFrame(pollGamepad);
     }
 
-    // Si el usuario conecta el mando después de cargar la página,
-    // el evento gamepadconnected disparará pollGamepad.
-    // Si ya estaba conectado, algunos navegadores requieren una tecla/botón
-    // para disparar el evento, así que dejamos el estado como "Buscando...".
+    // Nota: si el mando ya estaba conectado antes de cargar la página,
+    // algunos navegadores requieren pulsar un botón para disparar gamepadconnected.
 });
 </script>
 {% endblock %}

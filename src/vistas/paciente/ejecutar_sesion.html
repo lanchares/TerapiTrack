@@ -5,16 +5,16 @@
 {% block content %}
 <div class="container-fluid p-0" style="height: 100vh; background: #000;">
     <div class="row g-0 h-100">
-        <!-- Video demostración (50% - izquierda) -->
+        <!-- Panel izquierdo: vídeo demostración del ejercicio -->
         <div class="col-md-6 h-100 position-relative">
             <div class="h-100 d-flex flex-column" style="min-height:0;">
-                <!-- Header del video demo -->
+                <!-- Cabecera del vídeo de demostración -->
                 <div class="bg-primary text-white p-3 text-center">
                     <h4 class="mb-0" id="ejercicioNombre">Esperando al profesional...</h4>
                     <small id="ejercicioTipo" class="text-light"></small>
                 </div>
 
-                <!-- Video demostrativo -->
+                <!-- Zona principal del vídeo de demostración -->
                 <div class="flex-grow-1 position-relative" style="min-height:0;">
                     <video id="demoVideo" controls autoplay muted loop
                            class="w-100 h-100"
@@ -23,7 +23,7 @@
                         Tu navegador no soporta videos.
                     </video>
 
-                    <!-- Overlay cuando no hay video -->
+                    <!-- Capa de espera mientras el terapeuta no ha iniciado la sesión -->
                     <div id="waitingOverlay" class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-dark bg-opacity-75">
                         <div class="text-center text-white">
                             <div class="spinner-border text-primary mb-3" role="status">
@@ -37,10 +37,10 @@
             </div>
         </div>
 
-        <!-- Cámara del paciente (50% - derecha) -->
+        <!-- Panel derecho: cámara del paciente y estado del mando -->
         <div class="col-md-6 h-100 position-relative">
             <div class="h-100 d-flex flex-column">
-                <!-- Header de la cámara -->
+                <!-- Cabecera de la cámara del paciente -->
                 <div class="bg-success text-white p-3 text-center">
                     <h4 class="mb-0">Tu ejecución</h4>
                     <div id="recordingStatus" class="d-none">
@@ -49,20 +49,20 @@
                     </div>
                 </div>
 
-                <!-- Cámara del paciente -->
+                <!-- Vista previa de la cámara del paciente -->
                 <div class="flex-grow-1 position-relative">
                     <video id="cameraPreview" autoplay playsinline muted
                            class="w-100 h-100"
                            style="object-fit: cover; background: #1a1a1a;"></video>
 
-                    <!-- Timer de grabación -->
+                    <!-- Temporizador de la grabación de respuesta -->
                     <div id="timerDisplay" class="position-absolute top-0 end-0 bg-dark bg-opacity-75 text-white p-2 rounded-bottom-start d-none">
                         <i class="bi bi-stopwatch me-1"></i>
                         <span id="timer">00:00</span>
                     </div>
                 </div>
 
-                <!-- Estado del mando -->
+                <!-- Representación resumida del estado del mando SNES -->
                 <div class="bg-dark text-white p-2">
                     <div class="d-flex justify-content-center">
                         <div class="mini-snes-controller">
@@ -78,7 +78,7 @@
         </div>
     </div>
 
-    <!-- Botón de salida (solo visible si no está en sesión activa) -->
+    <!-- Botón para salir mientras aún no se ha iniciado la sesión activa -->
     <div class="position-absolute top-0 end-0 p-3" id="exitButton">
         <a href="{{ url_for('paciente.dashboard') }}" class="btn btn-outline-light">
             <i class="bi bi-x-lg"></i>
@@ -87,6 +87,7 @@
 </div>
 
 <style>
+    /* Punto rojo indicador de grabación en curso */
     .recording-dot {
         display: inline-block;
         width: 8px;
@@ -102,12 +103,14 @@
         51%, 100% { opacity: 0.3; }
     }
 
+    /* Contenedor del mini mando SNES */
     .mini-snes-controller {
         display: flex;
         gap: 8px;
         align-items: center;
     }
 
+    /* Botones del mini mando */
     .mini-snes-button {
         width: 24px;
         height: 24px;
@@ -122,6 +125,7 @@
         opacity: 0.6;
     }
 
+    /* Estado cuando el botón está siendo pulsado en el mando real */
     .mini-snes-button.active {
         opacity: 1;
         transform: scale(1.2);
@@ -131,7 +135,7 @@
 {% block scripts %}
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    // Elementos DOM
+    // Referencias a elementos de la interfaz de vídeo y cámara
     const cameraPreview = document.getElementById('cameraPreview');
     const demoVideo = document.getElementById('demoVideo');
     const ejercicioNombre = document.getElementById('ejercicioNombre');
@@ -141,7 +145,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const timer = document.getElementById('timer');
     const waitingOverlay = document.getElementById('waitingOverlay');
 
-    // Mini mando visual
+    // Referencias al mini mando visual
     const miniButtons = {
         'Y': document.getElementById('mini-y'),
         'X': document.getElementById('mini-x'),
@@ -149,59 +153,52 @@ document.addEventListener("DOMContentLoaded", function() {
         'A': document.getElementById('mini-a')
     };
 
-    // Datos de ejercicios y sesión
+    // Datos de ejercicios y sesión que vienen del backend
     const ejercicios = {{ ejercicios_json|tojson }};
     const sesionId = {{ sesion.Id }};
 
     console.log("Ejercicios cargados del paciente:", ejercicios);
     console.log("Sesión ID:", sesionId);
 
-    // Variables de estado
+    // Variables de estado de la sesión y grabación
     let isSessionActive = false;
     let mediaRecorder = null;
     let recordedChunks = [];
     let startTime;
     let timerInterval;
-    let currentExercise = -1;      // índice en el array
-    let currentExerciseId = null;  // Id de EjercicioSesion
+    let currentExercise = -1;      // índice en el array de ejercicios
+    let currentExerciseId = null;  // Id de EjercicioSesion actual
     const totalExercises = ejercicios.length;
 
-    // Estabilidad del id enviado por el profesional
-    let ultimoEjercicioRecibido = null;   // último id ya aceptado
-    let candidatoId = null;               // id que se está estabilizando
-    let pollsMismoId = 0;                 // nº de polls seguidos viendo candidatoId
+    // Parámetros de estabilización de cambios de ejercicio recibidos del profesional
+    let ultimoEjercicioRecibido = null;   // último id aceptado
+    let candidatoId = null;               // id que se está comprobando
+    let pollsMismoId = 0;                 // número de polls consecutivos con el mismo id candidato
     const REQUIRED_STABLE_POLLS = 2;
-    const MIN_CHANGE_INTERVAL = 8000;     // 8 s entre cambios aceptados
+    const MIN_CHANGE_INTERVAL = 8000;     // milisegundos mínimos entre cambios aceptados
     let lastChangeTime = 0;
     let cambioEnProceso = false;
 
-    // Evitar subidas duplicadas simultáneas
+    // Control de subidas para evitar duplicados
     let isUploading = false;
+    const ejerciciosCompletados = new Set();           // ejercicios con vídeo ya subido
+    const ejerciciosSubidosEnEstaSesion = new Set();   // ejercicios que ya han iniciado subida en esta sesión
 
-    // Ejercicios ya completados (vídeo subido)
-    const ejerciciosCompletados = new Set();
-
-    // Ejercicios para los que ya se ha iniciado una subida en esta sesión
-    const ejerciciosSubidosEnEstaSesion = new Set();
-
-    // Flag para evitar múltiples stops por la misma grabación
+    // Flags para evitar dobles llamadas a stop/onstop
     let stopAlreadyCalled = false;
-
-    // Bloqueo parcial de cambios mientras se graba
     let lockCambioEjercicio = false;
-
-    // Flag para evitar procesar onstop más de una vez por grabación
     let onStopHandled = false;
 
-    // Estado del gamepad
+    // Estado del mando y memoria del último frame
     let gamepadIndex = null;
     let lastButtonStates = { Y: false, X: false, B: false, A: false };
 
-    // Inicializar cámara, mando y polling
+    // Inicio de cámara, mando y polling del estado de la sesión
     initCamera();
     initGamepad();
     startPollingEstadoSesion();
 
+    // Inicializa la cámara del paciente
     async function initCamera() {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({
@@ -216,21 +213,22 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    // Gamepad: solo indicador visual y Y para volver mientras no hay sesión activa
+    // Inicializa escuchas del Gamepad (mando)
     function initGamepad() {
         window.addEventListener('gamepadconnected', (e) => {
             gamepadIndex = e.gamepad.index;
-            console.log('🎮 Mando conectado (ejecutar_sesion):', e.gamepad.id);
+            console.log('Mando conectado (ejecutar_sesion):', e.gamepad.id);
             requestAnimationFrame(pollGamepad);
         });
 
         window.addEventListener('gamepaddisconnected', () => {
-            console.log('🎮 Mando desconectado (ejecutar_sesion)');
+            console.log('Mando desconectado (ejecutar_sesion)');
             gamepadIndex = null;
             Object.values(miniButtons).forEach(btn => btn && btn.classList.remove('active'));
         });
     }
 
+    // Lee el estado del mando en bucle y actualiza la UI
     function pollGamepad() {
         if (gamepadIndex === null) return;
 
@@ -241,7 +239,7 @@ document.addEventListener("DOMContentLoaded", function() {
             return;
         }
 
-        // Mapping adaptado a tu mando: 0=X, 1=A, 2=B, 3=Y
+        // Mapping adaptado: 0=X, 1=A, 2=B, 3=Y
         const btnX = gp.buttons[0]?.pressed || false;
         const btnA = gp.buttons[1]?.pressed || false;
         const btnB = gp.buttons[2]?.pressed || false;
@@ -249,7 +247,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         const states = { A: btnA, B: btnB, X: btnX, Y: btnY };
 
-        // Actualizar mini-mando visual
+        // Actualizar mini mando visual según botones pulsados
         Object.keys(miniButtons).forEach(letter => {
             const el = miniButtons[letter];
             if (!el) return;
@@ -257,7 +255,7 @@ document.addEventListener("DOMContentLoaded", function() {
             else el.classList.remove('active');
         });
 
-        // Mientras la sesión no está activa, permitir volver con Y
+        // Mientras la sesión no está activa, permitir salir con Y hacia el listado de sesiones
         if (!isSessionActive && states.Y && !lastButtonStates.Y) {
             window.location.href = "{{ url_for('paciente.mis_sesiones') }}";
             return;
@@ -267,30 +265,31 @@ document.addEventListener("DOMContentLoaded", function() {
         requestAnimationFrame(pollGamepad);
     }
 
-    // SINCRONIZACIÓN CON PROFESIONAL
+    // Inicia el polling periódico del estado de la sesión frente al backend
     function startPollingEstadoSesion() {
-        console.log("🔄 Iniciando polling cada 2 segundos...");
+        console.log("Iniciando polling de estado de sesión cada 2 segundos...");
         comprobarEstadoSesion();
         setInterval(comprobarEstadoSesion, 2000);
     }
 
+    // Consulta al backend qué ejercicio está activo y si la sesión ha terminado
     async function comprobarEstadoSesion() {
         if (cambioEnProceso) {
-            console.log('⏸️ Cambio en proceso, saltando polling...');
+            console.log('Cambio de ejercicio en proceso, se omite este ciclo de polling.');
             return;
         }
 
         try {
             const resp = await fetch(`/profesional/api/sesion/${sesionId}/estado`);
             if (!resp.ok) {
-                console.warn("⚠️ Error:", resp.status);
+                console.warn("Respuesta HTTP no exitosa:", resp.status);
                 return;
             }
 
             const data = await resp.json();
-            console.log("Estado recibido:", data);
+            console.log("Estado de sesión recibido:", data);
 
-            // Sesión terminada
+            // Gestión de sesión terminada desde el profesional
             if (data.terminada) {
                 isSessionActive = false;
                 waitingOverlay.classList.remove('d-none');
@@ -298,7 +297,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 ejercicioTipo.textContent = '';
                 demoVideo.pause();
 
-                // Cortar solo si sigue grabando y este ejercicio no está marcado como completado
+                // Detener grabación solo si sigue activa y el ejercicio no está ya marcado
                 if (mediaRecorder &&
                     mediaRecorder.state === 'recording' &&
                     currentExerciseId &&
@@ -315,115 +314,115 @@ document.addEventListener("DOMContentLoaded", function() {
             const ejercicioActivoId = data.ejercicio_activo_id;
             const now = Date.now();
 
-            // 1) Si el backend manda un id de ejercicio YA COMPLETADO, lo ignoramos
+            // Ignorar ids de ejercicios ya completados
             if (ejercicioActivoId != null && ejerciciosCompletados.has(ejercicioActivoId)) {
-                console.log("🔁 Id ya completado, se ignora:", ejercicioActivoId);
+                console.log("Id de ejercicio ya completado, se ignora:", ejercicioActivoId);
                 return;
             }
 
-            // 2) SIN EJERCICIO ACTIVO (null) -> ignorar siempre
+            // Si no hay ejercicio activo definido, se ignora
             if (ejercicioActivoId == null) {
-                console.log("⏳ Sin ejercicio activo (ignorado)");
+                console.log("Sin ejercicio activo informado por el servidor (ignorado).");
                 candidatoId = null;
                 pollsMismoId = 0;
                 return;
             }
 
-            // 3) Si el id es el mismo que el último aceptado, no hacer nada
+            // Si coincide con el último aceptado, no hay cambio
             if (ejercicioActivoId === ultimoEjercicioRecibido) {
                 return;
             }
 
-            // 4) Estabilización del nuevo id
+            // Estabilidad: contar cuántas veces consecutivas llega el mismo id
             if (candidatoId === ejercicioActivoId) {
                 pollsMismoId += 1;
             } else {
                 candidatoId = ejercicioActivoId;
                 pollsMismoId = 1;
             }
-            console.log(`🔍 Visto nuevo id ${candidatoId} (${pollsMismoId} veces seguidas)`);
+            console.log(`Visto nuevo id candidato ${candidatoId} (${pollsMismoId} veces seguidas).`);
 
             if (pollsMismoId < REQUIRED_STABLE_POLLS) {
                 return;
             }
 
-            // 5) Intervalo mínimo entre cambios reales de ejercicio
+            // Intervalo mínimo entre cambios reales de ejercicio
             if (ultimoEjercicioRecibido !== null &&
                 (now - lastChangeTime) < MIN_CHANGE_INTERVAL) {
-                console.log("Cambio ignorado por intervalo mínimo:", candidatoId);
+                console.log("Cambio ignorado por intervalo mínimo entre ejercicios:", candidatoId);
                 return;
             }
 
             if (candidatoId == null) {
-                console.log("❌ candidatoId es null, se ignora cambio");
+                console.log("candidatoId es null, se ignora cambio.");
                 return;
             }
 
             const index = ejercicios.findIndex(ej => ej.Id === candidatoId);
             if (index === -1) {
-                console.error(`❌ Ejercicio ${candidatoId} no encontrado en la lista`);
+                console.error(`Ejercicio con Id ${candidatoId} no encontrado en la lista local.`);
                 return;
             }
 
-            // Si el backend manda el mismo ejercicio que ya estoy mostrando, no recargo demo
+            // Si ya estamos mostrando ese índice, no recargamos
             if (index === currentExercise) {
-                console.log("🔁 Mismo ejercicio ya cargado, se ignora cambio.");
+                console.log("Ejercicio ya cargado, no se fuerza recarga de demo.");
                 return;
             }
 
-            // Si estamos grabando, solo bloqueamos saltar a ejercicios YA completados
+            // Si estamos grabando y se intenta saltar a ejercicio ya completado, se bloquea
             if (lockCambioEjercicio &&
                 mediaRecorder &&
                 mediaRecorder.state === 'recording' &&
                 ejerciciosCompletados.has(candidatoId)) {
-                console.log("🔒 Grabación en curso; se ignora cambio a ejercicio YA completado:", candidatoId);
+                console.log("Grabación en curso; se ignora salto a ejercicio ya completado:", candidatoId);
                 return;
             }
 
-            // Vamos a cambiar de ejercicio
+            // A partir de aquí se acepta el cambio
             cambioEnProceso = true;
             pollsMismoId = 0;
             lastChangeTime = now;
 
-            // Si ya había un ejercicio anterior y no está completado, cortar antes de cambiar
+            // Si había un ejercicio anterior sin completar y se está grabando, detén antes de cambiar
             if (ultimoEjercicioRecibido !== null &&
                 !ejerciciosCompletados.has(ultimoEjercicioRecibido) &&
                 mediaRecorder &&
                 mediaRecorder.state === 'recording') {
-                stopRecording();          // dispara uploadVideo()
+                stopRecording();
                 await new Promise(r => setTimeout(r, 500));
             }
 
+            // Primera activación de la sesión: ocultar overlay y botón de salir
             if (!isSessionActive) {
-                console.log("🎬 Iniciando sesión por primera vez...");
+                console.log("Sesión activada por primera vez.");
                 isSessionActive = true;
                 waitingOverlay.classList.add('d-none');
                 document.getElementById('exitButton').style.display = 'none';
             }
 
-            // Guardar id real que ha marcado el profesional
+            // Guardar id definitivo enviado por el profesional
             ultimoEjercicioRecibido = candidatoId;
             currentExerciseId = candidatoId;
 
-            console.log(`🎯 Cambiando a ejercicio con Id ${candidatoId}`);
+            console.log(`Cambiando a ejercicio con Id ${candidatoId}.`);
             await loadExercise(index);
             cambioEnProceso = false;
 
         } catch (e) {
-            console.warn("⚠️ Error en polling (posible navegación o red):", e);
+            console.warn("Error en polling de sesión (posible navegación o problema de red):", e);
             cambioEnProceso = false;
         }
-
     }
 
-    // LÓGICA DE EJERCICIOS
+    // Carga el ejercicio indicado y sincroniza vídeo demostrativo y grabación
     async function loadExercise(index) {
         if (index >= totalExercises) {
             endSession();
             return;
         }
 
-        console.log(`🎯 Cargando ejercicio ${index + 1}/${totalExercises}`);
+        console.log(`Cargando ejercicio ${index + 1} de ${totalExercises}.`);
         currentExercise = index;
 
         const ejercicio = ejercicios[index];
@@ -431,19 +430,19 @@ document.addEventListener("DOMContentLoaded", function() {
         // Id de EjercicioSesion asociado a este índice
         currentExerciseId = ejercicio.Id;
 
-        // Actualizar título inmediatamente
+        // Actualizar texto del encabezado de ejercicio
         ejercicioNombre.textContent = ejercicio.ejercicio.Nombre;
         ejercicioTipo.textContent = ejercicio.ejercicio.Tipo;
 
-        // Limpiar completamente el video anterior
-        console.log('🧹 Limpiando video anterior...');
+        // Limpiar completamente el vídeo anterior antes de cargar uno nuevo
+        console.log('Limpiando vídeo de demostración anterior.');
         demoVideo.pause();
         demoVideo.removeAttribute('src');
         demoVideo.load();
 
         await new Promise(resolve => setTimeout(resolve, 300));
 
-        // Determinar ruta del video
+        // Construir la ruta del archivo de vídeo según su nombre
         let videoSrc = ejercicio.ejercicio.Video;
         if (videoSrc.startsWith('ejercicio_')) {
             videoSrc = "/static/uploads/ejercicios/" + videoSrc;
@@ -451,11 +450,12 @@ document.addEventListener("DOMContentLoaded", function() {
             videoSrc = "/static/videos/" + videoSrc;
         }
 
-        console.log(`📹 Cargando nuevo video: ${videoSrc}`);
+        console.log(`Cargando nuevo vídeo de demostración: ${videoSrc}`);
 
         demoVideo.src = videoSrc;
         demoVideo.load();
 
+        // Esperar a que el vídeo esté listo (o timeout) y después iniciar grabación
         return new Promise((resolve) => {
             let timeoutId;
 
@@ -465,13 +465,13 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 try {
                     await demoVideo.play();
-                    console.log('✅ Video demo reproduciendo correctamente');
+                    console.log('Vídeo de demostración en reproducción.');
 
                     await new Promise(r => setTimeout(r, 1000));
                     startRecording();
                     resolve();
                 } catch (err) {
-                    console.error('❌ Error reproduciendo video:', err);
+                    console.error('Error al reproducir vídeo de demostración:', err);
                     startRecording();
                     resolve();
                 }
@@ -479,10 +479,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
             demoVideo.addEventListener('canplay', onCanPlay);
 
-            // Timeout de seguridad (5 segundos)
+            // Timeout de seguridad de 5 segundos para evitar bloqueo si canplay no se dispara
             timeoutId = setTimeout(() => {
                 demoVideo.removeEventListener('canplay', onCanPlay);
-                console.warn('⚠️ Timeout esperando video, forzando inicio');
+                console.warn('Timeout esperando al vídeo; se fuerza inicio de reproducción y grabación.');
                 demoVideo.play().catch(console.error);
                 startRecording();
                 resolve();
@@ -490,24 +490,25 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
+    // Inicia la grabación de la cámara del paciente
     function startRecording() {
         if (!cameraPreview.srcObject) {
-            console.warn("No hay stream de cámara disponible para grabar.");
+            console.warn("No hay flujo de cámara disponible para iniciar grabación.");
             return;
         }
 
-        // Si ya hay un mediaRecorder grabando, no iniciar otro
+        // Evitar iniciar más de una grabación a la vez
         if (mediaRecorder && mediaRecorder.state === 'recording') {
-            console.warn("Ya hay una grabación en curso, se ignora startRecording.");
+            console.warn("Ya hay una grabación en curso; se ignora startRecording.");
             return;
         }
 
         try {
             mediaRecorder = new MediaRecorder(cameraPreview.srcObject);
-            recordedChunks = [];        // limpiar buffer siempre
+            recordedChunks = [];        // limpiar buffer
             stopAlreadyCalled = false;  // reset para esta grabación
-            lockCambioEjercicio = true; // bloquear retrocesos a ejerc. completados
-            onStopHandled = false;      // NUEVO: reset del flag de onstop
+            lockCambioEjercicio = true; // bloquear cambios a ejercicios completados durante la grabación
+            onStopHandled = false;      // reset del flag de onstop
 
             mediaRecorder.ondataavailable = (event) => {
                 if (event.data.size > 0) {
@@ -515,10 +516,10 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             };
 
-            // NUEVO: envolvemos uploadVideo para que solo se ejecute una vez
+            // onstop se asegura de invocar uploadVideo solo una vez
             mediaRecorder.onstop = () => {
                 if (onStopHandled) {
-                    console.warn("onstop ya se procesó, se ignora.");
+                    console.warn("Evento onstop ya procesado anteriormente; se ignora.");
                     return;
                 }
                 onStopHandled = true;
@@ -532,17 +533,18 @@ document.addEventListener("DOMContentLoaded", function() {
             startTime = Date.now();
             timerInterval = setInterval(updateTimer, 1000);
         } catch (err) {
-            console.error("Error al iniciar grabación:", err);
+            console.error("Error al iniciar la grabación de vídeo:", err);
             lockCambioEjercicio = false;
         }
     }
 
+    // Detiene la grabación (si está activa) y actualiza estado visual
     function stopRecording() {
         if (!mediaRecorder) return;
 
-        // Evitar múltiples stop() por la misma grabación
+        // Evitar llamadas múltiples a stop() para la misma grabación
         if (stopAlreadyCalled) {
-            console.warn("stopRecording ya fue llamado para esta grabación, se ignora.");
+            console.warn("stopRecording ya fue llamado para esta grabación; se ignora.");
             return;
         }
         stopAlreadyCalled = true;
@@ -551,7 +553,8 @@ document.addEventListener("DOMContentLoaded", function() {
             mediaRecorder.stop();
         }
 
-        lockCambioEjercicio = false;  // permitir cambios cuando termina la grabación
+        // Al parar se permite de nuevo el cambio de ejercicio
+        lockCambioEjercicio = false;
 
         recordingStatus.classList.add('d-none');
         timerDisplay.classList.add('d-none');
@@ -559,6 +562,7 @@ document.addEventListener("DOMContentLoaded", function() {
         timer.textContent = "00:00";
     }
 
+    // Actualiza el contador de tiempo de grabación mostrado al paciente
     function updateTimer() {
         const elapsed = Math.floor((Date.now() - startTime) / 1000);
         const minutes = Math.floor(elapsed / 60).toString().padStart(2, '0');
@@ -566,35 +570,36 @@ document.addEventListener("DOMContentLoaded", function() {
         timer.textContent = `${minutes}:${seconds}`;
     }
 
+    // Sube el vídeo grabado al servidor para el ejercicio actual
     async function uploadVideo() {
         if (!recordedChunks || recordedChunks.length === 0) return;
         if (!currentExerciseId) {
-            console.warn("No hay currentExerciseId, no se sube vídeo.");
+            console.warn("No hay currentExerciseId; no se sube vídeo.");
             return;
         }
 
         const ejercicioSesionId = currentExerciseId;
 
-        // Si este ejercicio ya está marcado como completado, no subas nada
+        // No repetir subida si el ejercicio ya está marcado como completado
         if (ejerciciosCompletados.has(ejercicioSesionId)) {
-            console.warn("Ejercicio ya completado, se ignora uploadVideo:", ejercicioSesionId);
+            console.warn("Ejercicio ya completado; uploadVideo se omite para:", ejercicioSesionId);
             return;
         }
 
-        // Si ya se inició una subida para este ejercicio en esta sesión, no iniciar otra
+        // No iniciar más de una subida para el mismo ejercicio en esta sesión
         if (ejerciciosSubidosEnEstaSesion.has(ejercicioSesionId)) {
-            console.warn("Ya se inició una subida para este ejercicio en esta sesión, se ignora:", ejercicioSesionId);
+            console.warn("Ya se inició subida para este ejercicio en esta sesión; se omite:", ejercicioSesionId);
             return;
         }
         ejerciciosSubidosEnEstaSesion.add(ejercicioSesionId);
 
         if (isUploading) {
-            console.warn("Ya hay una subida en curso, se ignora esta llamada.");
+            console.warn("Ya hay una subida en curso; se ignora esta llamada.");
             return;
         }
         isUploading = true;
 
-        console.log("⏫ Subiendo vídeo de ejercicio", ejercicioSesionId);
+        console.log("Subiendo vídeo de ejercicio con Id:", ejercicioSesionId);
 
         const blob = new Blob(recordedChunks, { type: 'video/webm' });
         const formData = new FormData();
@@ -612,30 +617,31 @@ document.addEventListener("DOMContentLoaded", function() {
                     const data = await response.json();
                     msg = data.mensaje || '';
                 } catch (e) {}
-                console.log('Video aceptado por el servidor:', msg);
+                console.log('Vídeo aceptado por el servidor:', msg);
                 ejerciciosCompletados.add(ejercicioSesionId);
             } else {
                 const txt = await response.text();
-                console.warn('Error HTTP al subir video:', response.status, txt);
+                console.warn('Error HTTP al subir vídeo:', response.status, txt);
             }
         } catch (error) {
-            console.warn('⚠️ Error subiendo video (posible navegación o red):', error);
+            console.warn('Error subiendo vídeo (posible problema de red o navegación):', error);
         } finally {
             isUploading = false;
         }
     }
 
-
+    // Marca el final de la sesión y redirige tras una breve pausa
     function endSession() {
         isSessionActive = false;
-        ejercicioNombre.textContent = '¡Sesión completada!';
-        ejercicioTipo.textContent = 'Excelente trabajo';
+        ejercicioNombre.textContent = 'Sesión completada';
+        ejercicioTipo.textContent = 'Buen trabajo';
 
         setTimeout(() => {
             window.location.href = "{{ url_for('paciente.dashboard') }}";
         }, 3000);
     }
 
+    // Utilidad básica para mostrar mensajes (actualmente a consola)
     function showAlert(message) {
         console.log(message);
     }

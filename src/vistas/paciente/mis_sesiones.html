@@ -5,27 +5,27 @@
 {% block content %}
 <div class="container-fluid vh-100" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 2rem 0;">
     
-    <!-- Botón de regreso VERDE -->
+    <!-- Botón de regreso (mapeado al botón Y del mando) -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <a href="{{ url_for('paciente.dashboard') }}" class="btn btn-outline-light btn-lg snes-back-btn" id="btn-back">
             <span class="snes-letter">Y</span>
             <i class="bi bi-arrow-left me-2"></i>Volver al Inicio
         </a>
         
-        <!-- Estado del mando -->
+        <!-- Indicador de estado del mando -->
         <div class="text-white">
             <i class="bi bi-controller me-1"></i>
             <span class="badge bg-secondary" id="mando-status">Buscando mando...</span>
         </div>
     </div>
 
-    <!-- Header simple -->
+    <!-- Cabecera principal -->
     <div class="text-center mb-4">
         <h1 class="display-5 fw-bold text-white mb-3">
             <i class="bi bi-calendar-check me-2"></i>Mis Sesiones
         </h1>
         
-        <!-- Título del período auto-actualizable -->
+        <!-- Tarjeta con rango de fechas del periodo mostrado -->
         <div class="row justify-content-center mb-3">
             <div class="col-md-6">
                 <div class="card bg-white bg-opacity-90">
@@ -38,7 +38,7 @@
         </div>
     </div>
 
-    <!-- Calendario de 3 semanas auto-renovable -->
+    <!-- Calendario de sesiones para 3 semanas -->
     <div class="row justify-content-center">
         <div class="col-md-11">
             <div class="card bg-white bg-opacity-95">
@@ -46,7 +46,7 @@
                     <h5 class="mb-0"><i class="bi bi-calendar3 me-2"></i>Calendario de Sesiones</h5>
                 </div>
                 <div class="card-body p-0">
-                    <!-- Días de la semana header -->
+                    <!-- Cabecera con días de la semana -->
                     <div class="row g-0 border-bottom bg-light">
                         <div class="col text-center py-2 fw-bold">Lunes</div>
                         <div class="col text-center py-2 fw-bold">Martes</div>
@@ -57,14 +57,14 @@
                         <div class="col text-center py-2 fw-bold">Domingo</div>
                     </div>
 
-                    <!-- Semanas del calendario -->
+                    <!-- Contenedor donde se inyectan las semanas del calendario -->
                     <div id="calendarWeeks">
                         <!-- Se llena dinámicamente con JavaScript -->
                     </div>
                 </div>
             </div>
 
-            <!-- Sesión seleccionada - CAMBIO A ROJO -->
+            <!-- Panel inferior con información de la sesión seleccionada -->
             <div class="card mt-3 bg-white bg-opacity-95" id="selectedSessionCard" style="display: none;">
                 <div class="card-header text-white" style="background: #dc3545 !important;">
                     <h5 class="mb-0"><i class="bi bi-play-circle me-2"></i>Sesión Lista para Iniciar</h5>
@@ -73,7 +73,7 @@
                     <div class="row align-items-center">
                         <div class="col-md-8">
                             <div id="selectedSessionInfo">
-                                <!-- Info de la sesión seleccionada -->
+                                <!-- Información detallada de la sesión seleccionada -->
                             </div>
                         </div>
                         <div class="col-md-4 text-end">
@@ -88,9 +88,9 @@
         </div>
     </div>
 
-    <!-- Instrucciones de navegación -->
+    <!-- Leyenda fija con controles del mando para esta pantalla -->
     <div class="navigation-help">
-        <strong>🎮 Navegación:</strong><br>
+        <strong>Navegación con mando:</strong><br>
         ← → : Mover entre sesiones<br>
         ↑ ↓ : Bajar/Subir en la pantalla<br>
         A : Iniciar sesión<br>
@@ -99,6 +99,7 @@
 </div>
 
 <style>
+/* Botón de volver tipo botón Y del mando */
 .snes-back-btn {
     position: relative;
     border: 3px solid rgba(255,255,255,0.8);
@@ -111,6 +112,7 @@
     color: white;
 }
 
+/* Circulito con letra Y en el botón de volver */
 .snes-letter {
     position: absolute;
     top: -5px;
@@ -127,6 +129,7 @@
     justify-content: center;
 }
 
+/* Circulito con letra A en el botón de iniciar sesión */
 .snes-letter-action {
     position: absolute;
     top: -5px;
@@ -143,6 +146,7 @@
     justify-content: center;
 }
 
+/* Celda de día del calendario */
 .calendar-day {
     min-height: 120px;
     border: 1px solid #dee2e6;
@@ -156,6 +160,7 @@
     background-color: rgba(0,123,255,0.1);
 }
 
+/* Número de día en la esquina superior */
 .day-number {
     position: absolute;
     top: 5px;
@@ -165,11 +170,13 @@
     font-size: 1rem;
 }
 
+/* Contenedor de sesiones de un día */
 .day-sessions {
     margin-top: 25px;
     padding: 5px;
 }
 
+/* Tarjeta individual de sesión dentro del día */
 .session-item {
     background: linear-gradient(145deg, #007bff, #0056b3);
     color: white;
@@ -187,7 +194,7 @@
     border-color: rgba(255,255,255,0.8);
 }
 
-/* SESIÓN SELECCIONADA EN ROJO - FORZADO */
+/* Sesión seleccionada visualmente en rojo (coincide con panel inferior) */
 .session-item.selected {
     background: #dc3545 !important;
     border-color: white !important;
@@ -205,7 +212,7 @@
     }
 }
 
-/* Navegación mejorada */
+/* Resaltado específico cuando se navega con el mando */
 .session-item.mando-highlighted {
     border-color: #ffc107 !important;
     border-width: 3px !important;
@@ -217,7 +224,7 @@
     50% { transform: scale(1.05); }
 }
 
-/* Instrucciones de navegación */
+/* Caja fija con instrucciones de navegación */
 .navigation-help {
     position: fixed;
     bottom: 20px;
@@ -249,10 +256,10 @@ document.addEventListener('DOMContentLoaded', function() {
     let gamepadIndex = null;
     let lastButtonStates = { Y: false, A: false, left: false, right: false, up: false, down: false };
     
-    // Datos de sesiones desde el servidor
+    // Sesiones programadas inyectadas desde el backend
     const sesiones = {{ sesiones|tojson }};
     
-    // Convertir Fecha_Programada manualmente (evita cambios de zona horaria)
+    // Normaliza Fecha_Programada a objetos Date sin cambios de zona horaria
     sesiones.forEach(sesion => {
         if (sesion.Fecha_Programada) {
             const [fecha, hora] = sesion.Fecha_Programada.split('T');
@@ -269,11 +276,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    // Actualiza el badge de estado del mando
     function setMandoStatus(text, klass) {
         mandoStatus.className = 'badge ' + klass;
         mandoStatus.innerHTML = `<i class="bi bi-controller me-1"></i>${text}`;
     }
     
+    // Devuelve el lunes de la semana de la fecha dada
     function getMonday(date) {
         const d = new Date(date);
         const day = d.getDay();
@@ -281,6 +290,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return new Date(d.setDate(diff));
     }
     
+    // Obtiene la fecha de inicio del periodo mostrado (hoy o siguiente lunes)
     function getStartDate() {
         const today = new Date();
         const currentDay = today.getDay();
@@ -294,6 +304,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+    // Construye el array de sesiones navegables (solo estados pendientes)
     function updateAvailableSessions() {
         availableSessions = [];
         document.querySelectorAll('.session-item').forEach((item) => {
@@ -304,11 +315,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
         });
-        console.log(`Found ${availableSessions.length} available sessions`);
+        console.log(`Sesiones disponibles para navegación con mando: ${availableSessions.length}`);
     }
     
+    // Marca visualmente una sesión según índice (para navegación con mando)
     function highlightSession(index) {
-        // Limpiar destacado previo
         document.querySelectorAll('.session-item').forEach(item => {
             item.classList.remove('mando-highlighted');
         });
@@ -318,11 +329,12 @@ document.addEventListener('DOMContentLoaded', function() {
             sessionData.element.classList.add('mando-highlighted');
             sessionData.element.scrollIntoView({ behavior: 'smooth', block: 'center' });
             
-            // Auto-seleccionar sesión
+            // Selecciona sesión al mover el foco con mando
             selectSession(sessionData.sesionId);
         }
     }
     
+    // Dibuja las 3 semanas de calendario y vincula sesiones
     function renderCalendar() {
         const startDate = getStartDate();
         const endDate = new Date(startDate);
@@ -374,14 +386,14 @@ document.addEventListener('DOMContentLoaded', function() {
         
         calendarWeeks.innerHTML = html;
         
-        // Event listeners a sesiones
+        // Asociación de clic a cada sesión
         document.querySelectorAll('.session-item').forEach(item => {
             item.addEventListener('click', function() {
                 selectSession(this.dataset.sesionId);
             });
         });
         
-        // Actualizar sesiones disponibles
+        // Construcción de la lista para navegación con mando
         setTimeout(() => {
             updateAvailableSessions();
             if (availableSessions.length > 0 && selectedSessionIndex === -1) {
@@ -391,25 +403,22 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 100);
     }
     
+    // Selecciona una sesión (clic o mando) y actualiza panel inferior
     function selectSession(sesionId) {
-        // Limpiar selección previa
         document.querySelectorAll('.session-item').forEach(item => {
             item.classList.remove('selected');
         });
         
-        // Buscar y seleccionar nueva sesión
         const sesion = sesiones.find(s => s.Id == sesionId);
         if (sesion && sesion.Estado === 'PENDIENTE') {
             selectedSession = sesion;
             
-            // Marcar como seleccionada - FORZAR ROJO
             const sessionElement = document.querySelector(`[data-sesion-id="${sesionId}"]`);
             if (sessionElement) {
                 sessionElement.classList.add('selected');
                 sessionElement.style.background = '#dc3545 !important';
             }
             
-            // Mostrar info de la sesión
             const fecha = sesion.fecha_obj.toLocaleDateString('es-ES', {
                 weekday: 'long',
                 year: 'numeric',
@@ -434,20 +443,21 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Gamepad API
+    // Gamepad API: conexión y estado visual
     window.addEventListener('gamepadconnected', (e) => {
         gamepadIndex = e.gamepad.index;
-        console.log('🎮 Mando conectado (mis_sesiones):', e.gamepad.id);
+        console.log('Mando conectado (mis_sesiones):', e.gamepad.id);
         setMandoStatus('Mando Conectado', 'bg-success');
         requestAnimationFrame(pollGamepad);
     });
 
     window.addEventListener('gamepaddisconnected', () => {
-        console.log('🎮 Mando desconectado (mis_sesiones)');
+        console.log('Mando desconectado (mis_sesiones)');
         gamepadIndex = null;
         setMandoStatus('Mando Desconectado', 'bg-danger');
     });
 
+    // Bucle de lectura del mando para navegación en esta pantalla
     function pollGamepad() {
         if (gamepadIndex === null) return;
 
@@ -458,7 +468,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Mapping estándar: 0=X, 1=A, 2=B, 3=Y
+        // Mapping adaptado: 0=X, 1=A, 2=B, 3=Y
         const btnA = gp.buttons[1]?.pressed || false;
         const btnY = gp.buttons[3]?.pressed || false;
 
@@ -472,12 +482,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const states = { Y: btnY, A: btnA, left, right, up, down };
 
-        // Botón Y - Volver
+        // Y: volver a la pantalla principal del paciente
         if (states.Y && !lastButtonStates.Y) {
             backBtn.click();
         }
         
-        // Botón A - Iniciar sesión seleccionada
+        // A: iniciar sesión actualmente seleccionada (si existe)
         if (states.A && !lastButtonStates.A && selectedSession) {
             startSessionBtn.classList.add('mando-selected');
             setTimeout(() => {
@@ -485,7 +495,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 300);
         }
         
-        // NAVEGACIÓN: ← → entre sesiones
+        // Navegación lateral entre sesiones (si hay varias)
         if (states.left && !lastButtonStates.left) {
             if (selectedSessionIndex > 0) {
                 selectedSessionIndex--;
@@ -500,7 +510,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
-        // SCROLL CON ↑ ↓
+        // Scroll vertical con cruceta o stick
         if (states.up && !lastButtonStates.up) {
             window.scrollBy(0, -200);
         }
@@ -513,10 +523,10 @@ document.addEventListener('DOMContentLoaded', function() {
         requestAnimationFrame(pollGamepad);
     }
     
-    // Inicializar
+    // Render inicial del calendario
     renderCalendar();
     
-    // Auto-renovar cada lunes
+    // Configura auto-renovación del calendario cada lunes
     const now = new Date();
     const nextMonday = new Date(now);
     nextMonday.setDate(now.getDate() + (8 - now.getDay()) % 7);

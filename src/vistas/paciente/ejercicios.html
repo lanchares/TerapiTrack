@@ -5,7 +5,7 @@
 {% block content %}
 <div class="container-fluid vh-100" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 2rem 0;">
     
-    <!-- Botón de regreso VERDE -->
+    <!-- Botón de regreso VERDE (ligado al botón Y del mando) -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <a href="{{ url_for('paciente.dashboard') }}" class="btn btn-outline-light btn-lg snes-back-btn" id="btn-back">
             <span class="snes-letter">Y</span>
@@ -13,6 +13,7 @@
         </a>
     </div>
 
+    <!-- Cabecera de la sección de ejercicios -->
     <div class="text-center mb-4">
         <h1 class="display-5 fw-bold text-white mb-3">
             <i class="bi bi-play-circle me-2"></i>Mis Ejercicios
@@ -20,7 +21,7 @@
         <p class="text-white-50">Usa ← → para navegar y A para ver el video</p>
     </div>
 
-    <!-- Grid de ejercicios NAVEGABLE -->
+    <!-- Grid de ejercicios navegable con mando -->
     <div class="row justify-content-center">
         <div class="col-md-10">
             {% if ejercicios %}
@@ -29,7 +30,7 @@
                     <div class="col-md-6 col-lg-4 exercise-card-wrapper" data-index="{{ loop.index0 }}">
                         <div class="card h-100 exercise-card" data-ejercicio-id="{{ ejercicio_data.ejercicio.Id }}">
                             <div class="card-body d-flex flex-column">
-                                <!-- Video SIN reproducción automática -->
+                                <!-- Video SIN reproducción automática (solo vista previa) -->
                                 <div class="mb-3 position-relative video-container">
                                     <video class="w-100 rounded exercise-video" 
                                            style="height: 200px; object-fit: cover;" 
@@ -38,7 +39,7 @@
                                            data-video-src="{{ ejercicio_data.video_path }}">
                                         <source src="{{ ejercicio_data.video_path }}" type="video/mp4">
                                     </video>
-                                    <!-- Overlay de play visible -->
+                                    <!-- Overlay con icono de play siempre visible -->
                                     <div class="position-absolute top-50 start-50 translate-middle play-overlay">
                                         <div class="play-icon">
                                             <i class="bi bi-play-circle-fill fs-1 text-white"></i>
@@ -86,17 +87,17 @@
         </div>
     </div>
 
-    <!-- Modal para ejercicio grande -->
+    <!-- Modal de detalle del ejercicio (video grande + descripción) -->
     <div id="ejercicio-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.9); z-index:2000; align-items:center; justify-content:center;">
         <div id="ejercicio-contenido" style="background:#fff; padding:2rem; border-radius:1rem; max-width:90vw; max-height:90vh; overflow:auto; position:relative;">
-            <!-- Contenido se inserta dinámicamente -->
+            <!-- Contenido se inserta dinámicamente vía JS -->
         </div>
         <div style="position:absolute; top:2rem; right:3rem; color:#fff; font-size:1.5rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">
             Pulsa <strong style="color:#00ff00;">Y</strong> para volver
         </div>
     </div>
 
-    <!-- Instrucciones de navegación -->
+    <!-- Leyenda fija con controles del mando -->
     <div class="navigation-help">
         <strong>🎮 Navegación:</strong><br>
         ← → : Mover entre ejercicios<br>
@@ -107,7 +108,7 @@
 </div>
 
 <style>
-/* Botón verde como el mando */
+/* Botón verde tipo botón Y del mando */
 .snes-back-btn {
     position: relative;
     border: 3px solid rgba(255,255,255,0.8);
@@ -120,6 +121,7 @@
     color: white;
 }
 
+/* Circulito con la letra Y en el botón de volver */
 .snes-letter {
     position: absolute;
     top: -5px;
@@ -136,7 +138,7 @@
     justify-content: center;
 }
 
-/* Tarjetas de ejercicios navegables */
+/* Tarjetas de ejercicios navegables (teclado/mando) */
 .exercise-card {
     transition: all 0.3s ease;
     cursor: pointer;
@@ -148,6 +150,7 @@
     box-shadow: 0 8px 25px rgba(0,0,0,0.2);
 }
 
+/* Estado cuando la tarjeta está seleccionada por el mando */
 .exercise-card-wrapper.mando-selected .exercise-card {
     border-color: #ffc107;
     box-shadow: 0 0 30px rgba(255,193,7,0.8);
@@ -160,7 +163,7 @@
     50% { box-shadow: 0 0 40px rgba(255,193,7,1); }
 }
 
-/* Video container */
+/* Contenedor del vídeo de previsualización */
 .video-container {
     overflow: hidden;
     border-radius: 8px;
@@ -168,10 +171,12 @@
     position: relative;
 }
 
+/* Capa con icono de play encima del vídeo */
 .play-overlay {
     text-shadow: 0 0 10px rgba(0,0,0,0.8);
 }
 
+/* Animación de foco en el icono de play si está seleccionada por mando */
 .exercise-card-wrapper.mando-selected .play-overlay .play-icon {
     animation: playPulse 1s infinite;
 }
@@ -181,7 +186,7 @@
     50% { transform: scale(1.2); }
 }
 
-/* Modal styling */
+/* Modal a pantalla casi completa */
 #ejercicio-modal {
     display: none;
 }
@@ -190,7 +195,7 @@
     display: flex !important;
 }
 
-/* Instrucciones de navegación */
+/* Caja flotante con ayuda de navegación del mando */
 .navigation-help {
     position: fixed;
     bottom: 20px;
@@ -220,6 +225,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log(`Found ${exerciseWrappers.length} exercises for navigation`);
     
+    // Marca visualmente qué ejercicio está seleccionado
     function highlightExercise(index) {
         // Limpiar selección previa
         exerciseWrappers.forEach((wrapper) => {
@@ -231,7 +237,7 @@ document.addEventListener('DOMContentLoaded', function() {
             selectedWrapper.classList.add('mando-selected');
             selectedWrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
             
-            // Actualizar ejercicio actual
+            // Actualizar datos del ejercicio actual a partir de la tarjeta
             const ejercicioId = selectedWrapper.querySelector('.exercise-card').dataset.ejercicioId;
             currentEjercicio = {
                 Id: ejercicioId,
@@ -245,6 +251,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+    // Construye y muestra el modal con el vídeo en grande
     function mostrarEjercicioGrande() {
         if (!currentEjercicio) return;
         
@@ -269,21 +276,21 @@ document.addEventListener('DOMContentLoaded', function() {
         modal.style.display = 'flex';
     }
 
+    // Cierra el modal y detiene el vídeo interno
     function cerrarEjercicioGrande() {
         modal.classList.remove('show');
         modal.style.display = 'none';
         
-        // Pausar video si está reproduciéndose
         const video = modalContent.querySelector('video');
         if (video) {
             video.pause();
         }
     }
     
-    // Hacer función global para el botón de cerrar
+    // Función global para el botón "×" del modal
     window.cerrarEjercicioGrande = cerrarEjercicioGrande;
     
-    // Click en tarjetas para seleccionar
+    // Click con ratón/táctil: seleccionar tarjeta
     exerciseWrappers.forEach((wrapper, index) => {
         wrapper.addEventListener('click', function() {
             selectedExerciseIndex = index;
@@ -291,7 +298,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Gamepad API
+    // ---- Gamepad API para navegación en esta pantalla ----
     window.addEventListener('gamepadconnected', (e) => {
         gamepadIndex = e.gamepad.index;
         console.log('🎮 Mando conectado (ejercicios):', e.gamepad.id);
@@ -313,11 +320,11 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Mapping estándar: 0=X, 1=A, 2=B, 3=Y
+        // Mapping adaptado: 0=X, 1=A, 2=B, 3=Y
         const btnX = gp.buttons[0]?.pressed || false;
-        const btnA = gp.buttons[1]?.pressed || false; // no usado aquí
+        const btnA = gp.buttons[1]?.pressed || false; // botón A del mando
         const btnB = gp.buttons[2]?.pressed || false; // no usado aquí
-        const btnY = gp.buttons[3]?.pressed || false;
+        const btnY = gp.buttons[3]?.pressed || false; // botón Y para volver
 
         const axisX = gp.axes[0] || 0;
         const axisY = gp.axes[1] || 0;
@@ -329,7 +336,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const states = { Y: btnY, A: btnA, left, right, up, down };
 
-        // Botón Y - Volver (funciona siempre)
+        // Y: volver (si modal abierto, cierra; si no, vuelve a dashboard)
         if (states.Y && !lastButtonStates.Y) {
             if (modal.classList.contains('show')) {
                 cerrarEjercicioGrande();
@@ -338,13 +345,13 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        // Botón A - Mostrar ejercicio en grande (solo si no está el modal abierto)
+        // A: abrir detalle del ejercicio seleccionado (solo si modal cerrado)
         if (states.A && !lastButtonStates.A && !modal.classList.contains('show')) {
             mostrarEjercicioGrande();
         }
 
         if (!modal.classList.contains('show')) {
-            // NAVEGACIÓN ← → entre ejercicios
+            // Navegación lateral entre tarjetas ← →
             if (states.left && !lastButtonStates.left) {
                 if (selectedExerciseIndex > 0) {
                     selectedExerciseIndex--;
@@ -359,7 +366,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
             
-            // SCROLL CON ↑ ↓
+            // Scroll global de la página con ↑ ↓
             if (states.up && !lastButtonStates.up) {
                 window.scrollBy(0, -200);
             }
@@ -367,7 +374,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 window.scrollBy(0, 200);
             }
         } else {
-            // Cuando el modal está abierto, usar ↑ ↓ para desplazar dentro del modal
+            // Con el modal abierto, ↑ ↓ desplazan el contenido del modal
             if (states.up && !lastButtonStates.up) {
                 modalContent.scrollBy(0, -150);
             }
@@ -380,7 +387,7 @@ document.addEventListener('DOMContentLoaded', function() {
         requestAnimationFrame(pollGamepad);
     }
     
-    // Inicializar selección
+    // Selección inicial del primer ejercicio (si existe)
     if (exerciseWrappers.length > 0) {
         highlightExercise(selectedExerciseIndex);
     }
