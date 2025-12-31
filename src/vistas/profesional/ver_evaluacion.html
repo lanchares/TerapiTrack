@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2><i class="bi bi-clipboard-check me-2"></i>Evaluación Registrada</h2>
+    <h2><i class="bi bi-clipboard-check me-2"></i>Evaluación registrada</h2>
     <a href="{{ url_for('profesional.evaluar_sesion', sesion_id=ejercicio_sesion.Sesion_Id) }}" 
        class="btn btn-secondary">
         <i class="bi bi-arrow-left me-1"></i>Volver a la sesión
@@ -18,24 +18,29 @@
     </div>
     <div class="card-body">
         <div class="row">
-            <!-- Video del paciente -->
+            <!-- Vídeo del paciente -->
             <div class="col-md-6 mb-4">
-                <h5>Video del paciente:</h5>
+                <h5>Vídeo del paciente</h5>
                 {% if video_respuesta %}
                 <video controls class="w-100 rounded" style="max-height: 300px;">
                     <source src="{{ video_respuesta.Ruta_Almacenamiento }}" type="video/webm">
                     Tu navegador no soporta videos.
                 </video>
+                {% else %}
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle me-1"></i>
+                    No hay vídeo asociado a esta evaluación.
+                </div>
                 {% endif %}
             </div>
             
-            <!-- Evaluación -->
+            <!-- Detalle de la evaluación -->
             <div class="col-md-6 mb-4">
-                <h5>Evaluación:</h5>
+                <h5>Evaluación</h5>
                 <div class="card bg-light">
                     <div class="card-body">
                         <div class="mb-3">
-                            <h6>Puntuación:</h6>
+                            <h6>Puntuación</h6>
                             <div class="d-flex align-items-center">
                                 <div class="me-3">
                                     {% for i in range(1, 6) %}
@@ -51,7 +56,7 @@
                         </div>
                         
                         <div class="mb-3">
-                            <h6>Comentarios:</h6>
+                            <h6>Comentarios</h6>
                             <div class="bg-white p-3 rounded border">
                                 {{ evaluacion.Comentarios or 'Sin comentarios adicionales' }}
                             </div>

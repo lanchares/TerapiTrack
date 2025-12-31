@@ -6,17 +6,18 @@
 <div class="card shadow mb-4">
     <div class="card-header py-3">
         <h6 class="m-0 fw-bold text-primary">
-            <i class="bi bi-plus-circle me-1"></i>Crear Nueva Sesión
+            <i class="bi bi-plus-circle me-1"></i>Crear nueva sesión
         </h6>
     </div>
     <div class="card-body">
         <form method="POST">
             {{ form.hidden_tag() }}
             
-            <!-- Selección de paciente -->
+            <!-- Bloque: selección de paciente y fecha -->
             <div class="mb-4">
-                <h5 class="fw-bold mb-3">Asignar a Paciente</h5>
+                <h5 class="fw-bold mb-3">Asignar a paciente</h5>
                 <div class="row">
+                    <!-- Selector de paciente -->
                     <div class="col-md-6">
                         {{ form.paciente_id.label(class="form-label") }}
                         {{ form.paciente_id(class="form-select") }}
@@ -28,9 +29,10 @@
                         </div>
                         {% endif %}
                     </div>
+                    <!-- Fecha y hora programada -->
                     <div class="col-md-6">
                         {{ form.fecha_programada.label(class="form-label") }}
-                        {{ form.fecha_programada(class="form-control", type="datetime-local") }}
+                        {{ form.fecha_programada(class="form-control", type="datetime-local", id="fecha_programada") }}
                         {% if form.fecha_programada.errors %}
                         <div class="text-danger">
                             {% for error in form.fecha_programada.errors %}
@@ -42,11 +44,11 @@
                 </div>
             </div>
 
-            <!-- Selección de ejercicios -->
+            <!-- Bloque: selección de ejercicios para la sesión -->
             {% if form.ejercicios.choices %}
             <div class="mb-4">
-                <h5 class="fw-bold mb-3">Seleccionar Ejercicios</h5>
-                <p class="text-muted">Selecciona los ejercicios que formarán parte de esta sesión:</p>
+                <h5 class="fw-bold mb-3">Seleccionar ejercicios</h5>
+                <p class="text-muted">Elige los ejercicios que formarán parte de esta sesión.</p>
                 
                 <div style="max-height: 260px; overflow-y: auto; border: 1px solid #ced4da; border-radius: .375rem; padding: .75rem;">
                     <div class="row">
@@ -54,8 +56,8 @@
                         <div class="col-md-6 mb-2">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" 
-                                    name="ejercicios" value="{{ valor }}" 
-                                    id="ejercicio_{{ valor }}">
+                                       name="ejercicios" value="{{ valor }}" 
+                                       id="ejercicio_{{ valor }}">
                                 <label class="form-check-label" for="ejercicio_{{ valor }}">
                                     {{ etiqueta }}
                                 </label>
@@ -74,12 +76,14 @@
                 {% endif %}
             </div>
             {% else %}
+            <!-- Mensaje cuando aún no hay ejercicios creados -->
             <div class="alert alert-warning">
                 <i class="bi bi-exclamation-triangle me-2"></i>
-                No hay ejercicios disponibles. <a href="{{ url_for('profesional.crear_ejercicio') }}">Crear un ejercicio</a> primero.
+                No hay ejercicios disponibles. Primero debes <a href="{{ url_for('profesional.crear_ejercicio') }}">crear un ejercicio</a>.
             </div>
             {% endif %}
             
+            <!-- Botón principal para guardar la sesión -->
             <div class="d-grid">
                 {{ form.submit(class="btn btn-success") }}
             </div>
@@ -87,31 +91,31 @@
     </div>
 </div>
 
-
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const fechaInput = document.getElementById('fecha_programada');
-    
-    // Establecer fecha mínima (hoy)
+    if (!fechaInput) return;
+
+    // Fecha mínima permitida: momento actual
     const now = new Date();
     const year = now.getFullYear();
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const day = String(now.getDate()).padStart(2, '0');
     const hours = String(now.getHours()).padStart(2, '0');
     const minutes = String(now.getMinutes()).padStart(2, '0');
-    
+
     const minDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
     fechaInput.min = minDateTime;
-    
-    // Establecer valor por defecto (mañana a las 10:00)
+
+    // Valor por defecto: mañana a las 10:00
     const tomorrow = new Date(now);
     tomorrow.setDate(tomorrow.getDate() + 1);
     tomorrow.setHours(10, 0, 0, 0);
-    
+
     const tomorrowYear = tomorrow.getFullYear();
     const tomorrowMonth = String(tomorrow.getMonth() + 1).padStart(2, '0');
     const tomorrowDay = String(tomorrow.getDate()).padStart(2, '0');
-    
+
     fechaInput.value = `${tomorrowYear}-${tomorrowMonth}-${tomorrowDay}T10:00`;
 });
 </script>

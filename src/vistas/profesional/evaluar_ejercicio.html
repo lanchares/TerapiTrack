@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2><i class="bi bi-star-fill me-2"></i>Evaluar Ejercicio</h2>
+    <h2><i class="bi bi-star-fill me-2"></i>Evaluar ejercicio</h2>
     <a href="{{ url_for('profesional.evaluar_sesion', sesion_id=ejercicio_sesion.Sesion_Id) }}" 
        class="btn btn-secondary">
         <i class="bi bi-arrow-left me-1"></i>Volver a la sesión
@@ -17,18 +17,18 @@
     </div>
     <div class="card-body">
         <div class="row">
-            <!-- Video demostrativo -->
+            <!-- Vídeo demostrativo del ejercicio -->
             <div class="col-md-6 mb-4">
-                <h5>Video demostrativo:</h5>
+                <h5>Vídeo demostrativo</h5>
                 <video controls class="w-100 rounded" style="max-height: 300px;">
                     {% if ejercicio_sesion.ejercicio.Video.startswith('http') %}
-                        <!-- Vídeo en URL (Cloudinary u otro) -->
+                        <!-- Vídeo en URL externa -->
                         <source src="{{ ejercicio_sesion.ejercicio.Video }}" type="video/mp4">
                     {% elif ejercicio_sesion.ejercicio.Video.startswith('ejercicio_') %}
-                        <!-- Vídeo subido por profesional -->
+                        <!-- Vídeo subido por el profesional -->
                         <source src="{{ url_for('static', filename='uploads/ejercicios/' + ejercicio_sesion.ejercicio.Video) }}" type="video/mp4">
                     {% else %}
-                        <!-- Vídeo base del sistema -->
+                        <!-- Vídeo base incluido en la aplicación -->
                         <source src="{{ url_for('static', filename='videos/' + ejercicio_sesion.ejercicio.Video) }}" type="video/mp4">
                     {% endif %}
                     Tu navegador no soporta videos.
@@ -36,9 +36,9 @@
                 <p class="mt-2 small text-muted">{{ ejercicio_sesion.ejercicio.Descripcion }}</p>
             </div>
 
-            <!-- Video del paciente -->
+            <!-- Vídeo grabado por el paciente -->
             <div class="col-md-6 mb-4">
-                <h5>Video del paciente:</h5>
+                <h5>Vídeo del paciente</h5>
                 {% if video_respuesta %}
                 <video controls class="w-100 rounded" style="max-height: 300px;">
                     <source src="{{ video_respuesta.Ruta_Almacenamiento }}" type="video/webm">
@@ -51,7 +51,7 @@
                 <div class="alert alert-warning d-flex align-items-center">
                     <i class="bi bi-exclamation-triangle-fill me-2"></i>
                     <div>
-                        <strong>No hay video disponible</strong>
+                        <strong>No hay vídeo disponible</strong>
                         <p class="mb-0">Este ejercicio no fue grabado durante la sesión.</p>
                     </div>
                 </div>
@@ -59,7 +59,7 @@
             </div>
         </div>
        
-        <!-- Formulario de evaluación solo si hay video -->
+        <!-- Formulario de evaluación solo cuando existe un vídeo de respuesta -->
         {% if video_respuesta %}
         <div class="card border-0 shadow-sm">
             <div class="card-body">
@@ -71,9 +71,9 @@
                             <i class="bi bi-star-fill text-warning me-2"></i>Evaluación del ejercicio
                         </h5>
                        
-                        <!-- ✅ PUNTUACIÓN BONITA con estrellas -->
+                        <!-- Puntuación mediante estrellas -->
                         <div class="mb-4">
-                            <label class="form-label fw-bold mb-3">Puntuación del ejercicio:</label>
+                            <label class="form-label fw-bold mb-3">Puntuación del ejercicio</label>
                             <div class="rating-container">
                                 {% for i in range(1, 6) %}
                                 <div class="rating-item">
@@ -106,7 +106,7 @@
                             {% endif %}
                         </div>
                        
-                        <!-- Comentarios -->
+                        <!-- Comentarios cualitativos del profesional -->
                         <div class="mb-3">
                             {{ form.comentarios.label(class="form-label fw-bold") }}
                             {{ form.comentarios(class="form-control", rows=4, placeholder="Añade comentarios sobre la ejecución del ejercicio...") }}
@@ -122,16 +122,17 @@
                    
                     <div class="d-grid">
                         <button type="submit" class="btn btn-success btn-lg">
-                            <i class="bi bi-check-circle me-1"></i>Guardar Evaluación
+                            <i class="bi bi-check-circle me-1"></i>Guardar evaluación
                         </button>
                     </div>
                 </form>
             </div>
         </div>
         {% else %}
+        <!-- Mensaje cuando no hay vídeo y no se puede evaluar -->
         <div class="alert alert-info text-center">
             <h5><i class="bi bi-info-circle me-2"></i>No se puede evaluar</h5>
-            <p class="mb-0">No hay video grabado para este ejercicio, por lo que no se puede realizar una evaluación.</p>
+            <p class="mb-0">No hay vídeo grabado para este ejercicio, por lo que no es posible realizar una evaluación.</p>
             <a href="{{ url_for('profesional.evaluar_sesion', sesion_id=ejercicio_sesion.Sesion_Id) }}"
                class="btn btn-primary mt-3">
                 <i class="bi bi-arrow-left me-1"></i>Volver a la sesión
@@ -141,8 +142,7 @@
     </div>
 </div>
 
-
-<!-- ✅ ESTILOS CSS PARA PUNTUACIÓN BONITA -->
+<!-- Estilos para el selector de puntuación con estrellas -->
 <style>
 .rating-container {
     display: flex;
@@ -151,16 +151,13 @@
     flex-wrap: wrap;
 }
 
-
 .rating-item {
     position: relative;
 }
 
-
 .rating-input {
     display: none;
 }
-
 
 .rating-label {
     cursor: pointer;
@@ -174,13 +171,11 @@
     min-width: 80px;
 }
 
-
 .rating-label:hover {
     border-color: #ffc107;
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
-
 
 .rating-input:checked + .rating-label {
     border-color: #ffc107;
@@ -188,23 +183,19 @@
     transform: scale(1.05);
 }
 
-
 .rating-star {
     font-size: 1.5rem;
     color: #6c757d;
     margin-bottom: 5px;
 }
 
-
 .rating-input:checked + .rating-label .rating-star {
     color: #ffc107;
 }
 
-
 .rating-input:hover + .rating-label .rating-star {
     color: #ffc107;
 }
-
 
 .rating-text {
     font-weight: bold;
@@ -212,12 +203,10 @@
     margin-bottom: 3px;
 }
 
-
 .rating-description {
     font-size: 0.8rem;
     color: #6c757d;
 }
-
 
 .rating-input:checked + .rating-label .rating-description {
     color: #856404;

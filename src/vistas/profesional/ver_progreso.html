@@ -11,10 +11,11 @@
 </div>
 
 <div class="row">
+    <!-- Información básica del paciente -->
     <div class="col-md-4 mb-4">
         <div class="card shadow">
             <div class="card-header py-3">
-                <h6 class="m-0 fw-bold text-primary">Información del Paciente</h6>
+                <h6 class="m-0 fw-bold text-primary">Información del paciente</h6>
             </div>
             <div class="card-body">
                 <p><strong>Nombre:</strong> {{ paciente.usuario.Nombre }} {{ paciente.usuario.Apellidos }}</p>
@@ -25,10 +26,11 @@
         </div>
     </div>
     
+    <!-- Gráfico de evolución de puntuaciones -->
     <div class="col-md-8 mb-4">
         <div class="card shadow">
             <div class="card-header py-3">
-                <h6 class="m-0 fw-bold text-primary">Gráfica de Progreso</h6>
+                <h6 class="m-0 fw-bold text-primary">Gráfica de progreso</h6>
             </div>
             <div class="card-body">
                 {% if evaluaciones %}
@@ -37,7 +39,7 @@
                 <div class="text-center py-4">
                     <i class="bi bi-graph-up fs-1 text-muted"></i>
                     <h5 class="mt-3">Sin datos para mostrar</h5>
-                    <p>No hay evaluaciones suficientes para generar gráficas</p>
+                    <p>No hay evaluaciones suficientes para generar gráficas.</p>
                 </div>
                 {% endif %}
             </div>
@@ -45,9 +47,10 @@
     </div>
 </div>
 
+<!-- Historial tabla de evaluaciones individuales -->
 <div class="card shadow">
     <div class="card-header py-3">
-        <h6 class="m-0 fw-bold text-primary">Historial de Evaluaciones</h6>
+        <h6 class="m-0 fw-bold text-primary">Historial de evaluaciones</h6>
     </div>
     <div class="card-body">
         {% if evaluaciones %}
@@ -90,20 +93,19 @@
 {% if evaluaciones %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-// Preparar datos para la gráfica
+// Datos agregados por sesión para el gráfico de progreso
 const evalSesion = {{ evaluaciones_sesion_json|tojson }};
 const fechas = evalSesion.map(e => e.Fecha);
 const puntuaciones = evalSesion.map(e => e.Media_Puntuacion);
 
-
-// Crear gráfica
+// Configuración del gráfico de línea de puntuaciones
 const ctx = document.getElementById('progressChart').getContext('2d');
 new Chart(ctx, {
     type: 'line',
     data: {
         labels: fechas,
         datasets: [{
-            label: 'Puntuación',
+            label: 'Puntuación media',
             data: puntuaciones,
             borderColor: 'rgb(75, 192, 192)',
             backgroundColor: 'rgba(75, 192, 192, 0.2)',

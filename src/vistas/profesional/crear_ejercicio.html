@@ -4,17 +4,19 @@
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2><i class="bi bi-plus-circle me-2"></i>Crear Nuevo Ejercicio</h2>
+    <h2><i class="bi bi-plus-circle me-2"></i>Crear nuevo ejercicio</h2>
     <a href="{{ url_for('profesional.listar_ejercicios') }}" class="btn btn-secondary">
-        <i class="bi bi-arrow-left me-1"></i>Volver
+        <i class="bi bi-arrow-left me-1"></i>Volver al listado
     </a>
 </div>
 
 <div class="card shadow">
     <div class="card-body">
-        <form method="POST" enctype="multipart/form-data">  <!-- ✅ IMPORTANTE: multipart/form-data -->
+        <!-- Formulario para crear un ejercicio con subida de vídeo -->
+        <form method="POST" enctype="multipart/form-data">  <!-- multipart/form-data necesario para archivos -->
             {{ form.hidden_tag() }}
             
+            <!-- Nombre del ejercicio -->
             <div class="mb-3">
                 {{ form.nombre.label(class="form-label fw-bold") }}
                 {{ form.nombre(class="form-control") }}
@@ -23,6 +25,7 @@
                 {% endfor %}
             </div>
             
+            <!-- Descripción del ejercicio -->
             <div class="mb-3">
                 {{ form.descripcion.label(class="form-label fw-bold") }}
                 {{ form.descripcion(class="form-control", rows=4) }}
@@ -31,26 +34,29 @@
                 {% endfor %}
             </div>
             
+            <!-- Tipo o categoría del ejercicio -->
             <div class="mb-3">
                 {{ form.tipo.label(class="form-label fw-bold") }}
                 {{ form.tipo(class="form-control", placeholder="Ej: Movilidad, Fortalecimiento...") }}
-                <div class="form-text">Escribe libremente el tipo de ejercicio</div>
+                <div class="form-text">Escribe libremente el tipo o categoría del ejercicio.</div>
                 {% for error in form.tipo.errors %}
                     <div class="text-danger small">{{ error }}</div>
                 {% endfor %}
             </div>
             
+            <!-- Vídeo demostrativo del ejercicio -->
             <div class="mb-4">
                 {{ form.video.label(class="form-label fw-bold") }}
                 {{ form.video(class="form-control") }}
-                <div class="form-text">Formatos soportados: MP4, WebM, MOV (Máx. 50MB)</div>
+                <div class="form-text">Formatos soportados: MP4, WebM, MOV. Tamaño máximo: 50 MB.</div>
                 {% for error in form.video.errors %}
                     <div class="text-danger small">{{ error }}</div>
                 {% endfor %}
             </div>
             
+            <!-- Botón principal para guardar el nuevo ejercicio -->
             <button type="submit" class="btn btn-primary w-100 py-2">
-                <i class="bi bi-save me-2"></i>Crear Ejercicio
+                <i class="bi bi-save me-2"></i>Crear ejercicio
             </button>
         </form>
     </div>

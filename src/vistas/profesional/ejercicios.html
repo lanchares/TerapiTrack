@@ -4,9 +4,9 @@
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2><i class="bi bi-collection me-2"></i>Biblioteca de Ejercicios</h2>
+    <h2><i class="bi bi-collection me-2"></i>Biblioteca de ejercicios</h2>
     <a href="{{ url_for('profesional.crear_ejercicio') }}" class="btn btn-success">
-        <i class="bi bi-plus-circle me-1"></i>Nuevo Ejercicio
+        <i class="bi bi-plus-circle me-1"></i>Nuevo ejercicio
     </a>
 </div>
 
@@ -17,7 +17,7 @@
     <div class="card-body">
         <form method="GET" class="row g-3">
             <div class="col-md-6">
-                <input type="text" name="search" class="form-control" placeholder="Buscar por nombre..." 
+                <input type="text" name="search" class="form-control" placeholder="Buscar por nombre..."
                        value="{{ request.args.get('search', '') }}">
             </div>
             <div class="col-md-4">
@@ -64,7 +64,7 @@
                             </a>
                         </td>
                     </tr>
-                    <!-- Modal para ver video -->
+                    <!-- Modal para previsualizar el vídeo del ejercicio -->
                     <div class="modal fade" id="videoModal{{ ejercicio.Id }}" tabindex="-1">
                         <div class="modal-dialog modal-lg">
                             <div class="modal-content">
@@ -75,13 +75,13 @@
                                 <div class="modal-body">
                                     <video id="videoEjercicio{{ ejercicio.Id }}" controls class="w-100">
                                         {% if ejercicio.Video.startswith('http') %}
-                                            <!-- Vídeos en URL (Cloudinary u otros) -->
+                                            <!-- Vídeos servidos por URL externa (por ejemplo, CDN) -->
                                             <source src="{{ ejercicio.Video }}" type="video/mp4">
                                         {% elif ejercicio.Video.startswith('ejercicio_') %}
-                                            <!-- Videos creados por profesionales -->
+                                            <!-- Vídeos subidos por profesionales -->
                                             <source src="{{ url_for('static', filename='uploads/ejercicios/' + ejercicio.Video) }}" type="video/mp4">
                                         {% else %}
-                                            <!-- Videos base del sistema -->
+                                            <!-- Vídeos base incluidos en la aplicación -->
                                             <source src="{{ url_for('static', filename='videos/' + ejercicio.Video) }}" type="video/mp4">
                                         {% endif %}
                                         Tu navegador no soporta videos.
@@ -93,10 +93,10 @@
                     </div>
                     {% else %}
                     <tr>
-                        <td colspan="4" class="text-center py-4">
+                        <td colspan="5" class="text-center py-4">
                             <i class="bi bi-collection fs-1 text-muted"></i>
                             <h5 class="mt-3">No se encontraron ejercicios</h5>
-                            <p>Crea tu primer ejercicio usando el botón "Nuevo Ejercicio"</p>
+                            <p>Crea tu primer ejercicio usando el botón «Nuevo ejercicio».</p>
                         </td>
                     </tr>
                     {% endfor %}
@@ -106,7 +106,7 @@
     </div>
 </div>
 
-<!-- Script para pausar el vídeo al cerrar cualquier modal de ejercicio -->
+<!-- Pausa y reinicio del vídeo al cerrar los modales de ejercicios -->
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const modals = document.querySelectorAll('.modal');

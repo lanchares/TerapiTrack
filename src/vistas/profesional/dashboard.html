@@ -13,14 +13,14 @@
 </div>
 
 <div class="row">
-    <!-- Pacientes Asignados -->
+    <!-- Resumen: Pacientes asignados -->
     <div class="col-xl-3 col-md-6 mb-4">
         <a href="{{ url_for('profesional.listar_pacientes') }}" class="text-decoration-none">
             <div class="card border-start-primary shadow h-100 py-2 hover-card">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
-                            <div class="text-xs fw-bold text-primary text-uppercase mb-1">Pacientes Asignados</div>
+                            <div class="text-xs fw-bold text-primary text-uppercase mb-1">Pacientes asignados</div>
                             <div class="h5 mb-0 fw-bold text-gray-800">{{ stats.total_pacientes }}</div>
                         </div>
                         <div class="col-auto">
@@ -32,14 +32,14 @@
         </a>
     </div>
 
-    <!-- Sesiones Pendientes -->
+    <!-- Resumen: Sesiones pendientes -->
     <div class="col-xl-3 col-md-6 mb-4">
         <a href="{{ url_for('profesional.listar_sesiones') }}" class="text-decoration-none">
             <div class="card border-start-success shadow h-100 py-2 hover-card">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
-                            <div class="text-xs fw-bold text-success text-uppercase mb-1">Sesiones Pendientes</div>
+                            <div class="text-xs fw-bold text-success text-uppercase mb-1">Sesiones pendientes</div>
                             <div class="h5 mb-0 fw-bold text-gray-800">{{ stats.sesiones_pendientes }}</div>
                         </div>
                         <div class="col-auto">
@@ -51,14 +51,14 @@
         </a>
     </div>
 
-    <!-- Evaluaciones Pendientes -->
+    <!-- Resumen: Evaluaciones pendientes -->
     <div class="col-xl-3 col-md-6 mb-4">
         <a href="{{ url_for('profesional.listar_sesiones') }}" class="text-decoration-none">
             <div class="card border-start-info shadow h-100 py-2 hover-card">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
-                            <div class="text-xs fw-bold text-info text-uppercase mb-1">Evaluaciones Pendientes</div>
+                            <div class="text-xs fw-bold text-info text-uppercase mb-1">Evaluaciones pendientes</div>
                             <div class="h5 mb-0 fw-bold text-gray-800">{{ stats.evaluaciones_pendientes }}</div>
                         </div>
                         <div class="col-auto">
@@ -70,14 +70,13 @@
         </a>
     </div>
 
-    
-    <!-- Tarjeta: Próximas Sesiones -->
+    <!-- Resumen: Próximas sesiones -->
     <div class="col-xl-3 col-md-6 mb-4">
         <div class="card border-start-warning shadow h-100 py-2">
             <div class="card-body">
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                        <div class="text-xs fw-bold text-warning text-uppercase mb-1">Próximas Sesiones</div>
+                        <div class="text-xs fw-bold text-warning text-uppercase mb-1">Próximas sesiones</div>
                         <div class="h5 mb-0 fw-bold text-gray-800">
                             {{ stats.proximas_sesiones|length }}
                         </div>
@@ -92,35 +91,36 @@
 </div>
 
 <div class="row mt-4">
+    <!-- Acciones rápidas del profesional -->
     <div class="col-lg-8">
         <div class="card shadow mb-4">
             <div class="card-header py-3">
-                <h6 class="m-0 fw-bold text-primary">Acciones Rápidas</h6>
+                <h6 class="m-0 fw-bold text-primary">Acciones rápidas</h6>
             </div>
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-6 mb-2">
                         <a href="{{ url_for('profesional.listar_ejercicios') }}" class="btn btn-icon-split btn-info w-100">
                             <span class="icon"><i class="bi bi-collection"></i></span>
-                            <span class="text">Biblioteca de Ejercicios</span>
+                            <span class="text">Biblioteca de ejercicios</span>
                         </a>
                     </div>
                     <div class="col-md-6 mb-2">
                         <a href="{{ url_for('profesional.crear_ejercicio') }}" class="btn btn-icon-split btn-warning w-100">
                             <span class="icon"><i class="bi bi-plus-circle"></i></span>
-                            <span class="text">Nuevo Ejercicio</span>
+                            <span class="text">Nuevo ejercicio</span>
                         </a>
                     </div>
                     <div class="col-md-6 mb-2">
                         <a href="{{ url_for('profesional.listar_sesiones') }}" class="btn btn-icon-split btn-secondary w-100">
                             <span class="icon"><i class="bi bi-calendar-week"></i></span>
-                            <span class="text">Ver Sesiones Programadas</span>
+                            <span class="text">Ver sesiones programadas</span>
                         </a>
                     </div>
                     <div class="col-md-6 mb-2">
                         <a href="{{ url_for('profesional.crear_sesion') }}" class="btn btn-icon-split btn-success w-100">
                             <span class="icon"><i class="bi bi-plus-circle"></i></span>
-                            <span class="text">Crear Nueva Sesión</span>
+                            <span class="text">Crear nueva sesión</span>
                         </a>
                     </div>
                 </div>
@@ -128,10 +128,11 @@
         </div>
     </div>
     
+    <!-- Lista de próximas sesiones con acceso directo -->
     <div class="col-lg-4">
         <div class="card shadow mb-4">
             <div class="card-header py-3">
-                <h6 class="m-0 fw-bold text-primary">Próximas Sesiones</h6>
+                <h6 class="m-0 fw-bold text-primary">Próximas sesiones</h6>
             </div>
             <div class="card-body">
                 <ul class="list-group list-group-flush">
@@ -140,7 +141,6 @@
                         <div>
                             <h6 class="mb-0">{{ sesion.paciente.usuario.Nombre }}</h6>
                             <small class="text-muted">{{ sesion.Fecha_Programada|datetimeformat }}</small>
-
                         </div>
                         <a href="{{ url_for('profesional.ejecutar_sesion', sesion_id=sesion.Id) }}" 
                            class="btn btn-sm btn-primary">
@@ -160,6 +160,7 @@
 </div>
 
 <style>
+/* Efecto visual al pasar el ratón por encima de las tarjetas resumen */
 .hover-card {
     transition: all 0.3s ease;
     cursor: pointer;

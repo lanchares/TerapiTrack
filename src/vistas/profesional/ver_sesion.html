@@ -18,12 +18,12 @@
         {% if sesion.Estado == 'PENDIENTE' %}
         <a href="{{ url_for('profesional.ejecutar_sesion', sesion_id=sesion.Id) }}" 
            class="btn btn-primary">
-            <i class="bi bi-play me-1"></i>Iniciar Sesión
+            <i class="bi bi-play me-1"></i>Iniciar sesión
         </a>
         {% elif sesion.Estado == 'COMPLETADA' %}
         <a href="{{ url_for('profesional.evaluar_sesion', sesion_id=sesion.Id) }}" 
            class="btn btn-success">
-            <i class="bi bi-clipboard-check me-1"></i>Evaluar Sesión
+            <i class="bi bi-clipboard-check me-1"></i>Evaluar sesión
         </a>
         {% endif %}
         <a href="{{ url_for('profesional.listar_sesiones') }}" class="btn btn-secondary">
@@ -33,10 +33,11 @@
 </div>
 
 <div class="row">
+    <!-- Información general de la sesión -->
     <div class="col-md-6 mb-4">
         <div class="card shadow">
             <div class="card-header py-3">
-                <h6 class="m-0 fw-bold text-primary">Información General</h6>
+                <h6 class="m-0 fw-bold text-primary">Información general</h6>
             </div>
             <div class="card-body">
                 <ul class="list-group list-group-flush">
@@ -49,7 +50,7 @@
                         <strong>{{ sesion.paciente.Condicion_Medica or 'No especificada' }}</strong>
                     </li>
                     <li class="list-group-item d-flex justify-content-between">
-                        <span>Fecha Programada:</span>
+                        <span>Fecha programada:</span>
                         <strong>{{ sesion.Fecha_Programada|datetimeformat }}</strong>
                     </li>
                     <li class="list-group-item d-flex justify-content-between">
@@ -57,7 +58,7 @@
                         <strong>{{ sesion.Estado }}</strong>
                     </li>
                     <li class="list-group-item d-flex justify-content-between">
-                        <span>Fecha de Creación:</span>
+                        <span>Fecha de creación:</span>
                         <strong>{{ sesion.Fecha_Asignacion|datetimeformat('%d/%m/%Y') }}</strong>
                     </li>
                 </ul>
@@ -65,10 +66,11 @@
         </div>
     </div>
     
+    <!-- Lista de ejercicios asignados -->
     <div class="col-md-6 mb-4">
         <div class="card shadow">
             <div class="card-header py-3 d-flex justify-content-between align-items-center">
-                <h6 class="m-0 fw-bold text-primary">Ejercicios Asignados</h6>
+                <h6 class="m-0 fw-bold text-primary">Ejercicios asignados</h6>
                 <span class="badge bg-primary">{{ ejercicios|length }}</span>
             </div>
             <div class="card-body">
@@ -97,7 +99,7 @@
         <div class="card shadow">
             <div class="card-header py-3 d-flex justify-content-between align-items-center">
                 <h6 class="m-0 fw-bold text-success">
-                    <i class="bi bi-star-fill me-2"></i>Evaluaciones de la Sesión
+                    <i class="bi bi-star-fill me-2"></i>Evaluaciones de la sesión
                 </h6>
                 <span class="badge bg-success">
                     {{ ejercicios|selectattr('evaluacion')|list|length }}/{{ ejercicios|length }} evaluados
@@ -127,7 +129,7 @@
                                 <div class="mb-2">
                                     <strong>Puntuación:</strong>
                                     <div class="text-warning">
-                                        {% for i in range(1, 6) %}
+                                        {% for i in range(1, 5 + 1) %}
                                             {% if i <= ejercicio.evaluacion.Puntuacion %}
                                                 <i class="bi bi-star-fill"></i>
                                             {% else %}
@@ -147,12 +149,12 @@
                                 <div class="mt-2">
                                     <a href="{{ url_for('profesional.ver_evaluacion', ejercicio_sesion_id=ejercicio.Id) }}" 
                                        class="btn btn-info w-100">
-                                        <i class="bi bi-eye me-1"></i>Ver Evaluación
+                                        <i class="bi bi-eye me-1"></i>Ver evaluación
                                     </a>
                                 </div>
                                 {% else %}
                                 <div class="text-center py-2">
-                                    <p class="text-muted mb-2">Este ejercicio aún no ha sido evaluado</p>
+                                    <p class="text-muted mb-2">Este ejercicio aún no ha sido evaluado.</p>
                                     <a href="{{ url_for('profesional.evaluar_ejercicio', ejercicio_sesion_id=ejercicio.Id) }}" 
                                        class="btn btn-sm btn-warning">
                                         <i class="bi bi-star me-1"></i>Evaluar ahora
@@ -165,10 +167,9 @@
                     {% endfor %}
                 </div>
                 
-                <!-- Resumen de evaluaciones -->
-                {% if evaluaciones_existentes %}
+                <!-- Resumen numérico de la sesión -->
                 <div class="mt-4 p-3 bg-light rounded">
-                    <h6 class="fw-bold mb-3">Resumen de la Sesión</h6>
+                    <h6 class="fw-bold mb-3">Resumen de la sesión</h6>
                     <div class="row">
                         <div class="col-md-4">
                             <div class="text-center">
@@ -192,8 +193,6 @@
                         </div>
                     </div>
                 </div>
-                {% endif %}
-                
                 {% else %}
                 <div class="text-center py-4">
                     <i class="bi bi-clipboard-x display-4 text-muted"></i>
@@ -201,7 +200,7 @@
                     <p class="text-muted">Los ejercicios de esta sesión aún no han sido evaluados.</p>
                     <a href="{{ url_for('profesional.evaluar_sesion', sesion_id=sesion.Id) }}" 
                        class="btn btn-success">
-                        <i class="bi bi-star-fill me-1"></i>Comenzar Evaluación
+                        <i class="bi bi-star-fill me-1"></i>Comenzar evaluación
                     </a>
                 </div>
                 {% endif %}

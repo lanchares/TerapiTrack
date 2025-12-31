@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2><i class="bi bi-clipboard-check me-2"></i>Evaluar Sesión</h2>
+    <h2><i class="bi bi-clipboard-check me-2"></i>Evaluar sesión</h2>
     <a href="{{ url_for('profesional.listar_sesiones') }}" class="btn btn-secondary">
         <i class="bi bi-arrow-left me-1"></i>Volver
     </a>
@@ -16,13 +16,17 @@
     </div>
     <div class="card-body">
         <div class="row">
+            <!-- Datos generales de la sesión -->
             <div class="col-md-6">
                 <p><strong>Fecha:</strong> {{ sesion.Fecha_Programada|datetimeformat }}</p>
                 <p><strong>Estado:</strong> <span class="badge bg-success">{{ sesion.Estado }}</span></p>
             </div>
             <div class="col-md-6">
                 <p><strong>Ejercicios:</strong> {{ ejercicios|length }}</p>
-                <p><strong>Evaluados:</strong> {{ ejercicios|selectattr('evaluacion')|list|length }}/{{ ejercicios|length }}</p>
+                <p>
+                    <strong>Evaluados:</strong>
+                    {{ ejercicios|selectattr('evaluacion')|list|length }}/{{ ejercicios|length }}
+                </p>
             </div>
         </div>
     </div>
@@ -37,9 +41,9 @@
                 <small class="text-muted">{{ item.ejercicio_sesion.ejercicio.Tipo }}</small>
             </div>
             <div class="card-body">
-                <!-- Video respuesta -->
+                <!-- Vídeo de respuesta del paciente -->
                 <div class="mb-3">
-                    <h6>Video del paciente:</h6>
+                    <h6>Vídeo del paciente</h6>
                     {% if item.video_respuesta %}
                     <video controls class="w-100 rounded" style="max-height: 250px;">
                         <source src="{{ item.video_respuesta.Ruta_Almacenamiento }}" type="video/webm">
@@ -48,12 +52,12 @@
                     {% else %}
                     <div class="alert alert-warning">
                         <i class="bi bi-exclamation-triangle me-1"></i>
-                        No hay video grabado para este ejercicio
+                        No hay vídeo grabado para este ejercicio.
                     </div>
                     {% endif %}
                 </div>
                 
-                <!-- Evaluación existente o formulario -->
+                <!-- Bloque de evaluación: existente o pendiente -->
                 {% if item.evaluacion %}
                 <div class="alert alert-success">
                     <h6><i class="bi bi-check-circle-fill me-1"></i>Ejercicio evaluado</h6>
@@ -67,7 +71,9 @@
                         <strong>Comentarios:</strong>
                         <p class="mb-0">{{ item.evaluacion.Comentarios }}</p>
                     </div>
-                    <small class="text-muted">Evaluado el {{ item.evaluacion.Fecha_Evaluacion|datetimeformat('%d/%m/%Y') }}</small>
+                    <small class="text-muted">
+                        Evaluado el {{ item.evaluacion.Fecha_Evaluacion|datetimeformat('%d/%m/%Y') }}
+                    </small>
                 </div>
                 {% elif item.video_respuesta %}
                 <a href="{{ url_for('profesional.evaluar_ejercicio', ejercicio_sesion_id=item.ejercicio_sesion.Id) }}" 
@@ -77,7 +83,7 @@
                 {% else %}
                 <div class="alert alert-secondary">
                     <i class="bi bi-info-circle me-1"></i>
-                    Sin video para evaluar
+                    Sin vídeo disponible para evaluar este ejercicio.
                 </div>
                 {% endif %}
             </div>
@@ -88,7 +94,7 @@
         <div class="alert alert-warning text-center py-4">
             <i class="bi bi-exclamation-triangle display-4 text-warning"></i>
             <h3 class="mt-3">No hay ejercicios en esta sesión</h3>
-            <p class="mb-0">Esta sesión no tiene ejercicios asignados</p>
+            <p class="mb-0">Esta sesión no tiene ejercicios asignados.</p>
         </div>
     </div>
     {% endfor %}
