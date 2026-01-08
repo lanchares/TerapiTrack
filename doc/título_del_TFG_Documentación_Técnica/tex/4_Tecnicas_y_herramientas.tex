@@ -1,73 +1,129 @@
 \capitulo{4}{Técnicas y herramientas}
-Este capítulo describe las metodologías, tecnologías y utilidades elegidas para el desarrollo de TerapiTrack, justificando cada decisión y recogiendo las principales ventajas de cada alternativa considerada.
+Este capítulo presenta las metodologías, tecnologías y utilidades empleadas en el desarrollo de TerapiTrack. 
+El propósito es ofrecer una visión ordenada del entorno de trabajo y de la base tecnológica sobre la que se construye la aplicación, de manera que sirva de referencia para entender las decisiones de diseño descritas en los capítulos siguientes \cite{UbuPlantillaLatex,GithubTerapitrack}.
 
 \section{Metodología de desarrollo}
 
-\subsection{Gestión ágil con Jira}
-Se optó por una organización ágil utilizando \textbf{Jira} para la planificación y el control del trabajo. Esta herramienta ha permitido dividir el proyecto en sprints y tareas distribuidas en tableros, facilitando el seguimiento del progreso real y la adaptación ágil ante imprevistos. Jira es compatible con metodologías como Scrum y Kanban, permitiendo organizar el desarrollo por etapas incrementales y gestionar incidencias de forma eficiente.
+\subsection{Metodologías ágiles y Jira}
+Las metodologías ágiles plantean una forma de organizar los proyectos de software en iteraciones cortas, con entregas frecuentes y una revisión continua de las tareas pendientes \cite{pressman_ingenieria_sw}. 
+En lugar de planificar todo el desarrollo al detalle desde el principio, se trabaja con ciclos de duración limitada en los que se van cerrando bloques pequeños de funcionalidad.
 
-
+En TerapiTrack se ha utilizado \textbf{Jira} como herramienta de apoyo a esta forma de trabajo \cite{JiraTerapitrack}.
+Jira permite crear tareas, agruparlas en sprints, registrar incidencias y visualizar el estado del proyecto en tableros, lo que facilita ver de un vistazo qué está hecho, qué está pendiente y qué se ha replanificado durante el desarrollo.
 
 \section{Tecnologías de backend}
 
 \subsection{Python y Flask}
-\textbf{Flask} ha sido el framework seleccionado para el desarrollo web backend debido a su flexibilidad, ligereza y la facilidad con la que se puede integrar con diferentes extensiones. Permite crear aplicaciones a medida y controlar con detalle la estructura de cada módulo, sin imponer capas innecesarias ni patrones rígidos. Otras plataformas como Django fueron consideradas, aunque Flask resultó más idóneo para un proyecto modular y de tamaño medio, donde la sencillez y el control sobre la arquitectura eran prioritarios.
+El \emph{backend} de TerapiTrack está desarrollado en \textbf{Python}, un lenguaje de programación de propósito general muy extendido en el ámbito del desarrollo web, la ciencia de datos y la automatización \cite{pressman_ingenieria_sw}. 
+Entre sus ventajas destacan una sintaxis relativamente sencilla y una comunidad amplia que mantiene librerías para la mayoría de necesidades habituales en un proyecto.
 
-\textbf{Ventajas de Flask:}
-\begin{itemize}
-    \item Ligero, flexible y fácil de aprender
-    \item Permite una estructura de proyecto a medida
-    \item Ecosistema de extensiones muy abundante
-    \item Ideal para aplicaciones modulares y APIs RESTful
-\end{itemize}
+Sobre Python se ha utilizado el microframework web \textbf{Flask} \cite{FlaskDocs}.
+Flask proporciona las piezas básicas para construir una aplicación web: definición de rutas, manejo de peticiones y respuestas HTTP, integración con sistemas de plantillas y soporte para extensiones que cubren necesidades como la autenticación o el acceso a bases de datos \cite{FlaskDocs,JinjaDocs}.
+
+En el proyecto la aplicación principal se define en \texttt{app.py} y se organiza en varios módulos de controladores que agrupan las rutas según el rol del usuario (\texttt{admin\_controlador.py}, \texttt{profesional\_controlador.py}, \texttt{auth\_controlador.py}, etc.), siguiendo el patrón de \emph{blueprints} descrito en la documentación oficial y en guías prácticas específicas \cite{FlaskBlueprintsDocs,RealPythonBlueprints}.
+Además, se han definido decoradores propios en \texttt{decoradores.py} para comprobar el rol y otras condiciones de acceso antes de ejecutar determinadas vistas.
 
 \subsection{SQLAlchemy}
-Para la interacción con la base de datos se ha implementado \textbf{SQLAlchemy}, un ORM ampliamente utilizado en el ecosistema Python. SQLAlchemy permite gestionar modelos y relaciones mediante objetos, evitando la escritura directa de SQL y facilitando la migración o ampliación futura del sistema. Su uso minimiza errores y simplifica la validación de datos, además de proporcionar portabilidad entre distintos motores de base de datos.
+Para la interacción con la base de datos se emplea \textbf{SQLAlchemy}, una biblioteca de mapeo objeto–relacional (ORM, \textit{Object–Relational Mapping}) ampliamente utilizada en el ecosistema Python \cite{SQLAlchemyDocs}. 
+Un ORM permite trabajar con las tablas de la base de datos a través de clases y objetos, de forma que las consultas y actualizaciones se expresan en código Python y la biblioteca se encarga de traducirlas a SQL \cite{FlaskSQLAlchemyPattern}.
 
-\subsection{Alternativas}
-Se evaluó el uso de otras bibliotecas ORM y la manipulación directa con SQL clásico, pero se descartaron para evitar redundancia y riesgos de inconsistencia.
+En TerapiTrack los modelos se encuentran separados en ficheros como \texttt{usuario.py}, \texttt{paciente.py}, \texttt{profesional.py}, \texttt{ejercicio.py}, \texttt{sesion.py} o \texttt{evaluacion.py}, y se complementan con un módulo de asociaciones para las relaciones de muchos a muchos.
+SQLAlchemy se inicializa en el módulo de extensiones (\texttt{extensiones.py}), lo que permite reutilizar la misma instancia en toda la aplicación \cite{SQLAlchemyDocs}.
 
 \section{Gestión de datos}
 
-\subsection{Base de datos: SQLite}
-Durante el desarrollo se ha empleado \textbf{SQLite} por su sencillez y portabilidad (no requiere servidor y almacena toda la información en un solo archivo), idónea para pruebas y prototipos rápidos.
+\subsection{Bases de datos en desarrollo y producción}
+Durante el desarrollo local se ha utilizado \textbf{SQLite} como motor de base de datos principal \cite{date_db}. 
+SQLite es un sistema de base de datos relacional embebido que almacena toda la información en un único fichero en disco y no requiere un servidor independiente, lo que simplifica la configuración del entorno de trabajo.
+
+Para el despliegue en la nube se ha configurado la aplicación para trabajar con \textbf{PostgreSQL}, un gestor de bases de datos relacional de código abierto ampliamente usado en entornos de producción.
+En Heroku se emplea el complemento de base de datos PostgreSQL, al que la aplicación se conecta mediante la cadena de conexión definida en las variables de entorno \cite{HerokuDashboard,HerokuTerapitrackApp}.
+
+La selección del motor de base de datos en cada entorno se realiza a través del fichero \texttt{config.py}, donde se define la \texttt{SQLALCHEMY\_DATABASE\_URI}.
+Además, se dispone del script \texttt{poblar\_bd.py}, que permite inicializar la base de datos con datos de ejemplo (usuarios, pacientes, ejercicios, sesiones y evaluaciones) para facilitar las pruebas.
 
 \subsection{Herramienta complementaria: DB Browser for SQLite}
-Durante la fase inicial, DB Browser for SQLite facilitó la visualización y depuración de la base de datos desde un entorno gráfico.
+Como apoyo al trabajo con la base de datos local se ha utilizado \textbf{DB Browser for SQLite}, una herramienta gráfica que permite inspeccionar tablas, ejecutar consultas y modificar registros de forma visual \cite{DBBrowser}.
+Su uso ha sido especialmente útil en las primeras iteraciones del diseño del esquema y durante la depuración de datos de prueba.
 
 \section{Tecnologías de frontend}
 
-\subsection{Bootswatch}
-El diseño y la apariencia de la interfaz de TerapiTrack se basan en \textbf{Bootswatch}, una colección de temas CSS construidos sobre Bootstrap. Esta decisión permitió aplicar rápidamente estilos accesibles y coherentes, favoreciendo la navegación intuitiva y el cumplimiento de estándares WCAG de accesibilidad web.
-
 \subsection{HTML5, JavaScript y Jinja}
-Se empleó \textbf{HTML5} como base estructural de las páginas, \textbf{JavaScript} para funcionalidades interactivas y la grabación web, y el motor \textbf{Jinja} para el renderizado dinámico del frontend en Flask. La combinación de estas tecnologías aporta flexibilidad y compatibilidad con todos los navegadores modernos.
+La capa de presentación de TerapiTrack se construye sobre varias tecnologías web:
+
+\begin{itemize}
+    \item \textbf{HTML5} (HyperText Markup Language) es el estándar de marcado utilizado para definir la estructura de las páginas web, incluyendo encabezados, párrafos, formularios o tablas.
+    \item \textbf{JavaScript} es un lenguaje de programación orientado al desarrollo en el lado del cliente, que permite añadir interactividad a las páginas, reaccionar a eventos del usuario y realizar peticiones asíncronas al servidor.
+    \item \textbf{Jinja} es un motor de plantillas para Python que se integra con Flask y permite generar HTML de forma dinámica a partir de plantillas y datos, reutilizando estructuras comunes en distintas vistas \cite{JinjaDocs}.
+\end{itemize}
+
+Las plantillas principales se organizan en carpetas por rol (\texttt{admin}), (\texttt{profesional}), (\texttt{paciente}). 
+Todas ellas heredan de una plantilla base (\texttt{base.html}) que define la estructura común de menús, cabeceras y mensajes.
+Entre las vistas más relevantes se encuentran los distintos paneles de control (\texttt{dashboard.html}) y las páginas de ejecución de sesiones (\texttt{ejecutar\_sesion.html}), donde se combinan los vídeos de ejemplo con la cámara del paciente y los controles necesarios para completar la sesión.
+
+\subsection{Bootstrap y Bootswatch}
+Para el diseño visual se ha empleado \textbf{Bootstrap}, un \emph{framework} CSS que ofrece componentes predefinidos (botones, menús, rejillas, formularios) y un sistema de diseño adaptable a diferentes tamaños de pantalla \cite{pressman_ingenieria_sw}. 
+Sobre Bootstrap se han aplicado temas de \textbf{Bootswatch}, que proporcionan estilos alternativos listos para usar sin modificar el marcado HTML \cite{Bootswatch}.
+
+El uso de estos componentes facilita mantener una apariencia coherente en toda la aplicación y aplicar criterios básicos de accesibilidad, como tamaños de fuente adecuados, contraste suficiente y distribución ordenada de los elementos en la interfaz \cite{wcag22}.
 
 \section{Testing y aseguramiento de la calidad}
 
 \subsection{Pytest}
-El testeo automatizado se llevó a cabo con \textbf{Pytest}, por su sintaxis sencilla, el soporte de fixtures reutilizables y la facilidad para parametrizar y agrupar pruebas. Esta herramienta ha permitido obtener cobertura completa en los módulos críticos y facilita la detección precoz de errores antes del despliegue.
+Las pruebas automáticas se han realizado con \textbf{Pytest}, un marco de testing para Python que permite definir casos de prueba como funciones y agruparlos en módulos dentro de la carpeta \texttt{tests} \cite{PytestDocs}.
+Pytest ofrece utilidades para preparar datos de prueba mediante \textit{fixtures}, parametrizar pruebas y generar informes con el resultado de la ejecución \cite{PytestDocs}.
+
+En el contexto de TerapiTrack se ha utilizado para comprobar el funcionamiento de los modelos de datos y algunos de los flujos principales definidos en los controladores, reduciendo el riesgo de introducir errores al modificar el código.
 
 \section{Despliegue e infraestructura}
 
 \subsection{Heroku}
-\textbf{Heroku} se eligió como plataforma de despliegue por su facilidad de uso, integración con Git y escalado automático de recursos según la carga de trabajo. El sistema de despliegue continuo con \textit{git push} agiliza las pruebas y actualizaciones en entornos cloud, permitiendo centrarse en la funcionalidad sin preocuparse por la gestión del servidor.
+Para ejecutar la aplicación en un entorno accesible desde internet se ha utilizado \textbf{Heroku}, una plataforma \textit{Platform as a Service} (PaaS) \cite{HerokuDashboard}.
+Heroku permite desplegar aplicaciones a partir de un repositorio Git y definir el proceso de arranque mediante un fichero \texttt{Procfile}, en el que se indica el comando que debe ejecutarse para iniciar la aplicación Flask con un servidor compatible con WSGI \cite{HerokuTerapitrackApp}.
+
+La configuración concreta del entorno (por ejemplo, la URL de la base de datos PostgreSQL o la clave secreta de Flask) se realiza mediante variables de entorno, que la aplicación lee en tiempo de ejecución a través del módulo de configuración.
+
+Para el almacenamiento de archivos multimedia se ha integrado \textbf{Cloudinary}, un servicio externo que permite gestionar y servir de forma eficiente los vídeos y otros recursos generados por la aplicación \cite{CloudinaryConsole}.
 
 \section{Control de versiones y colaboración}
 
 \subsection{Git y GitHub}
-Toda la gestión del código se apoyó en \textbf{Git} como sistema distribuido de control de versiones y \textbf{GitHub} como repositorio central, lo que facilitó el trabajo colaborativo y la trazabilidad de los cambios a lo largo de todas las iteraciones. El uso de GitHub permitió registrar issues, realizar revisiones de código y mantener sincronizado el trabajo entre las distintas ramas del repositorio.
+El código del proyecto se gestiona con \textbf{Git}, un sistema de control de versiones distribuido que mantiene un historial de cambios y permite trabajar con ramas para desarrollar nuevas funcionalidades de forma aislada \cite{gamma_design_patterns}. 
+Como repositorio remoto se ha empleado \textbf{GitHub}, que ofrece alojamiento para el código, sistema de \textit{issues} para registrar tareas e incidencias y herramientas para revisar cambios antes de integrarlos en la rama principal \cite{GithubTerapitrack}.
+
+Para el trabajo diario se ha utilizado \textbf{Git Bash} como interfaz de línea de comandos, lo que facilita ejecutar los comandos de Git desde el propio entorno de desarrollo.
 
 \section{Otras herramientas de desarrollo}
 
+Durante el desarrollo también se han utilizado varias herramientas de apoyo:
+
 \begin{itemize}
-\item \textbf{Visual Studio Code}: Entorno principal de edición y depuración, con extensiones dedicadas para Python, Flask y control de versiones.
-\item \textbf{Overleaf}: Redacción colaborativa de esta memoria en LaTeX, facilitando la organización de capítulos y anexos.
-\item \textbf{Draw.io}: Creación de diagramas para representar la arquitectura y el flujo de datos del sistema.
+    \item \textbf{Visual Studio Code}: Entorno de desarrollo integrado utilizado como editor principal para el código Python, las plantillas y los ficheros de configuración, con extensiones específicas para Flask, Git y trabajo con SQLite.
+    \item \textbf{LaTeX Workshop y Overleaf}: Herramientas para la edición y compilación de la memoria y los anexos en \LaTeX{}, combinando el trabajo local en Visual Studio Code con la plataforma colaborativa Overleaf \cite{OverleafEditor,UbuPlantillaLatex}. 
+    \item \textbf{Draw.io}: Aplicación para la creación de diagramas, utilizada para representar la arquitectura general del sistema, el modelo de datos y los principales flujos de uso.
 \end{itemize}
 
-\section{Comparativas y justificación de elecciones}
+\section{Resumen de herramientas utilizadas}
 
-A lo largo del desarrollo, se compararon tecnologías tanto por facilidad de integración como por el soporte ofrecido por la comunidad, documentación y curva de aprendizaje. Herramientas como Flask y SQLAlchemy se adaptaron perfectamente a los requisitos de modularidad y personalización, mientras que plataformas como Heroku y GitHub ofrecieron un entorno sencillo y ágil para desplegar y gestionar el ciclo de vida completo del proyecto.
+El conjunto de técnicas y herramientas descrito en este capítulo constituye la base tecnológica de TerapiTrack y sirve como referencia para comprender los aspectos de diseño e implementación que se desarrollan en los capítulos de aspectos relevantes y en los anexos técnicos.
 
-Este conjunto de herramientas ha permitido desarrollar TerapiTrack de forma organizada, eficiente y con una sólida base para abordar futuras escalas y mejoras del sistema.
+\tablaSmall{Herramientas utilizadas en el proyecto}{l l p{7cm}}
+{herramientas_terapitrack}
+{ \textbf{Herramienta} & \textbf{Ámbito} & \textbf{Descripción} \\}
+{
+Flask & Backend & Lógica de servidor y gestión de rutas y vistas web. \\
+SQLAlchemy & Base de datos & ORM para definir modelos y gestionar consultas sobre bases de datos relacionales. \\
+SQLite / PostgreSQL & Base de datos & Motores relacionales usados respectivamente en desarrollo local y en despliegue en la nube. \\
+DB Browser for SQLite & Base de datos & Cliente gráfico para inspección, consulta y edición de la base de datos SQLite. \\
+Jinja & Plantillas & Motor de plantillas para generar dinámicamente las páginas HTML desde Flask. \\
+HTML5 / JavaScript & Frontend & Estructura del contenido y lógica en el navegador para dotar de interactividad a la interfaz. \\
+Bootstrap / Bootswatch & Frontend & Framework CSS y temas visuales para construir una interfaz adaptable y coherente. \\
+Cloudinary & Almacenamiento & Servicio externo para almacenar y servir archivos multimedia generados por la aplicación. \\
+Jira & Gestión & Planificación, seguimiento de tareas y organización en sprints. \\
+Git & Versionado & Sistema de control de versiones distribuido para gestionar la evolución del código. \\
+Git Bash & Versionado & Uso de Git desde la línea de comandos en el entorno local. \\
+GitHub & Repositorio & Alojamiento remoto del código, sistema de \textit{issues} y revisión de cambios. \\
+Visual Studio Code & Desarrollo & Entorno integrado de edición, depuración y ejecución del código fuente. \\
+LaTeX Workshop / Overleaf & Documentación & Herramientas para la redacción y compilación de la memoria y los anexos en \LaTeX{}. \\
+Heroku & Despliegue & Plataforma PaaS utilizada para ejecutar la aplicación Flask y la base de datos en la nube. \\
+}

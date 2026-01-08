@@ -3,7 +3,7 @@
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org/)
 [![Flask](https://img.shields.io/badge/Flask-3.1.0-green.svg)](https://flask.palletsprojects.com/)
 [![License](https://img.shields.io/badge/License-TFG-orange.svg)]()
-[![Tests](https://img.shields.io/badge/Tests-100%25%20Coverage-brightgreen.svg)]()
+[![Tests](https://img.shields.io/badge/Tests-99%25%20Coverage-brightgreen.svg)]()
 
 Sistema web de gestión de terapias de rehabilitación online para pacientes con dificultades motoras.
 

@@ -1,145 +1,71 @@
 \capitulo{3}{Conceptos teóricos}
-Este capítulo sintetiza los aspectos teóricos esenciales para entender la naturaleza y el desarrollo del proyecto TerapiTrack. Se abordan tanto conceptos del ámbito sanitario como fundamentos tecnológicos y de ingeniería del software aplicados durante la implementación.
+En este capítulo se revisan los conceptos teóricos básicos que sirven de soporte al proyecto TerapiTrack.
+Primero se abordan nociones relacionadas con la enfermedad de Parkinson y la rehabilitación, y después se describen los principios de accesibilidad, los patrones de diseño y los modelos de datos que se han tenido en cuenta durante el desarrollo.
 
-\section{Telemedicina y rehabilitación remota}
+\section{Enfermedades degenerativas y enfermedad de Parkinson}
+Las enfermedades degenerativas son trastornos en los que determinadas estructuras del organismo se deterioran de forma progresiva, lo que provoca una pérdida lenta pero continua de funciones.
+Cuando el sistema nervioso central se ve afectado, este deterioro suele traducirse en problemas de movimiento, equilibrio, memoria o comunicación que requieren tratamientos prolongados y un seguimiento estrecho \cite{who_parkinson_2023,ninds_parkinson}.
 
-La telemedicina hace referencia al uso de las tecnologías de la información y la comunicación para prestar servicios sanitarios a distancia. En el caso concreto de la rehabilitación, estas herramientas permiten realizar el seguimiento y diseño de terapias físicas o cognitivas sin que paciente y profesional coincidan en el mismo lugar, facilitando así la continuidad asistencial en enfermedades crónicas como el Parkinson y superando barreras geográficas.
+La enfermedad de Parkinson es un trastorno neurodegenerativo crónico que afecta principalmente al control del movimiento.
+Se caracteriza por temblor en reposo, rigidez muscular, lentitud en la iniciación de los movimientos y alteraciones del equilibrio, y actualmente no tiene cura.
+La combinación de tratamiento farmacológico y programas de rehabilitación específicos permite reducir la intensidad de los síntomas, mantener la autonomía durante más tiempo y mejorar la calidad de vida de los pacientes \cite{cleveland_parkinson,who_parkinson_2023}.
+
+\section{Terapia ocupacional y rehabilitación}
+La terapia ocupacional es una disciplina sanitaria que ayuda a las personas a participar de forma lo más independiente posible en las actividades significativas de su vida diaria, adaptando tanto las tareas como el entorno cuando existe una enfermedad, lesión o discapacidad \cite{nbcot_ot,rehab_hss}.
+En pacientes con enfermedad de Parkinson, la terapia ocupacional trabaja aspectos como el vestido, la higiene personal, la movilidad en el hogar o la organización de rutinas, con el objetivo de prolongar la autonomía en las actividades básicas y sociales \cite{rehab_hss}.
+
+La rehabilitación de trastornos del movimiento suele combinar fisioterapia, terapia ocupacional, ejercicio físico estructurado y, en algunos casos, logopedia.
+Este tipo de intervención requiere sesiones frecuentes y un seguimiento continuado, por lo que acceder de forma regular a los servicios especializados resulta especialmente complicado para pacientes que viven lejos de los centros de referencia o que tienen dificultades para desplazarse \cite{parkinson_telerehab_review}.
+
+\section{Telemedicina y telerehabilitación}
+La telemedicina hace referencia al uso de las tecnologías de la información y la comunicación para prestar servicios sanitarios a distancia, permitiendo que paciente y profesional interactúen sin encontrarse en el mismo lugar físico \cite{rosen2009_telerehab_technologies}.
+Dentro de este ámbito, la telerehabilitación se centra en el diseño, la supervisión y la evaluación de programas de rehabilitación mediante herramientas remotas, como videoconferencia o plataformas web específicas \cite{rosen2009_telerehab_technologies}.
+
+En el caso de la enfermedad de Parkinson, la telerehabilitación ofrece la posibilidad de mantener la frecuencia de las terapias aunque el paciente resida en la “España vaciada” o tenga movilidad reducida.
+Permite reducir desplazamientos, facilita la adherencia al tratamiento y hace posible que el profesional revise de forma diferida los ejercicios realizados en casa \cite{parkinson_telerehab_review,parkinson_telerehab_protocol}.
 
 \section{Accesibilidad y usabilidad en aplicaciones sanitarias}
+Las aplicaciones orientadas a la salud deben diseñarse pensando en usuarios con diferentes capacidades motoras, sensoriales o cognitivas, y también en personas de edad avanzada con poca experiencia en el uso de ordenadores o dispositivos móviles.
+Ni la edad ni el nivel de conocimiento tecnológico deberían convertirse en una barrera a la hora de acceder a programas de telerehabilitación \cite{rosen2009_telerehab_technologies,telehealth_accessibility}.
 
-Las aplicaciones orientadas a la salud deben contemplar criterios estrictos de accesibilidad y usabilidad para garantizar que cualquier paciente, independientemente de sus capacidades motrices o cognitivas, pueda manejar la plataforma con facilidad. Algunos principios fundamentales son:
-
-\begin{itemize}
-    \item \textbf{Perceptible}: Que todos los elementos y mensajes sean claros y apreciables por los usuarios.
-    \item \textbf{Operable}: Los controles y formularios deben ser sencillos y adaptados para personas con limitaciones motoras.
-    \item \textbf{Comprensible}: El lenguaje, la navegación y las acciones deben ser directas y sin ambigüedades.
-    \item \textbf{Robusto}: El sistema ha de ser compatible con distintos dispositivos y tecnologías de apoyo.
-\end{itemize}
-
-\section{Arquitectura Modelo-Vista-Controlador (MVC)}
-
-El patrón de diseño MVC es una estrategia habitual para el desarrollo de aplicaciones web, como TerapiTrack, y divide la lógica en tres partes diferenciadas:
+Los estándares de accesibilidad web, como las pautas WCAG, recogen cuatro principios generales que sirven de guía para el diseño de interfaces accesibles \cite{wcag22}.
 
 \begin{itemize}
-    \item \textbf{Modelo}: Encargado de la gestión y estructura de los datos (usuarios, pacientes, profesionales, ejercicios, sesiones, etc.).
-    \item \textbf{Vista}: Responsable de mostrar la información utilizando una interfaz clara, jerárquica y accesible.
-    \item \textbf{Controlador}: Interpreta las acciones del usuario, comunica modelo y vista, y coordina la lógica de la aplicación (ejemplo: iniciar sesión, asignar sesiones, evaluar ejercicios, etc.).
+    \item \textbf{Perceptibilidad}: La información y los componentes de la interfaz deben presentarse de forma que puedan percibirse por distintos tipos de usuarios, por ejemplo cuidando el contraste de color, el tamaño de la tipografía o el uso de textos alternativos en imágenes \cite{wcag22}.
+    \item \textbf{Operabilidad}: Los controles deben poder manejarse con diferentes dispositivos de entrada (ratón, teclado, pantallas táctiles o mandos) y con un número reducido de acciones, algo especialmente relevante en personas con limitaciones motoras \cite{rosen2009_telerehab_technologies,telehealth_accessibility}.
+    \item \textbf{Comprensibilidad}: Los textos, mensajes de error y flujos de navegación han de ser claros y coherentes, evitando tecnicismos innecesarios y sobrecarga de información \cite{wcag22}.
+    \item \textbf{Robustez}: El contenido debe mostrarse correctamente en distintos navegadores y dispositivos, y ser compatible con tecnologías de apoyo como lectores de pantalla o ampliadores de pantalla \cite{wcag22}.
 \end{itemize}
 
-\section{Bases de datos relacionales y modelos de información}
+Estos principios han guiado el diseño de la interfaz de TerapiTrack, priorizando menús sencillos, textos claros y un número reducido de acciones por pantalla.
 
-El almacenamiento de información clínica o terapéutica requiere garantizar la integridad, trazabilidad y seguridad de los datos. Se utilizan bases de datos relacionales (en este caso, SQLite mediante SQLAlchemy) para organizar usuarios, pacientes, profesionales, ejercicios y sesiones. Destacan dos conceptos clave:
-
-\subsection{Normalización}
-
-El proceso de normalización evita la redundancia y asegura la integridad referencial. En TerapiTrack, las tablas principales (Usuario, Paciente, Profesional, Ejercicio, Sesión) mantienen relaciones claras y funcionales entre sí.
-
-\subsection{Relaciones de muchos a muchos}
-
-Para reflejar la realidad donde un paciente puede trabajar con varios profesionales, y un ejercicio puede asignarse a muchas sesiones, se utilizan tablas intermedias que permiten una asignación flexible y transparente.
-
-\section{Tecnologías empleadas en el desarrollo del sistema}
-
-En la construcción de TerapiTrack se han utilizado las siguientes tecnologías principales:
+\section{Patrones de diseño y arquitectura Modelo–Vista–Controlador}
+En el desarrollo de aplicaciones web es habitual apoyarse en patrones de diseño que separan responsabilidades y facilitan la evolución del sistema.
+Uno de los más extendidos es el patrón Modelo–Vista–Controlador (MVC), que organiza la aplicación en tres componentes principales \cite{gamma_design_patterns}:
 
 \begin{itemize}
-    \item \textbf{Flask}: Framework web en Python para la gestión de rutas y lógica de servidor (backend).
-    \item \textbf{SQLAlchemy}: Herramienta ORM que gestiona la interacción con bases de datos relacionales.
-    \item \textbf{SQLite}: Motor de base de datos embebido, ideal para pruebas y despliegues sencillos.
-    \item \textbf{Jinja}: Motor de plantillas para renderizado dinámico de vistas e interfaces HTML.
-    \item \textbf{Bootswatch}: Colección de temas para Bootstrap que facilita una apariencia visual moderna y accesible.
-    \item \textbf{Jira}: Plataforma de gestión de proyectos y seguimiento de tareas.
-    \item \textbf{GitBash} y \textbf{GitHub}: Control del versionado de código y colaboración entre desarrolladores.
+    \item \textbf{Modelo}: Representa los datos y las reglas de negocio asociadas a cada entidad del dominio, incluyendo la definición de estructuras de almacenamiento y restricciones de integridad.
+    \item \textbf{Vista}: Define cómo se presenta la información al usuario, normalmente mediante páginas web o plantillas que muestran formularios, listados y mensajes.
+    \item \textbf{Controlador}: Actúa como intermediario entre el modelo y la vista, recibiendo las peticiones del usuario, invocando la lógica necesaria y seleccionando la respuesta adecuada.
 \end{itemize}
 
-\section{Consideraciones de seguridad y privacidad}
+Este tipo de arquitectura favorece que el código relacionado con la persistencia de datos, la lógica de aplicación y la interfaz de usuario pueda evolucionar de manera relativamente independiente, algo especialmente útil en proyectos que pueden ampliarse en el futuro \cite{gamma_design_patterns}.
 
-Por tratarse de datos sensibles, el desarrollo tiene en cuenta aspectos de seguridad:
+\section{Bases de datos relacionales}
+Las bases de datos relacionales permiten organizar la información en tablas relacionadas entre sí mediante claves primarias y foráneas, garantizando la integridad de los datos mediante restricciones y reglas de consistencia \cite{date_db}.
+Este modelo resulta adecuado para almacenar información clínica y de seguimiento, donde es importante mantener un historial coherente de usuarios, sesiones y evaluaciones.
 
-\begin{itemize}
-    \item Cifrado de contraseñas.
-    \item Control de acceso por roles (administrador, profesional, paciente).
-    \item Políticas de retención y eliminación de vídeos terapéuticos.
-    \item Uso de sesiones y validación para autenticación segura.
-\end{itemize}
+La \textbf{normalización} es el proceso mediante el cual se descompone la información en tablas más pequeñas para reducir la redundancia y evitar anomalías en las operaciones de inserción, actualización y borrado.
+Aplicar niveles adecuados de normalización ayuda a mantener la coherencia de los datos y a simplificar su mantenimiento a largo plazo \cite{date_db}.
 
-\section{Buenas prácticas y validación}
+Una \textbf{relación de muchos a muchos} aparece cuando varios registros de una tabla pueden asociarse con varios registros de otra.
+En estos casos se introduce una tabla intermedia que almacena los pares de elementos relacionados y permite gestionar de forma clara y trazable esas asociaciones (por ejemplo, la vinculación entre pacientes y profesionales o la asignación de ejercicios a sesiones) \cite{date_db}.
 
-Se fomenta la calidad y mantenibilidad del software mediante:
+\section{Validación y pruebas de software}
+La validación de un sistema de software busca comprobar que la solución desarrollada cumple los requisitos definidos y que se comporta de forma correcta en los escenarios de uso previstos.
+Para ello se utilizan diferentes tipos de pruebas, que pueden combinarse según las necesidades del proyecto \cite{pressman_ingenieria_sw}.
 
-\begin{itemize}
-    \item Pruebas automatizadas para comprobar el funcionamiento de módulos clave.
-    \item Documentación de código, manuales de usuario y de instalación.
-    \item Uso de metodologías ágiles en la organización del trabajo (por ejemplo, con Jira).
-\end{itemize}
+Entre las más habituales se encuentran las \textbf{pruebas unitarias}, centradas en módulos o funciones concretas; las \textbf{pruebas de integración}, que comprueban el funcionamiento conjunto de varios componentes; y las \textbf{pruebas funcionales} o de sistema, orientadas a verificar flujos de usuario o casos de uso completos.
+Automatizar parte de estas pruebas permite detectar errores de diseño o programación de manera temprana y reduce el riesgo de fallos en fases avanzadas del desarrollo \cite{pressman_ingenieria_sw}.
 
-\section{Ejemplos prácticos de uso de la plantilla \LaTeX{}}
-
-A continuación se muestran algunos ejemplos de comandos útiles de la plantilla, siguiendo el formato recomendado por la documentación:
-
-\subsection{Secciones y subsecciones}
-
-Las secciones se incluyen con el comando:
-\begin{verbatim}
-\section{Nombre de sección}
-\end{verbatim}
-Las subsecciones se incluyen de forma análoga:
-\begin{verbatim}
-\subsection{Nombre de subsección}
-\end{verbatim}
-
-\subsubsection{Subsubsecciones}
-
-Para mayor detalle se puede emplear el comando:
-\begin{verbatim}
-\subsubsection{Nombre de subsubsección}
-\end{verbatim}
-
-\section{Referencias}
-
-Las referencias a artículos, webs o libros se incluyen con cite, como en el siguiente ejemplo: cite~\cite{wiki:latex}. Para citar varios recursos: ~\cite{koza92, bortolot2005}.
-
-\section{Imágenes}
-
-La plantilla dispone de comandos propios para incorporar imágenes, por ejemplo:
-
-\imagen{escudoInfor}{Escudo de la Universidad de Burgos}{.5}
-
-\section{Listas de items}
-
-Existen diversas formas de listar:
-
-\begin{itemize}
-    \item Primer ítem de la lista.
-    \item Segundo ítem relevante.
-\end{itemize}
-
-\begin{enumerate}
-    \item Primer elemento.
-    \item Segundo elemento.
-\end{enumerate}
-
-\begin{description}
-    \item[Primer ítem] Descripción más detallada.
-    \item[Segundo ítem] Segunda descripción relevante.
-\end{description}
-
-\section{Tablas}
-
-Se pueden emplear comandos clásicos o los de la plantilla. Ejemplo:
-
-\tablaSmall{Herramientas utilizadas en el proyecto}{l l l}
-{herramientas_terapitrack}
-{ \textbf{Herramienta} & \textbf{Ámbito} & \textbf{Descripción} \\}
-{
-Flask & Backend & Desarrollo de la lógica de servidor y API \\
-SQLAlchemy & Base de datos & ORM para conexión y gestión relacional de datos \\
-SQLite & Base de datos & Motor ligero y embebido para el almacenamiento de información \\
-Jinja & Plantillas & Renderizado dinámico de las páginas HTML \\
-Bootswatch & Frontend & Apariencia visual basada en Bootstrap \\
-Jira & Gestión & Organización, planificación y seguimiento del proyecto \\
-GitBash & Versionado & Control del código mediante terminal \\
-GitHub & Repositorio & Colaboración y almacenamiento del proyecto \\
-}
-
-Este capítulo proporciona así el contexto teórico y tecnológico que sustenta toda la memoria y el desarrollo de la aplicación.
+Este conjunto de conceptos proporciona el contexto teórico y tecnológico que sustenta la memoria y ayuda a entender las decisiones que se detallan en los capítulos posteriores.

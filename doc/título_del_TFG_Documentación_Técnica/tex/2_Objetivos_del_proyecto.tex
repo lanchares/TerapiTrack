@@ -1,26 +1,37 @@
 \capitulo{2}{Objetivos del proyecto}
 
-Este capítulo expone de manera clara los propósitos principales del desarrollo de TerapiTrack, distinguiendo entre los objetivos funcionales ―enfocados en las necesidades detectadas para usuarios y profesionales― y los objetivos técnicos, que marcan las directrices para la construcción y despliegue de la plataforma. Esta diferenciación permite visualizar tanto la utilidad práctica del sistema como los aspectos tecnológicos que respaldan su funcionamiento.
+Este capítulo recoge los objetivos que se persiguen con la realización del proyecto.
+En primer lugar se presentan los objetivos funcionales, que describen qué se espera que ofrezca la aplicación a sus usuarios.
+A continuación se detallan los objetivos técnicos, relacionados con la forma de construir y desplegar el sistema, y por último se recogen los objetivos personales planteados para el desarrollo del trabajo.
 
 \section{Objetivos funcionales}
 
 \begin{itemize}
-    \item Gestionar diferentes perfiles de usuario (administrador, paciente, personal sanitario: médico, terapeuta, psicólogo, enfermero) con permisos diferenciados.
-    \item Permitir la vinculación de pacientes con los profesionales responsables de su seguimiento.
-    \item Ofrecer una biblioteca de ejercicios y recursos terapéuticos en formato audiovisual, filtrable según necesidades clínicas.
-    \item Facilitar la creación y programación de sesiones personalizadas de rehabilitación.
-    \item Registrar y evaluar el progreso de cada paciente mediante grabaciones, informes y revisión de ejercicios.
-    \item Impulsar la comunicación bidireccional y las notificaciones entre los usuarios y los profesionales, para un acompañamiento real y adaptado.
-    \item Asegurar la trazabilidad de la evolución terapéutica, con un acceso a la información ajustado a la privacidad y rol de cada usuario.
+    \item Gestionar diferentes perfiles de usuario (administrador, paciente y profesionales sanitarios) con permisos diferenciados según su rol.
+    \item Permitir la vinculación de pacientes con los profesionales responsables de su seguimiento terapéutico.
+    \item Ofrecer una biblioteca de ejercicios y recursos terapéuticos en formato audiovisual, organizada y filtrable según las necesidades de cada paciente.
+    \item Facilitar la creación y programación de sesiones personalizadas de rehabilitación, formadas por combinaciones de ejercicios.
+    \item Registrar la realización de las sesiones y asociar las grabaciones de los ejercicios al historial de cada paciente, para su posterior revisión y evaluación.
+    \item Proporcionar a los pacientes un entorno sencillo donde puedan consultar sus sesiones programadas, realizar los ejercicios guiados por vídeo y revisar la evolución de sus evaluaciones.
+    \item Asegurar la trazabilidad básica de la evolución terapéutica, ofreciendo a los profesionales una visión estructurada de las sesiones realizadas y de las puntuaciones registradas.
 \end{itemize}
 
 \section{Objetivos técnicos}
 
 \begin{itemize}
-    \item Desarrollar la aplicación sobre un framework robusto (Flask) y modular, que facilite tanto el mantenimiento futuro como la ampliación de funcionalidades.
-    \item Diseñar e implementar una base de datos relacional segura y eficiente, que garantice la integridad y la protección de la información sensible.
-    \item Crear una interfaz accesible y sencilla, especialmente adaptada a personas con dificultades motoras y/o cognitivas.
-    \item Aplicar mecanismos de cifrado y control de accesos para preservar la privacidad y la seguridad de los datos almacenados y transferidos.
-    \item Implementar el despliegue de la aplicación en la nube (por ejemplo, a través de Heroku), asegurando así disponibilidad remota y alta accesibilidad.
-    \item Desarrollar una batería de pruebas automatizadas que permita validar el correcto funcionamiento y la calidad del sistema.
+    \item Construir una aplicación web modular que facilite el mantenimiento y la incorporación de nuevas funcionalidades en el futuro.
+    \item Diseñar e implementar una base de datos relacional que modele usuarios, pacientes, profesionales, ejercicios, sesiones y evaluaciones, garantizando la integridad de los datos clínicos manejados.
+    \item Desarrollar una interfaz web accesible y clara, especialmente pensada para pacientes con posibles dificultades motoras o cognitivas.
+    \item Incorporar mecanismos de autenticación, control de acceso por roles y cifrado de contraseñas que contribuyan a la protección de la información sensible.
+    \item Preparar la aplicación para su despliegue en un entorno en la nube, permitiendo el acceso remoto al sistema desde distintos dispositivos.
+    \item Definir y ejecutar una batería de pruebas sobre los componentes principales del sistema (modelos, controladores y flujos de usuario) que ayude a detectar fallos tanto de diseño como de programación y a comprobar su correcto funcionamiento.
+\end{itemize}
+
+\section{Objetivos personales}
+
+\begin{itemize}
+    \item Aplicar de forma integrada los conocimientos adquiridos a lo largo del Grado en un proyecto completo, desde el análisis de requisitos hasta el despliegue de la aplicación.
+    \item Profundizar en el desarrollo de aplicaciones web orientadas al ámbito sanitario y a la telerehabilitación.
+    \item Mejorar la capacidad de trabajo autónomo, planificación y gestión del tiempo en un proyecto de larga duración.
+    \item Adquirir experiencia práctica en el uso de herramientas profesionales de desarrollo, control de versiones y documentación técnica.
 \end{itemize}
