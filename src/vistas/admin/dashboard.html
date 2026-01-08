@@ -88,6 +88,27 @@
             </div>
         </a>
     </div>
+
+    <!-- Tarjeta: estadísticas del sistema -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <a href="{{ url_for('admin.estadisticas') }}" class="text-decoration-none">
+            <div class="card border-start-dark shadow h-100 py-2 hover-card">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs fw-bold text-dark text-uppercase mb-1">
+                                Estadísticas
+                            </div>
+                            <div class="h5 mb-0 fw-bold text-gray-800">Ver detalles</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-bar-chart fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
 </div>
 
 <div class="row mt-4">
@@ -125,6 +146,14 @@
                         <a href="{{ url_for('admin.crear_usuario') }}" class="btn btn-icon-split btn-success w-100">
                             <span class="icon"><i class="bi bi-person-plus"></i></span>
                             <span class="text">Crear Nuevo Usuario</span>
+                        </a>
+                    </div>
+
+                    <!-- Ir a estadísticas del sistema -->
+                    <div class="col-md-6 mb-2">
+                        <a href="{{ url_for('admin.estadisticas') }}" class="btn btn-icon-split btn-primary w-100">
+                            <span class="icon"><i class="bi bi-bar-chart"></i></span>
+                            <span class="text">Ver Estadísticas del Sistema</span>
                         </a>
                     </div>
                 </div>
