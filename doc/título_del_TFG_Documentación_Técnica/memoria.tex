@@ -8,6 +8,9 @@
 \usepackage{lmodern} % Scalable font
 \usepackage{microtype}
 \usepackage{placeins}
+\usepackage{silence}
+\WarningFilter{latexfont}{Font shape}
+\WarningFilter{latexfont}{Some font shapes}
 
 \RequirePackage{booktabs}
 \RequirePackage[table]{xcolor}
@@ -19,6 +22,7 @@
 \hypersetup{
 	allcolors = {red}
 }
+\pdfstringdefDisableCommands{\def\enskip{}} 
 
 % Ecuaciones
 \usepackage{amsmath}
