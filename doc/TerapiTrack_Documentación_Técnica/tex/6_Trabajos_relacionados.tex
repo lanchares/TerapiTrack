@@ -1,56 +1,58 @@
 \capitulo{6}{Trabajos relacionados}
 
-El desarrollo de TerapiTrack se enmarca en un ámbito de investigación activo en el que se han realizado diversos trabajos previos centrados en la telerehabilitación, el análisis de ejercicios mediante vídeo y la aplicación de técnicas de inteligencia artificial para evaluar el desempeño de pacientes.
-Este capítulo presenta un breve resumen de los trabajos más relevantes que han servido como referencia o que comparten objetivos similares con el proyecto actual.
+El desarrollo de TerapiTrack se enmarca en un ámbito de investigación activo en el que se han realizado diversos trabajos centrados en la telerehabilitación, el análisis de ejercicios mediante vídeo y la aplicación de técnicas de inteligencia artificial para evaluar el desempeño de pacientes.\cite{cubo2023_telerehab_parkinson}
+Este capítulo presenta un breve resumen de los trabajos más relevantes que han servido como referencia o que comparten objetivos similares con el proyecto actual.\cite{nunez2021_tfg_ejercicios,espinosa2022_tfg_deteccion}
 
 \section{Trabajos previos del grupo de investigación}
 
-Varios de los tutores y colaboradores del proyecto han participado en trabajos anteriores relacionados con la telerehabilitación y el análisis automático de ejercicios, lo que ha proporcionado una base sólida para el diseño de TerapiTrack.
+Varios de los tutores y colaboradores del proyecto han participado en trabajos anteriores relacionados con la telerehabilitación y el análisis automático de ejercicios, lo que ha proporcionado una base sólida para el diseño de TerapiTrack.\cite{garrido2021_tfm_infraestructura,ramirez2021_tfm_detectron}
 
 \subsection{Evaluación de ejercicios de rehabilitación en vídeo}
 
-El Trabajo Fin de Grado de Lucía Núñez Calvo abordó la evaluación automática de ejercicios de rehabilitación a partir de vídeos grabados por los pacientes \cite{nunez2021_tfg_ejercicios}.
-En ese proyecto se exploraron técnicas de extracción de características y comparación de poses para determinar si un paciente estaba realizando correctamente un ejercicio frente a un vídeo de referencia.
+El Trabajo Fin de Grado de Lucía Núñez Calvo abordó la evaluación automática de ejercicios de rehabilitación a partir de vídeos grabados por los pacientes.\cite{nunez2021_tfg_ejercicios}
+En ese proyecto se exploraron técnicas de extracción de características y comparación de poses para determinar si un paciente estaba realizando correctamente un ejercicio frente a un vídeo de referencia.\cite{nunez2021_tfg_ejercicios}
 
-TerapiTrack comparte el enfoque de trabajar con vídeos como fuente principal de información, aunque en este caso la evaluación del desempeño la realiza el profesional de forma manual en lugar de aplicar análisis automático.
-La experiencia acumulada en ese trabajo ha servido para diseñar la estructura de almacenamiento de vídeos y para prever una posible ampliación futura del sistema que integre técnicas de inteligencia artificial.
+TerapiTrack comparte el enfoque de trabajar con vídeos como fuente principal de información, aunque en este caso la evaluación del desempeño la realiza el profesional de forma manual en lugar de aplicar análisis automático.\cite{GithubTerapitrack}
+La experiencia acumulada en ese trabajo ha servido para diseñar la estructura de almacenamiento de vídeos y para prever una posible ampliación futura del sistema que integre técnicas de inteligencia artificial.\cite{nunez2021_tfg_ejercicios}
 
 \subsection{Detección de ejercicios en vídeos de rehabilitación}
 
-El Trabajo Fin de Grado de Luis Ángel Espinosa Lafuente se centró en la detección automática del tipo de ejercicio que un paciente estaba realizando a partir de la secuencia de poses capturadas en un vídeo \cite{espinosa2022_tfg_deteccion}.
-Este proyecto permitió validar que es posible clasificar ejercicios de forma fiable utilizando modelos entrenados sobre conjuntos de datos etiquetados.
+El Trabajo Fin de Grado de Luis Ángel Espinosa Lafuente se centró en la detección automática del tipo de ejercicio que un paciente estaba realizando a partir de la secuencia de poses capturadas en un vídeo.\cite{espinosa2022_tfg_deteccion}
+Este proyecto permitió validar que es posible clasificar ejercicios de forma fiable utilizando modelos entrenados sobre conjuntos de datos etiquetados.\cite{espinosa2022_tfg_deteccion}
 
-TerapiTrack no implementa detección automática de ejercicios, pero el modelo de datos está preparado para almacenar esta información si en el futuro se decide integrar un módulo de clasificación que ayude al profesional a identificar qué ejercicios ha realizado el paciente cuando este graba varios seguidos sin indicar explícitamente cuál corresponde a cada uno.
+En TerapiTrack cada ejercicio forma parte de una sesión planificada y queda identificado de forma explícita en el modelo de datos, de modo que la aplicación siempre sabe qué ejercicio está realizando el paciente cuando graba su respuesta.\cite{GithubTerapitrack}
+Aunque no se utiliza clasificación automática, el diseño actual facilitaría incorporar en el futuro un módulo de detección que complemente esta identificación y permita asociar métricas adicionales de calidad a cada ejercicio grabado.\cite{espinosa2022_tfg_deteccion}
 
 \subsection{Infraestructura para telerehabilitación y análisis online}
 
-El Trabajo Fin de Máster de José Luis Garrido Labrador desarrolló una infraestructura completa para gestionar programas de telerehabilitación, incluyendo el almacenamiento de vídeos, la asignación de ejercicios y el seguimiento de la evolución de los pacientes \cite{garrido2021_tfm_infraestructura}.
-Este trabajo sentó las bases arquitectónicas que se han reutilizado parcialmente en TerapiTrack, especialmente en lo relativo a la organización del modelo de datos y la separación de roles.
+El Trabajo Fin de Máster de José Luis Garrido Labrador desarrolló una infraestructura completa para gestionar programas de telerehabilitación, incluyendo el almacenamiento de vídeos, la asignación de ejercicios y el seguimiento de la evolución de los pacientes.\cite{garrido2021_tfm_infraestructura}
+Este trabajo sentó las bases arquitectónicas que se han reutilizado parcialmente en TerapiTrack, especialmente en lo relativo a la organización del modelo de datos y la separación de roles.\cite{garrido2021_tfm_infraestructura}
 
 \subsection{Detección de poses con Detectron2}
 
-El Trabajo Fin de Máster de José Miguel Ramírez Sanz exploró el uso de Detectron2, un framework de detección de objetos y poses, para extraer información sobre la posición de las articulaciones de un paciente a partir de vídeos de ejercicios \cite{ramirez2021_tfm_detectron}.
-Aunque TerapiTrack no incorpora análisis automático de poses en su versión actual, los resultados de ese trabajo han servido para entender las limitaciones técnicas y los requisitos de calidad de vídeo que serían necesarios si se decidiera añadir esta funcionalidad en el futuro.
+El Trabajo Fin de Máster de José Miguel Ramírez Sanz exploró el uso de Detectron2, un \emph{framework} de detección de objetos y poses, para extraer información sobre la posición de las articulaciones de un paciente a partir de vídeos de ejercicios.\cite{ramirez2021_tfm_detectron}
+Aunque TerapiTrack no incorpora análisis automático de poses en su versión actual, los resultados de ese trabajo han servido para entender las limitaciones técnicas y los requisitos de calidad de vídeo que serían necesarios si se decidiera añadir esta funcionalidad en el futuro.\cite{ramirez2021_tfm_detectron}
 
 \section{Sistemas de telerehabilitación para Parkinson}
 
-Existen en la literatura varios sistemas orientados específicamente a pacientes con enfermedad de Parkinson que combinan telerehabilitación con técnicas de análisis automático.
+Existen en la literatura varios sistemas orientados específicamente a pacientes con enfermedad de Parkinson que combinan telerehabilitación con técnicas de análisis automático.\cite{parkinson_telerehab_review}
 
-Cubo y colaboradores presentaron un sistema de telerehabilitación basado en técnicas de \emph{deep learning} para evaluar el desempeño de pacientes con Parkinson durante la realización de ejercicios en su domicilio \cite{cubo2023_telerehab_parkinson}.
-El sistema utiliza redes neuronales convolucionales para analizar vídeos y clasificar la calidad de los movimientos, proporcionando feedback automático al paciente y al profesional.
+Cubo y colaboradores presentaron un sistema de telerehabilitación basado en técnicas de \emph{deep learning} para evaluar el desempeño de pacientes con Parkinson durante la realización de ejercicios en su domicilio.\cite{cubo2023_telerehab_parkinson}
+El sistema utiliza redes neuronales convolucionales para analizar vídeos y clasificar la calidad de los movimientos, proporcionando \emph{feedback} automático al paciente y al profesional.\cite{cubo2023_telerehab_parkinson}
 
-TerapiTrack comparte el objetivo de facilitar el seguimiento remoto de pacientes con Parkinson, pero adopta un enfoque más centrado en la gestión del flujo de trabajo clínico (asignación de sesiones, almacenamiento de vídeos, evaluación manual por parte del profesional) que en el análisis automático.
-Esta decisión se debe a que la evaluación manual permite al profesional tener en cuenta aspectos cualitativos que son difíciles de capturar mediante algoritmos, y porque la integración de técnicas de inteligencia artificial requiere conjuntos de datos etiquetados y validados que no estaban disponibles al inicio del proyecto.
+TerapiTrack comparte el objetivo de facilitar el seguimiento remoto de pacientes con Parkinson, pero adopta un enfoque más centrado en la gestión del flujo de trabajo clínico (asignación de sesiones, almacenamiento de vídeos, evaluación manual por parte del profesional) que en el análisis automático.\cite{GithubTerapitrack}
+Esta decisión se debe a que la evaluación manual permite al profesional tener en cuenta aspectos cualitativos que son difíciles de capturar mediante algoritmos, y porque la integración de técnicas de inteligencia artificial requiere conjuntos de datos etiquetados y validados que no estaban disponibles al inicio del proyecto.\cite{parkinson_telerehab_protocol}
 
 \section{Diferencias y aportaciones de TerapiTrack}
 
 Frente a los trabajos relacionados mencionados, TerapiTrack aporta las siguientes características diferenciadoras:
 
 \begin{itemize}
-  \item \textbf{Gestión completa del ciclo de trabajo clínico}: TerapiTrack no se centra únicamente en el análisis de vídeos, sino en todo el proceso que va desde la asignación de ejercicios por parte del profesional hasta la evaluación del desempeño del paciente y la consulta del historial de sesiones.
-  \item \textbf{Interfaz accesible y adaptada a los tres roles}: El sistema proporciona vistas específicas para administradores, profesionales y pacientes, con navegación simplificada y criterios de accesibilidad pensados para usuarios con poca experiencia tecnológica o con limitaciones motoras \cite{wcag22,rosen2009_telerehab_technologies}.
-  \item \textbf{Almacenamiento externo de vídeos}: La integración con Cloudinary resuelve los problemas de escalabilidad y despliegue que surgen al almacenar vídeos en el propio servidor, facilitando el uso del sistema en entornos de producción reales \cite{CloudinaryConsole}.
-  \item \textbf{Evaluación cualitativa por parte del profesional}: A diferencia de los sistemas basados en análisis automático, TerapiTrack permite al profesional registrar comentarios y observaciones detalladas sobre cada ejercicio, algo especialmente valioso en el contexto clínico donde el juicio experto sigue siendo fundamental.
+  \item \textbf{Gestión completa del ciclo de trabajo clínico}: TerapiTrack no se centra únicamente en el análisis de vídeos, sino en todo el proceso que va desde la asignación de ejercicios por parte del profesional hasta la evaluación del desempeño del paciente y la consulta del historial de sesiones.\cite{GithubTerapitrack,garrido2021_tfm_infraestructura}
+  \item \textbf{Interfaz accesible y adaptada a los tres roles}: El sistema proporciona vistas específicas para administradores, profesionales y pacientes, con navegación simplificada y criterios de accesibilidad pensados para usuarios con poca experiencia tecnológica o con limitaciones motoras.\cite{wcag22,rosen2009_telerehab_technologies}
+  \item \textbf{Almacenamiento externo de vídeos}: La integración con Cloudinary resuelve los problemas de escalabilidad y despliegue que surgen al almacenar vídeos en el propio servidor, facilitando el uso del sistema en entornos de producción reales.\cite{CloudinaryConsole}
+  \item \textbf{Evaluación cualitativa por parte del profesional}: A diferencia de los sistemas basados en análisis automático, TerapiTrack permite al profesional registrar comentarios y observaciones detalladas sobre cada ejercicio, algo especialmente valioso en el contexto clínico donde el juicio experto sigue siendo fundamental.\cite{parkinson_telerehab_review}
+  \item \textbf{Preparado para integrar IA más adelante}: Aunque la versión actual no realiza análisis automático de poses ni clasificación de ejercicios, el modelo de datos y la forma de almacenar los vídeos están pensados para poder incorporar módulos de visión artificial y \emph{deep learning} en futuras versiones sin rediseñar por completo la aplicación.\cite{nunez2021_tfg_ejercicios,espinosa2022_tfg_deteccion,ramirez2021_tfm_detectron}
 \end{itemize}
 
-Estos aspectos hacen de TerapiTrack un sistema complementario a los trabajos previos, que puede servir como base para futuras ampliaciones que integren técnicas de inteligencia artificial sin renunciar a la supervisión humana del proceso terapéutico.
+Estos aspectos hacen de TerapiTrack un sistema complementario a los trabajos previos, que puede servir como base para futuras ampliaciones que integren técnicas de inteligencia artificial sin renunciar a la supervisión humana del proceso terapéutico.\cite{cubo2023_telerehab_parkinson,GithubTerapitrack}

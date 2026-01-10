@@ -1,5 +1,5 @@
 \capitulo{3}{Conceptos teóricos}
-En este capítulo se revisan los conceptos teóricos básicos que sirven de soporte al proyecto TerapiTrack.
+En este capítulo se revisan los conceptos teóricos básicos que sirven de soporte al proyecto TerapiTrack, tanto en su diseño como en su implementación.
 Primero se abordan nociones relacionadas con la enfermedad de Parkinson y la rehabilitación, y después se describen los principios de accesibilidad, los patrones de diseño y los modelos de datos que se han tenido en cuenta durante el desarrollo.
 
 \section{Enfermedades degenerativas y enfermedad de Parkinson}
@@ -37,7 +37,7 @@ Los estándares de accesibilidad web, como las pautas WCAG, recogen cuatro princ
     \item \textbf{Robustez}: El contenido debe mostrarse correctamente en distintos navegadores y dispositivos, y ser compatible con tecnologías de apoyo como lectores de pantalla o ampliadores de pantalla \cite{wcag22}.
 \end{itemize}
 
-Estos principios han guiado el diseño de la interfaz de TerapiTrack, priorizando menús sencillos, textos claros y un número reducido de acciones por pantalla.
+Estos principios han guiado el diseño de la interfaz de TerapiTrack, priorizando menús sencillos, textos claros y un número reducido de acciones por pantalla. \cite{GithubTerapitrack}
 
 \section{Patrones de diseño y arquitectura Modelo–Vista–Controlador}
 En el desarrollo de aplicaciones web es habitual apoyarse en patrones de diseño que separan responsabilidades y facilitan la evolución del sistema.
@@ -53,7 +53,7 @@ Este tipo de arquitectura favorece que el código relacionado con la persistenci
 
 \section{Bases de datos relacionales}
 Las bases de datos relacionales permiten organizar la información en tablas relacionadas entre sí mediante claves primarias y foráneas, garantizando la integridad de los datos mediante restricciones y reglas de consistencia \cite{date_db}.
-Este modelo resulta adecuado para almacenar información clínica y de seguimiento, donde es importante mantener un historial coherente de usuarios, sesiones y evaluaciones.
+Este modelo es el que se ha aplicado en TerapiTrack para organizar usuarios, pacientes, ejercicios, sesiones y evaluaciones.
 
 La \textbf{normalización} es el proceso mediante el cual se descompone la información en tablas más pequeñas para reducir la redundancia y evitar anomalías en las operaciones de inserción, actualización y borrado.
 Aplicar niveles adecuados de normalización ayuda a mantener la coherencia de los datos y a simplificar su mantenimiento a largo plazo \cite{date_db}.

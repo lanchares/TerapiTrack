@@ -1,51 +1,55 @@
 \capitulo{1}{Introducción}
-A medida que la población envejece y los servicios sanitarios se concentran principalmente en las ciudades, muchas personas que residen en zonas rurales encuentran dificultades para acceder a terapias de rehabilitación.
-Esta situación afecta de manera especial a quienes padecen determinados problemas de salud crónicos, entre ellos la enfermedad de Parkinson. 
 
-La enfermedad de Parkinson es un trastorno neurodegenerativo progresivo que provoca rigidez muscular, temblores y dificultades en el movimiento, y para el que actualmente no existe cura.
-No obstante, la realización continuada de ejercicios de rehabilitación física y cognitiva permite ralentizar en cierto grado la evolución de la enfermedad, mejorar la movilidad y mantener durante más tiempo la independencia y la calidad de vida de las personas afectadas.
-Las limitaciones de movilidad y la lejanía de los centros de referencia complican aún más el acceso a estas terapias, repercutiendo en el bienestar de los pacientes y en el esfuerzo de sus familias.
+A medida que la población envejece y los servicios sanitarios se concentran principalmente en las ciudades, muchas personas que residen en zonas rurales encuentran dificultades para acceder a terapias de rehabilitación.\cite{who_parkinson_2023}
+Esta situación afecta de manera especial a quienes padecen determinados problemas de salud crónicos, entre ellos la enfermedad de Parkinson.\cite{who_parkinson_2023,ninds_parkinson}
 
-Ante esta problemática, surge \textbf{TerapiTrack}, una plataforma web diseñada para facilitar el acompañamiento y el seguimiento de terapias, principalmente para personas diagnosticadas con la enfermedad de Parkinson.
-Su enfoque flexible y modular permite también su uso en otros casos que requieran terapias a distancia, como personas con otras enfermedades crónicas.
-TerapiTrack busca eliminar barreras geográficas y de accesibilidad, adaptándose a las necesidades y capacidades de distintos tipos de usuarios.
+La enfermedad de Parkinson es un trastorno neurodegenerativo progresivo que provoca rigidez muscular, temblores y dificultades en el movimiento, y para el que actualmente no existe cura.\cite{who_parkinson_2023,ninds_parkinson}
+No obstante, la realización continuada de ejercicios de rehabilitación física y cognitiva permite ralentizar en cierto grado la evolución de la enfermedad, mejorar la movilidad y mantener durante más tiempo la independencia y la calidad de vida de las personas afectadas.\cite{parkinson_telerehab_review}
+Las limitaciones de movilidad y la lejanía de los centros de referencia complican aún más el acceso a estas terapias, repercutiendo en el bienestar de los pacientes y en el esfuerzo de sus familias.\cite{parkinson_telerehab_review}
+
+Ante esta problemática, surge TerapiTrack, una plataforma web diseñada para facilitar el acompañamiento y el seguimiento de terapias, principalmente para personas diagnosticadas con la enfermedad de Parkinson.\cite{GithubTerapitrack}
+Su enfoque flexible y modular permite también su uso en otros casos que requieran terapias a distancia, como personas con otras enfermedades crónicas.\cite{GithubTerapitrack}
+TerapiTrack busca eliminar barreras geográficas y de accesibilidad, adaptándose a las necesidades y capacidades de distintos tipos de usuarios.\cite{GithubTerapitrack,telehealth_accessibility}
 
 \section{Contexto del problema}
-En España, esta problemática se acentúa especialmente en la conocida como “España vaciada”, donde una parte muy importante de la población está formada por personas de edad avanzada.
-Éste es un colectivo más propenso a padecer trastornos neurodegenerativos como la enfermedad de Parkinson y que, además, suele depender de familiares o cuidadores para desplazarse a los hospitales y centros sanitarios.
-Para muchos de estos pacientes, viajar hasta la ciudad únicamente para realizar sesiones de rehabilitación supone invertir varias horas en transporte, afrontar costes económicos adicionales y organizar la agenda de toda la familia, lo que sin duda dificulta mantener la regularidad necesaria en las terapias.
 
-El proyecto en el que se enmarca este Trabajo de Fin de Grado forma parte de una colaboración más amplia con el Servicio de Neurología del Hospital Universitario de Burgos, liderada por la doctora Esther Cubo.
-El objetivo general de esta colaboración es mejorar la calidad de vida de las personas con enfermedad de Parkinson mediante el uso de herramientas de inteligencia artificial y de telemedicina, trabajando en tres líneas principales: la detección temprana de la enfermedad a partir de pruebas que miden la bradicinesia, la detección de caídas y la aplicación de programas de telerehabilitación con retroalimentación automática. \cite{cubo2023_telerehab_parkinson,nunez2021_tfg_ejercicios,espinosa2022_tfg_deteccion,garrido2021_tfm_infraestructura,ramirez2021_tfm_detectron}.
-Dentro de este conjunto de proyectos, el TFG se sitúa en esta última línea y se centra en el desarrollo de una aplicación web que permita a los pacientes realizar en su domicilio ejercicios de rehabilitación guiados por vídeos preparados por neurólogos y terapeutas del hospital.
+En España, esta problemática se acentúa especialmente en la conocida como “España vaciada”, donde una parte muy importante de la población está formada por personas de edad avanzada.\cite{who_parkinson_2023}
+Este es un colectivo más propenso a padecer trastornos neurodegenerativos como la enfermedad de Parkinson y que, además, suele depender de familiares o cuidadores para desplazarse a los hospitales y centros sanitarios.\cite{who_parkinson_2023,ninds_parkinson}
+Para muchos de estos pacientes, viajar hasta la ciudad únicamente para realizar sesiones de rehabilitación supone invertir varias horas en transporte, afrontar costes económicos adicionales y organizar la agenda de toda la familia, lo que dificulta mantener la regularidad necesaria en las terapias.\cite{parkinson_telerehab_review}
+
+El proyecto en el que se enmarca este Trabajo de Fin de Grado forma parte de una colaboración más amplia con el Servicio de Neurología del Hospital Universitario de Burgos, liderada por la doctora Esther Cubo.\cite{cubo2023_telerehab_parkinson}
+El objetivo general de esta colaboración es mejorar la calidad de vida de las personas con enfermedad de Parkinson mediante el uso de herramientas de inteligencia artificial y de telemedicina, trabajando en tres líneas principales: la detección temprana de la enfermedad a partir de pruebas que miden la bradicinesia, la detección de caídas y la aplicación de programas de telerehabilitación con retroalimentación automática.\cite{cubo2023_telerehab_parkinson,nunez2021_tfg_ejercicios,espinosa2022_tfg_deteccion,garrido2021_tfm_infraestructura,ramirez2021_tfm_detectron}
+Dentro de este conjunto de proyectos, el TFG se sitúa en esta última línea y se centra en el desarrollo de una aplicación web que permita a los pacientes realizar en su domicilio ejercicios de rehabilitación guiados por vídeos preparados por neurólogos y terapeutas del hospital.\cite{GithubTerapitrack}
 
 \section{Propuesta de solución}
-El objetivo principal de TerapiTrack es acercar la rehabilitación y el control terapéutico al entorno cotidiano del paciente, ofreciendo una aplicación web que organice de forma sencilla las sesiones de ejercicios y permita registrar su realización en el domicilio.
 
-Se ha desarrollado la base funcional de dicha aplicación, estructurada en tres paneles diferenciados para administrador, profesional sanitario y paciente.
-El administrador puede gestionar usuarios, roles y vinculaciones entre pacientes y profesionales, así como configurar parámetros generales del sistema, como las políticas de retención de vídeos o ciertos límites de almacenamiento.
-El profesional dispone de herramientas para mantener su lista de pacientes, crear y catalogar ejercicios a partir de vídeos, programar sesiones terapéuticas personalizadas y revisar posteriormente las grabaciones y evaluaciones asociadas.
-Por su parte, el paciente accede a un panel simplificado desde el que puede consultar sus próximas sesiones, ejecutar los ejercicios guiados por vídeo y visualizar de forma clara su evolución a partir de las evaluaciones registradas.
+El objetivo principal de TerapiTrack es acercar la rehabilitación y el control terapéutico al entorno cotidiano del paciente, ofreciendo una aplicación web que organice de forma sencilla las sesiones de ejercicios y permita registrar su realización en el domicilio.\cite{GithubTerapitrack}
+
+Se ha desarrollado la base funcional de dicha aplicación, estructurada en tres paneles diferenciados para administrador, profesional sanitario y paciente.\cite{GithubTerapitrack}
+El administrador puede gestionar usuarios, roles y vinculaciones entre pacientes y profesionales, así como configurar parámetros generales del sistema, como las políticas de retención de vídeos o ciertos límites de almacenamiento.\cite{GithubTerapitrack}
+El profesional dispone de herramientas para mantener su lista de pacientes, crear y catalogar ejercicios a partir de vídeos, programar sesiones terapéuticas personalizadas y revisar posteriormente las grabaciones y evaluaciones asociadas.\cite{GithubTerapitrack}
+Por su parte, el paciente accede a un panel simplificado desde el que puede consultar sus próximas sesiones, ejecutar los ejercicios guiados por vídeo y visualizar de forma clara su evolución a partir de las evaluaciones registradas.\cite{GithubTerapitrack}
 
 Las principales funcionalidades que aporta la herramienta son:
 
 \begin{itemize}
-    \item Gestionar usuarios y roles (administrador, profesional y paciente), controlando el acceso mediante autenticación y decoradores específicos por tipo de usuario.
-    \item Permitir que los profesionales sanitarios creen ejercicios en vídeo, organicen sesiones personalizadas y las asignen a sus pacientes.
-    \item Registrar la realización de las sesiones y asociar las grabaciones de los ejercicios al historial de cada paciente, facilitando su posterior evaluación.
-    \item Presentar a cada paciente un entorno simplificado donde pueda consultar la planificación, realizar los ejercicios y revisar su progreso a lo largo del tiempo.
+    \item Gestionar usuarios y roles (administrador, profesional y paciente), controlando el acceso mediante autenticación y decoradores específicos por tipo de usuario.\cite{GithubTerapitrack}
+    \item Permitir que los profesionales sanitarios creen ejercicios en vídeo, organicen sesiones personalizadas y las asignen a sus pacientes.\cite{GithubTerapitrack}
+    \item Registrar la realización de las sesiones y asociar las grabaciones de los ejercicios al historial de cada paciente, facilitando su posterior evaluación.\cite{GithubTerapitrack}
+    \item Presentar a cada paciente un entorno simplificado donde pueda consultar la planificación, realizar los ejercicios y revisar su progreso a lo largo del tiempo.\cite{GithubTerapitrack}
 \end{itemize}
 
 \section{Materiales entregados}
-Para facilitar la validación, el uso y la posible evolución del sistema, se entrega junto con la memoria un conjunto de materiales adicionales:
+
+Para facilitar la validación, el uso y la posible evolución del sistema, se entrega junto con la memoria un conjunto de materiales adicionales:\cite{GithubTerapitrack}
 
 \begin{itemize}
-    \item El código fuente completo del proyecto, junto con su historial de cambios en el repositorio de control de versiones (incluida la rama \texttt{Pruebas} utilizada durante el desarrollo).
-    \item La definición de la base de datos y un juego de datos de prueba que permite ejecutar los principales casos de uso sin necesidad de configuración adicional.
-    \item La documentación técnica incluida en los anexos, donde se detallan la arquitectura del sistema, los modelos de datos y los controladores implementados.
-    \item Un manual de instalación y de usuario, con instrucciones paso a paso para desplegar la aplicación y una guía básica para cada tipo de usuario.
-    \item Un resumen de las pruebas realizadas sobre el sistema y de los resultados obtenidos.
-    \item Varios vídeos breves que muestran el funcionamiento de las distintas partes de TerapiTrack (panel de administrador, profesional y paciente), de manera que el tribunal pueda hacerse una idea clara de la aplicación sin tener que levantar todo el entorno.
+    \item El código fuente completo del proyecto, junto con su historial de cambios en el repositorio de control de versiones (incluida la rama \texttt{Pruebas} utilizada durante el desarrollo).\cite{GithubTerapitrack}
+    \item La definición de la base de datos y un juego de datos de prueba que permite ejecutar los principales casos de uso sin necesidad de configuración adicional.\cite{GithubTerapitrack}
+    \item La documentación técnica incluida en los anexos, donde se detallan la arquitectura del sistema, los modelos de datos y los controladores implementados.\cite{GithubTerapitrack}
+    \item Un manual de instalación y de usuario, con instrucciones paso a paso para desplegar la aplicación y una guía básica para cada tipo de usuario.\cite{GithubTerapitrack}
+    \item Un resumen de las pruebas realizadas sobre el sistema y de los resultados obtenidos.\cite{GithubTerapitrack}
+    \item Varios vídeos breves que muestran el funcionamiento de las distintas partes de TerapiTrack (panel de administrador, profesional y paciente), de manera que el tribunal pueda hacerse una idea clara de la aplicación sin tener que levantar todo el entorno.\cite{GithubTerapitrack}
 \end{itemize}
 
-El objetivo de este material adicional es que cualquier persona interesada pueda entender con rapidez el alcance del proyecto, comprobar su funcionamiento y disponer de una base sobre la que seguir trabajando.
+El objetivo de este material adicional es que cualquier persona interesada pueda entender con rapidez el alcance del proyecto, comprobar su funcionamiento y disponer de una base sobre la que seguir trabajando.\cite{GithubTerapitrack}

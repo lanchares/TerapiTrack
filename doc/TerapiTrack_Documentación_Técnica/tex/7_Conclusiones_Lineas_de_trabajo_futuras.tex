@@ -1,4 +1,46 @@
-\capitulo{7}{Conclusiones y Líneas de trabajo futuras}
+\capitulo{7}{Conclusiones y líneas de trabajo futuras}
 
-Todo proyecto debe incluir las conclusiones que se derivan de su desarrollo. Éstas pueden ser de diferente índole, dependiendo de la tipología del proyecto, pero normalmente van a estar presentes un conjunto de conclusiones relacionadas con los resultados del proyecto y un conjunto de conclusiones técnicas. 
-Además, resulta muy útil realizar un informe crítico indicando cómo se puede mejorar el proyecto, o cómo se puede continuar trabajando en la línea del proyecto realizado. 
+\section{Conclusiones}
+
+El desarrollo de TerapiTrack ha permitido pasar de una idea inicial de plataforma de telerehabilitación a una herramienta web funcional que gestiona usuarios, ejercicios, sesiones terapéuticas y evaluaciones en un entorno realista.\cite{GithubTerapitrack} 
+A lo largo del proyecto se han cubierto los principales objetivos funcionales y técnicos planteados, dejando una base razonablemente sólida sobre la que se pueden apoyar futuras extensiones del sistema.\cite{GithubTerapitrack}
+
+Desde el punto de vista funcional, la aplicación ofrece paneles diferenciados para administradores, profesionales sanitarios y pacientes, de forma que cada tipo de usuario dispone de un entorno adaptado a sus tareas habituales.\cite{GithubTerapitrack}
+El sistema permite gestionar la vinculación entre pacientes y profesionales, crear y catalogar ejercicios en vídeo, programar sesiones personalizadas y registrar su realización, incluyendo la subida y almacenamiento de las grabaciones generadas en el domicilio del paciente.\cite{HerokuTerapitrackApp}
+Además, se ha incorporado una trazabilidad básica de la evolución terapéutica a través del historial de sesiones y evaluaciones asociadas a cada paciente.\cite{GithubTerapitrack}
+
+En el ámbito técnico, se ha diseñado una arquitectura modular basada en Flask y \textit{blueprints}, apoyada en un modelo de datos relacional normalizado que separa claramente las entidades de usuario, paciente, profesional, ejercicio, sesión, vídeo de respuesta y evaluación.\cite{FlaskDocs,SQLAlchemyDocs}
+La integración de SQLAlchemy como ORM ha facilitado la evolución del esquema sin perder integridad referencial, mientras que el uso de Cloudinary ha permitido delegar el almacenamiento de vídeos en un servicio específico, evitando problemas de espacio y de ancho de banda en el propio servidor.\cite{CloudinaryConsole}
+El despliegue en Heroku y la configuración diferenciada de los entornos de desarrollo y producción han demostrado que la aplicación puede ejecutarse en la nube con una configuración razonable de recursos.\cite{HerokuTerapitrackApp,HerokuDashboard}
+
+Otro aspecto destacable es la incorporación de pruebas automatizadas con \textit{pytest} sobre los módulos más críticos, alcanzando una cobertura elevada en modelos, decoradores y componentes de configuración.\cite{PytestDocs,GithubTerapitrack}
+Estas pruebas, combinadas con pruebas manuales sobre los flujos de uso principales en el entorno desplegado, han ayudado a detectar errores de diseño e implementación en fases tempranas y han dado una mayor tranquilidad a la hora de refactorizar código o ajustar funcionalidades.\cite{GithubTerapitrack}
+La decisión de seguir una metodología de trabajo iterativa apoyada en Jira también ha sido útil para planificar, seguir el avance real del proyecto y reordenar prioridades cuando ha sido necesario.\cite{JiraTerapitrack}
+
+Desde una perspectiva más personal, el proyecto ha servido para integrar conocimientos de desarrollo web, bases de datos, control de versiones, despliegue en la nube y documentación técnica en un caso de uso centrado en la mejora de la calidad de vida de personas con enfermedad de Parkinson.\cite{GithubTerapitrack,garrido2021_tfm_infraestructura}
+El trabajo ha dejado claro lo importante que es mantener cierta disciplina en el uso de herramientas como Git y Jira, así como diseñar pensando en la accesibilidad y en las limitaciones de los usuarios finales desde el principio.\cite{wcag22,telehealth_accessibility}
+Aunque han aparecido dificultades técnicas y de organización en distintos momentos, la experiencia global ha sido muy enriquecedora y ha permitido entregar una primera versión de TerapiTrack que cumple los objetivos planteados y puede utilizarse en un contexto de telerehabilitación supervisada.\cite{cubo2023_telerehab_parkinson}
+
+\section{Líneas de trabajo futuras}
+
+La versión actual de TerapiTrack cubre el ciclo básico de planificación, realización y evaluación de sesiones terapéuticas, pero deja abiertas varias líneas de mejora que podrían abordarse en trabajos posteriores.\cite{GithubTerapitrack}
+Algunas de estas líneas están relacionadas con la ampliación de la funcionalidad y otras con la incorporación de técnicas de análisis de vídeo más avanzadas o con la adaptación del sistema a un entorno clínico real.\cite{cubo2023_telerehab_parkinson}
+
+En primer lugar, una evolución natural sería integrar módulos de análisis automático de las grabaciones utilizando técnicas de visión artificial y aprendizaje automático, aprovechando los trabajos previos del grupo en detección de poses y evaluación de ejercicios a partir de vídeo.\cite{nunez2021_tfg_ejercicios,espinosa2022_tfg_deteccion,ramirez2021_tfm_detectron}
+Esto permitiría complementar la evaluación manual del profesional con métricas objetivas sobre la ejecución de los movimientos, generando indicadores de calidad de los ejercicios o alertas cuando se detecten patrones de empeoramiento.\cite{parkinson_telerehab_review,parkinson_telerehab_protocol}
+
+En segundo lugar, sería interesante ampliar las funcionalidades de explotación de datos clínicos y de visualización del progreso del paciente.\cite{cubo2023_telerehab_parkinson}
+Actualmente el sistema ofrece un historial estructurado de sesiones y evaluaciones, pero se podrían incorporar gráficos más completos, filtros por tipo de ejercicio o por profesional y resúmenes periódicos tanto para los clínicos como para los propios pacientes.\cite{parkinson_telerehab_review}
+Este tipo de información agregada ayudaría a tomar decisiones sobre la adaptación de las terapias y a comunicar de forma más clara los avances o dificultades encontrados durante el tratamiento.\cite{who_parkinson_2023,ninds_parkinson}
+
+Otra línea de mejora tiene que ver con la accesibilidad y la experiencia de usuario.\cite{telehealth_accessibility,wcag22}
+Aunque la interfaz ya sigue criterios básicos de accesibilidad y se ha pensado para personas mayores con posibles limitaciones motoras, sería recomendable realizar pruebas de usabilidad con pacientes reales y profesionales para identificar barreras concretas y ajustar textos, colores, tamaño de los elementos y flujos de navegación.\cite{rosen2009_telerehab_technologies}
+También podría valorarse la adaptación de la interfaz a dispositivos móviles o tabletas, que en muchos casos resultan más cómodos en el entorno doméstico.\cite{telehealth_accessibility}
+
+Desde el punto de vista de la integración con el ecosistema sanitario, una evolución relevante sería conectar TerapiTrack con otros sistemas clínicos, como historias clínicas electrónicas o plataformas de citación y teleconsulta.\cite{cubo2023_telerehab_parkinson}
+Esta integración permitiría evitar la duplicación de información, mejorar la coordinación entre distintos profesionales y facilitar que TerapiTrack se incorpore como una herramienta más dentro de los procesos asistenciales habituales.\cite{cubo2023_telerehab_parkinson}
+Para ello sería necesario estudiar los requisitos legales y de interoperabilidad, así como los estándares de intercambio de datos empleados en cada entorno.\cite{cubo2023_telerehab_parkinson}
+
+Por último, cabría explorar la posibilidad de extender el uso de TerapiTrack más allá de la enfermedad de Parkinson, adaptando los catálogos de ejercicios y los criterios de evaluación a otras patologías crónicas que se puedan beneficiar de programas de rehabilitación remota.\cite{rehab_hss,nbcot_ot}
+El diseño modular del sistema, tanto en el modelo de datos como en la interfaz, facilita esta reutilización siempre que se definan de forma adecuada los nuevos perfiles de usuario, los tipos de ejercicio y las necesidades específicas de cada grupo de pacientes.\cite{date_db,pressman_ingenieria_sw}
+De este modo, el trabajo realizado podría servir como base para una plataforma más generalista de telerehabilitación, manteniendo el foco en la calidad, la accesibilidad y la seguridad de la información sanitaria.\cite{cubo2023_telerehab_parkinson}
