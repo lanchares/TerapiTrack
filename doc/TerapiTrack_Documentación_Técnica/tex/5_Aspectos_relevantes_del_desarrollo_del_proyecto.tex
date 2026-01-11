@@ -335,6 +335,19 @@ Además de las pruebas automáticas, se han realizado pruebas manuales tanto en 
 En paralelo, se han ejecutado pruebas sobre la base de datos desde \texttt{flask shell} y mediante consultas SQL en DB Browser for SQLite para verificar la creación de entidades, las relaciones de muchos a muchos y operaciones de actualización habituales (cambio de estado de sesiones, modificación de evaluaciones, etc.), que se describen con más detalle en el anexo de documentación técnica \cite{GithubTerapitrack}.
 Estas pruebas han permitido detectar problemas que no eran evidentes en el entorno local, como tiempos de respuesta más largos al subir vídeos grandes o errores de permisos en rutas específicas, cuya corrección se ha ido registrando en Jira y consolidando en la rama \texttt{Pruebas} siguiendo el ciclo iterativo descrito en la primera sección de este capítulo \cite{JiraTerapitrack}.
 
+\subsubsection{Análisis estático con SonarQube}
+
+Además de las pruebas automatizadas con \texttt{pytest}, se realizó un análisis estático del código utilizando SonarQube con el objetivo de detectar \emph{code smells}, posibles errores y problemas de mantenibilidad.\cite{GithubTerapitrack} Para ello se configuró un proyecto específico para \textit{TerapiTrack}, se lanzó el escaneo sobre el código de \texttt{src} y se revisaron los informes generados en la interfaz web de la herramienta.
+
+El resultado del análisis indicó que no se detectaban vulnerabilidades de seguridad ni errores críticos, y que la mayor parte de las incidencias correspondían a recomendaciones de estilo (nombres de variables, longitud de funciones o duplicidad leve de código). Estas observaciones se utilizaron para refactorizar algunos controladores y modelos, mejorando la legibilidad y reduciendo el acoplamiento entre módulos, aunque se mantuvieron ciertos \emph{smells} considerados aceptables para el alcance de un prototipo académico.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{img/sonarqube_resumen.png}
+  \caption{Resumen del análisis estático de \textit{TerapiTrack} en SonarQube.}
+  \label{fig:sonarqube-resumen}
+\end{figure}
+
 \section{Lecciones aprendidas y aspectos mejorables}
 
 El desarrollo de TerapiTrack ha sido una experiencia de aprendizaje continuo en la que se han ido descubriendo soluciones a medida que surgían los problemas.

@@ -250,4 +250,40 @@ En esta sección se describen los principales flujos y procedimientos implementa
   \item \textbf{Grabación y evaluación}: Durante la realización de una sesión, el sistema registra la ejecución de cada ejercicio mediante la cámara del dispositivo y almacena el vídeo asociado. Más tarde, los profesionales revisan esos vídeos, asignan una puntuación y añaden comentarios, generando un histórico de evaluaciones que se utiliza para visualizar la evolución del paciente a lo largo del tiempo.
 \end{itemize}
 
-En una versión futura del sistema podrían incorporarse diagramas de actividad para estos procedimientos, detallando para cada caso el actor implicado (paciente, profesional o administrador), las llamadas a los controladores y las interacciones principales con los modelos y la base de datos.
+Los diagramas de actividad que se muestran a continuación detallan los principales flujos procedimentales del sistema. En primer lugar se representan la creación de usuarios, la creación de ejercicios y la asignación de sesiones terapéuticas por parte del administrador y los profesionales. A continuación se describen la realización en directo de una sesión por parte del paciente, guiado por el profesional, y la evaluación posterior de los vídeos grabados.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{img/actividad_crear_usuario.png}
+  \caption{Diagrama de actividad de creación de usuario por parte del administrador.}
+  \label{fig:actividad-crear-usuario}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{img/actividad_crear_ejercicio.png}
+  \caption{Diagrama de actividad de creación de ejercicio por parte del profesional.}
+  \label{fig:actividad-crear-ejercicio}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{img/actividad_crear_asignar_sesion.png}
+  \caption{Diagrama de actividad de creación y asignación de sesión terapéutica.}
+  \label{fig:actividad-crear-sesion}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{img/actividad_realizar_sesion.png}
+  \caption{Diagrama de actividad de realización de una sesión terapéutica en \textit{TerapiTrack}.}
+  \label{fig:actividad-realizar-sesion}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{img/actividad_evaluar_sesion.png}
+  \caption{Diagrama de actividad de evaluación de una sesión terapéutica por parte del profesional.}
+  \label{fig:actividad-evaluar-sesion}
+\end{figure}
+

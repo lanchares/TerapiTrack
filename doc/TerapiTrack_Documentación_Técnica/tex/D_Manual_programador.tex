@@ -146,6 +146,13 @@ Una vez desplegada la aplicación, las variables de entorno (\texttt{SECRET\_KEY
   \label{fig:heroku-postgres}
 \end{figure}
 
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{img/heroku_videos.png}
+  \caption{Listado de vídeos de ejercicios en el directorio \texttt{src/static/videos} mediante \texttt{heroku run}.}
+  \label{fig:heroku-videos}
+\end{figure}
+
 
 \section{Pruebas del sistema}
 
@@ -157,7 +164,8 @@ La ejecución de la batería completa de pruebas puede realizarse con el siguien
 pytest --cov=src --cov-report=html
 \end{verbatim}
 
-Con esta orden se genera un informe de cobertura en la carpeta \texttt{htmlcov}, que puede abrirse en el navegador para analizar qué partes del código están cubiertas por pruebas y cuáles convendría reforzar. En la versión final del proyecto se han definido 198 pruebas y se ha alcanzado una cobertura global del 99\,\%, con todos los modelos y las funciones auxiliares al 100\,\% y los controladores principales (administrador, profesional, paciente y autenticación) en torno al 99\,\% de líneas cubiertas \cite{GithubTerapitrack}. La Figura~\ref{fig:coverage-html} recoge el informe de cobertura generado por \texttt{coverage.py}.
+Con esta orden se genera un informe de cobertura en la carpeta \texttt{htmlcov}, que puede abrirse en el navegador para analizar qué partes del código están cubiertas por pruebas y cuáles convendría reforzar. En la versión final del proyecto se han definido 190 pruebas y se ha alcanzado una cobertura global del 99\%, con todos los modelos y las funciones auxiliares al 100\% y los controladores principales (administrador, profesional, paciente y autenticación) en torno al 99\,\% de líneas cubiertas \cite{GithubTerapitrack}.
+La Figura~\ref{fig:coverage-html} recoge el informe de cobertura generado por \texttt{coverage.py}.
 
 \begin{figure}[H]
   \centering
@@ -181,7 +189,7 @@ Posteriormente se creó una sesión terapéutica, se añadieron ejercicios a tra
 
 \subsection{Pruebas SQL con DB Browser for SQLite}
 
-Como complemento a las pruebas anteriores, se ejecutaron sentencias SQL directamente sobre la base de datos SQLite utilizando DB Browser for SQLite \cite{DBBrowser}. El objetivo era validar operaciones típicas de mantenimiento (actualizaciones y consultas) y comprobar que las restricciones de clave primaria y foránea no impedían los cambios habituales.
+Como complemento a las pruebas anteriores, se ejecutaron sentencias SQL directamente sobre la base de datos SQLite utilizando DB Browser for SQLite \cite{dbbrowser_sqlite}. El objetivo era validar operaciones típicas de mantenimiento (actualizaciones y consultas) y comprobar que las restricciones de clave primaria y foránea no impedían los cambios habituales.
 
 En primer lugar se actualizó el nombre y los apellidos de un usuario mediante una sentencia \texttt{UPDATE} y se verificó el resultado con una consulta \texttt{SELECT} sobre la tabla \texttt{Usuario}. De forma similar, se modificó el estado de una sesión de \texttt{PENDIENTE} a \texttt{COMPLETADA} y se actualizó la fecha de asignación en la tabla \texttt{Sesion}. Por último, se cambió la puntuación y los comentarios de una evaluación específica en la tabla \texttt{Evaluacion}, comprobando que los nuevos valores se almacenaban correctamente y que la fecha de evaluación se mantenía consistente. La Figura~\ref{fig:dbbrowser-actualizaciones} muestra uno de estos ejemplos.
 
@@ -192,6 +200,12 @@ En primer lugar se actualizó el nombre y los apellidos de un usuario mediante u
   \label{fig:dbbrowser-actualizaciones}
 \end{figure}
 
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{img/dbbrowser_borrados.png}
+  \caption{Borrado de una relación N:M y verificación mediante consulta SQL en DB Browser for SQLite.}
+  \label{fig:dbbrowser-borrados}
+\end{figure}
 
 \section{Pantallas de autenticación y perfil}
 
