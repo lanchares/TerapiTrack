@@ -199,7 +199,7 @@ Fecha\_Expiracion & text &  &  & Fecha de expiración (YYYY-MM-DD) \\
 Ejercicio\_Sesion\_Id & integer & PK, FK & fk $\rightarrow$ Ejercicio\_Sesion(Id), not null & Identificador (FK \texttt{Ejercicio\_Sesion}) \\
 Puntuacion & numeric &  & check (>=1 and <=5), not null & Puntuación (1–5) asignada por profesional \\
 Comentarios & text &  &  & Observaciones de la evaluación \\
-fechas\_Evaluacion & text &  & not null & Fecha de evaluación (YYYY-MM-DD) \\
+Fecha\_Evaluacion & text &  & not null & Fecha de evaluación (YYYY-MM-DD) \\
 \hline
 \end{tabular}
 \caption{Diccionario de datos de la tabla \texttt{Evaluacion}}
@@ -250,4 +250,4 @@ En esta sección se describen los principales flujos y procedimientos implementa
   \item \textbf{Grabación y evaluación}: Durante la realización de una sesión, el sistema registra la ejecución de cada ejercicio mediante la cámara del dispositivo y almacena el vídeo asociado. Más tarde, los profesionales revisan esos vídeos, asignan una puntuación y añaden comentarios, generando un histórico de evaluaciones que se utiliza para visualizar la evolución del paciente a lo largo del tiempo.
 \end{itemize}
 
-En una versión ampliada de este anexo podrían incorporarse diagramas de actividad para estos procedimientos, mostrando para cada caso el actor implicado (paciente, profesional o administrador), las llamadas a los controladores y las interacciones principales con los modelos y la base de datos.
+En una versión futura del sistema podrían incorporarse diagramas de actividad para estos procedimientos, detallando para cada caso el actor implicado (paciente, profesional o administrador), las llamadas a los controladores y las interacciones principales con los modelos y la base de datos.

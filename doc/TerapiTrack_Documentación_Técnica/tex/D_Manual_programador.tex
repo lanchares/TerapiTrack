@@ -2,10 +2,146 @@
 
 \section{Introducción}
 
+Este anexo recoge la documentación técnica de \textit{TerapiTrack} dirigida a desarrolladores. El objetivo es describir la organización del código, los componentes principales de la aplicación y los pasos necesarios para compilar, instalar, ejecutar y probar el sistema en un entorno de desarrollo estándar.
+
+De este modo, cualquier desarrollador que se incorpore al proyecto puede entender con rapidez cómo está estructurada la aplicación y qué pasos seguir para trabajar sobre ella.
+
 \section{Estructura de directorios}
+
+El proyecto se organiza siguiendo una estructura modular que separa claramente la lógica de negocio, los modelos de datos, las vistas y las pruebas automatizadas. A continuación se resumen los directorios más relevantes:
+
+\begin{itemize}
+  \item \texttt{src/controladores}: Contiene los controladores de Flask organizados por dominio:
+  \begin{itemize}
+    \item \texttt{auth\_controlador.py}: Gestión de autenticación, login y logout.
+    \item \texttt{admin\_controlador.py}: Operaciones de administración de usuarios y configuración global.
+    \item \texttt{profesional\_controlador.py}: Gestión de pacientes, ejercicios, sesiones y evaluaciones desde la perspectiva del profesional.
+    \item \texttt{paciente\_controlador.py}: Panel de paciente, ejecución de sesiones y consulta de progreso.
+  \end{itemize}
+  \item \texttt{src/modelos}: Define los modelos de datos con SQLAlchemy:
+  \begin{itemize}
+    \item \texttt{usuario.py}, \texttt{paciente.py}, \texttt{profesional.py}: Entidades básicas de usuarios y perfiles sanitarios.
+    \item \texttt{ejercicio.py}, \texttt{sesion.py}, \texttt{evaluacion.py}, \texttt{videoRespuesta.py}: Entidades relacionadas con ejercicios, sesiones, vídeos y evaluaciones.
+    \item Ficheros de asociaciones para las relaciones muchos a muchos (por ejemplo, paciente--profesional o ejercicio--sesión).
+  \end{itemize}
+  \item \texttt{src/vistas}: Plantillas HTML Jinja2 organizadas por rol:
+  \begin{itemize}
+    \item \texttt{admin/}: Vistas del panel de administración.
+    \item \texttt{auth/}: Páginas de login y perfil.
+    \item \texttt{profesional/}: Pantallas de gestión de sesiones, ejercicios y evaluaciones.
+    \item \texttt{paciente/}: Dashboard de paciente, ejecución de sesiones y visualización de progreso.
+  \end{itemize}
+  \item \texttt{src/static}: Recursos estáticos de la aplicación:
+  \begin{itemize}
+    \item \texttt{css/}: Hojas de estilo, incluyendo temas basados en Bootstrap y Bootswatch.
+    \item \texttt{js/}: Ficheros JavaScript, entre ellos la lógica para la Gamepad API y el control con mando SNES.
+    \item \texttt{uploads/ejercicios/}: Vídeos subidos por los profesionales.
+    \item \texttt{videos/}: Vídeos base y recursos multimedia de ejemplo.
+  \end{itemize}
+  \item \texttt{src/forms.py}: Definición de formularios WTForms utilizados en login, gestión de usuarios, creación de ejercicios, sesiones y evaluaciones.
+  \item \texttt{src/config.py}: Parámetros de configuración de la aplicación (cadena de conexión a base de datos, claves de seguridad, integración con Cloudinary, etc.).
+  \item \texttt{src/extensiones.py}: Inicialización de extensiones de Flask (SQLAlchemy, Flask-Login, CSRF, etc.).
+  \item \texttt{tests}: Conjunto de pruebas unitarias e integración sobre modelos y controladores.
+  \item \texttt{config}: Archivos JSON de apoyo para la configuración y carga de datos.
+  \item \texttt{doc}: Ficheros \LaTeX{} correspondientes a la memoria y a los anexos del TFG.
+  \item \texttt{app.py}: Punto de entrada de la aplicación Flask.
+  \item \texttt{poblar\_bd.py}: Script para inicializar la base de datos con datos de prueba.
+  \item \texttt{Procfile}, \texttt{requirements.txt}, \texttt{pytest.ini}: Ficheros auxiliares para despliegue en Heroku, gestión de dependencias y configuración de pruebas.
+\end{itemize}
 
 \section{Manual del programador}
 
+Desde el punto de vista del programador, \textit{TerapiTrack} se apoya en Flask como framework web principal y en SQLAlchemy como capa de acceso a datos. La aplicación se construye siguiendo un patrón Modelo--Vista--Controlador adaptado a Flask, en el que:
+
+\begin{itemize}
+  \item Los \textbf{modelos} se definen como clases de SQLAlchemy en \texttt{src/modelos}, incluyendo atributos, relaciones y métodos auxiliares.
+  \item Los \textbf{controladores} se implementan como \textit{blueprints} de Flask en \texttt{src/controladores}, agrupando rutas según el rol o el dominio funcional.
+  \item Las \textbf{vistas} se generan mediante plantillas Jinja2 en \texttt{src/vistas}, combinadas con recursos estáticos en \texttt{src/static}.
+\end{itemize}
+
+El flujo de una petición típica comienza cuando el usuario accede a una ruta definida en un controlador, que comprueba la autenticación y los permisos del rol mediante decoradores y Flask-Login. A continuación, el controlador interactúa con los modelos para consultar o actualizar la base de datos y finalmente devuelve una respuesta HTML renderizada con Jinja o una redirección a otra vista, según el caso de uso.
+
+La lógica específica del mando SNES se implementa en ficheros JavaScript situados en \texttt{src/static/js}. Estos scripts emplean la Gamepad API del navegador para capturar las entradas del mando y traducirlas a acciones de navegación, selección o retroceso dentro de la interfaz del paciente, manteniendo el foco visual sobre el elemento actualmente activo.
+
+Para extender la aplicación, un desarrollador puede:
+
+\begin{itemize}
+  \item Añadir nuevos modelos o campos en \texttt{src/modelos}, actualizando el esquema de la base de datos y el diccionario de datos.
+  \item Incorporar rutas adicionales en los controladores existentes o crear nuevos \textit{blueprints} para funcionalidades específicas.
+  \item Crear o modificar plantillas en \texttt{src/vistas} para adaptar la interfaz a nuevos flujos de usuario.
+  \item Definir nuevos formularios en \texttt{src/forms.py} con campos y validaciones acordes a los requisitos.
+\end{itemize}
+
+Esta organización permite localizar de forma rápida dónde debe introducirse cada cambio y reduce el riesgo de mezclar lógica de presentación con acceso a datos.
+
 \section{Compilación, instalación y ejecución del proyecto}
 
+Para ejecutar \textit{TerapiTrack} en un entorno local se recomienda el siguiente procedimiento:
+
+\begin{enumerate}
+  \item \textbf{Clonar el repositorio} desde GitHub:
+  \begin{verbatim}
+  git clone https://github.com/lanchares/TerapiTrack.git
+  cd TerapiTrack
+  \end{verbatim}
+  \item \textbf{Crear y activar un entorno virtual} de Python:
+  \begin{itemize}
+    \item Windows:
+    \begin{verbatim}
+    python -m venv venv
+    venv\Scripts\activate
+    \end{verbatim}
+    \item Linux/Mac:
+    \begin{verbatim}
+    python -m venv venv
+    source venv/bin/activate
+    \end{verbatim}
+  \end{itemize}
+  \item \textbf{Instalar las dependencias} del proyecto:
+  \begin{verbatim}
+  pip install -r requirements.txt
+  \end{verbatim}
+  \item \textbf{Configurar las variables de entorno} creando un fichero \texttt{.env} en la raíz del proyecto con, al menos:
+  \begin{verbatim}
+  SECRET_KEY=tu_clave_secreta_aqui
+  DATABASE_URL=sqlite:///TerapiTrack.db
+  CLOUDINARY_CLOUD_NAME=tu_cloud_name
+  CLOUDINARY_API_KEY=tu_api_key
+  CLOUDINARY_API_SECRET=tu_api_secret
+  \end{verbatim}
+  \item \textbf{Inicializar la base de datos con datos de prueba}:
+  \begin{verbatim}
+  python poblar_bd.py
+  \end{verbatim}
+  Este script crea usuarios de ejemplo (administrador, profesionales y pacientes), así como ejercicios, sesiones y evaluaciones de prueba.
+  \item \textbf{Ejecutar la aplicación} en modo desarrollo:
+  \begin{verbatim}
+  python app.py
+  \end{verbatim}
+  \item \textbf{Acceder a la aplicación} desde el navegador:
+  \begin{verbatim}
+  http://localhost:5000
+  \end{verbatim}
+\end{enumerate}
+
+Para el despliegue en producción, el proyecto incluye un \texttt{Procfile} preparado para Heroku y está configurado para utilizar PostgreSQL como motor de base de datos en lugar de SQLite. La configuración concreta del entorno (URL de la base de datos, claves de Cloudinary, etc.) se define mediante variables de entorno en la plataforma de despliegue.
+
 \section{Pruebas del sistema}
+
+Las pruebas automatizadas de \textit{TerapiTrack} se han implementado con Pytest, combinando pruebas unitarias sobre los modelos y pruebas de integración sobre los controladores más relevantes. El objetivo principal es verificar que la lógica de negocio funciona según lo esperado y que los cambios en el código no introducen regresiones en los flujos básicos del sistema.
+
+La ejecución de la batería completa de pruebas puede realizarse con el siguiente comando:
+
+\begin{verbatim}
+pytest tests/ -v --cov=src --cov-report=html
+\end{verbatim}
+
+Con esta orden se genera un informe de cobertura en la carpeta \texttt{htmlcov}, que puede abrirse en el navegador para analizar qué partes del código están cubiertas por pruebas y cuáles convendría reforzar. En el momento de cierre del TFG, los modelos principales alcanzan una cobertura cercana al 100\% y los controladores críticos (gestión de usuarios, sesiones y evaluaciones) cuentan con pruebas representativas de los flujos esenciales.
+
+También es posible ejecutar únicamente las pruebas asociadas a un módulo o componente concreto, por ejemplo:
+
+\begin{verbatim}
+pytest tests/test_admin_controlador.py -v
+\end{verbatim}
+
+Esta organización de pruebas facilita el mantenimiento y evolución del sistema, ya que permite comprobar de forma rápida el impacto de cambios localizados en la lógica de negocio o en la estructura de datos antes de integrarlos en la rama principal del repositorio.

@@ -147,6 +147,29 @@ Para cada ejercicio de la sesión, el profesional puede asignar una calificació
 Esta información se almacena en la tabla \texttt{Evaluacion}, vinculada al registro concreto de \texttt{EjercicioSesion}, de forma que cada ejercicio dentro de una sesión tiene su propia evaluación independiente.
 Esto permite al paciente consultar más adelante qué ejercicios ha realizado bien y en cuáles debe centrar su atención en futuras sesiones.
 
+\subsection{Resumen de flujos principales}
+
+La tabla \ref{tabla:flujos_uso} resume los flujos de uso más relevantes de TerapiTrack, indicando el actor principal, una descripción breve y las vistas implicadas en cada caso.\cite{GithubTerapitrack}
+
+\begin{table}[htbp]
+  \centering
+  \caption{Flujos de uso principales}
+  \begin{tabular}{p{3cm} p{3cm} p{5cm} p{3cm}}
+    \textbf{Flujo} & \textbf{Actor} & \textbf{Descripción} & \textbf{Vistas implicadas} \\
+    Autenticación y acceso & Usuario (cualquier rol) & Introduce sus credenciales y, si son correctas, accede al panel correspondiente según su rol. & \texttt{login.html}, paneles \texttt{admin\_dashboard.html}, \texttt{profesional\_dashboard.html}, \texttt{paciente\_dashboard.html} \\
+    Creación de sesión terapéutica & Profesional & Selecciona un paciente, elige ejercicios de la biblioteca, define el orden y la fecha de realización y guarda la nueva sesión. & \texttt{crear\_sesion.html}, \texttt{detalle\_sesion.html} \\
+    Ejecución de sesión en domicilio & Paciente & Consulta las sesiones asignadas para el día, reproduce el vídeo de ejemplo, graba su ejecución y envía las grabaciones al sistema. & \texttt{mis\_sesiones.html}, \texttt{ejecutar\_sesion.html} \\
+    Evaluación de ejercicios grabados & Profesional & Revisa las grabaciones de una sesión completada, asigna una puntuación a cada ejercicio y añade comentarios cualitativos. & \texttt{sesiones\_completadas.html}, \texttt{evaluar\_sesion.html} \\
+    Consulta del historial y progreso & Paciente / Profesional & Visualiza el historial de sesiones, evaluaciones asociadas y evolución temporal de las puntuaciones. & \texttt{historial\_paciente.html}, \texttt{progreso\_paciente.html} \\
+  \end{tabular}
+  \label{tabla:flujos_uso}
+\end{table}
+
+\subsection{Visualización del progreso del paciente}
+
+Además de almacenar las evaluaciones individuales de cada ejercicio, TerapiTrack genera gráficos de evolución temporal que muestran de forma agregada las puntuaciones obtenidas por el paciente en sus sesiones.\cite{GithubTerapitrack}
+Estos gráficos, implementados con Chart.js en las vistas de profesional y paciente, permiten identificar tendencias de mejora o empeoramiento y facilitan que ambos comprendan de un vistazo cómo ha evolucionado el tratamiento a lo largo del tiempo.\cite{parkinson_telerehab_review,GithubTerapitrack}
+
 \section{Decisiones de diseño en la interfaz}
 
 La interfaz de TerapiTrack se ha diseñado teniendo en cuenta que muchos de los usuarios finales (pacientes) pueden ser personas mayores con poca experiencia en el uso de aplicaciones web, y que algunos de ellos presentan limitaciones motoras derivadas de la enfermedad de Parkinson \cite{rosen2009_telerehab_technologies,wcag22}.
@@ -212,3 +235,5 @@ Entre los aspectos mejorables se encuentran:
 \end{itemize}
 
 A pesar de estas limitaciones, el resultado final es un sistema funcional que cumple los objetivos planteados al inicio del proyecto y que puede servir como base para futuras ampliaciones, como la integración de análisis automático de los vídeos mediante inteligencia artificial o la incorporación de funcionalidades de comunicación en tiempo real entre paciente y profesional.
+
+Los diagramas de arquitectura, los esquemas del modelo de datos y las capturas de las pantallas principales para cada tipo de usuario se incluyen en los apéndices técnicos y en los manuales de usuario, de manera que complementan la descripción general presentada en este capítulo.\cite{GithubTerapitrack}

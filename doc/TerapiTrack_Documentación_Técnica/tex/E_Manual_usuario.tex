@@ -2,10 +2,101 @@
 
 \section{Introducción}
 
+Este anexo describe el uso de \textit{TerapiTrack} desde el punto de vista de los distintos perfiles de usuario (administrador, profesional sanitario y paciente). El objetivo es explicar qué necesita cada usuario para acceder al sistema, cómo se realiza la instalación básica en un entorno local de pruebas y cuáles son los pasos principales para utilizar la aplicación en el día a día.
+
 \section{Requisitos de usuarios}
+
+\subsection*{Requisitos técnicos}
+
+Para utilizar \textit{TerapiTrack} se recomienda disponer de:
+
+\begin{itemize}
+  \item Un ordenador de sobremesa o portátil con conexión a Internet.
+  \item Un navegador web moderno (Chrome, Firefox, Edge o similar), actualizado a una versión reciente.
+  \item Una cámara web funcional, necesaria para grabar la ejecución de los ejercicios.
+  \item Una conexión a Internet estable, suficiente para reproducir y subir vídeos cortos sin cortes frecuentes.
+  \item Opcionalmente, un mando USB tipo SNES compatible con la Gamepad API del navegador, recomendado para pacientes con dificultades motoras finas.
+\end{itemize}
+
+\subsection*{Perfiles de usuario}
+
+En el sistema existen tres tipos de usuario:
+
+\begin{itemize}
+  \item \textbf{Administrador}: Persona responsable de dar de alta usuarios, asignar roles, vincular pacientes con profesionales y configurar parámetros generales del sistema.
+  \item \textbf{Profesional sanitario}: Médico, terapeuta, psicólogo o enfermero que crea ejercicios, programa sesiones de rehabilitación y evalúa las grabaciones de sus pacientes.
+  \item \textbf{Paciente}: Usuario final que accede a las sesiones programadas, realiza los ejercicios guiados por vídeo y consulta sus evaluaciones y gráficos de progreso.
+\end{itemize}
 
 \section{Instalación}
 
+En un entorno real, \textit{TerapiTrack} se desplegaría en un servidor centralizado y los usuarios accederían a través del navegador, sin necesidad de instalación local. Para realizar pruebas en un entorno de desarrollo, es posible ejecutar la aplicación en un equipo propio siguiendo estos pasos básicos:
+
+\begin{enumerate}
+  \item Clonar el repositorio del proyecto e instalar las dependencias necesarias de Python.
+  \item Configurar las variables de entorno mínimas (clave secreta, cadena de conexión a la base de datos y credenciales de Cloudinary).
+  \item Inicializar la base de datos con el script de población, que crea usuarios de ejemplo (administrador, profesionales y pacientes), así como ejercicios, sesiones y evaluaciones de prueba.
+  \item Ejecutar la aplicación y acceder a la dirección \texttt{http://localhost:5000} desde el navegador.
+\end{enumerate}
+
+En este entorno de pruebas se proporcionan varias cuentas de ejemplo, entre ellas un usuario administrador (\texttt{admin@terapitrack.com}) y diferentes perfiles de profesional y paciente, que permiten recorrer los flujos principales sin necesidad de registrar usuarios nuevos.
+
 \section{Manual del usuario}
 
+\subsection*{Acceso al sistema}
+
+\begin{itemize}
+  \item Abra el navegador y acceda a la URL proporcionada (por ejemplo, \texttt{http://localhost:5000} en un entorno local).
+  \item Introduzca su correo electrónico y contraseña en el formulario de inicio de sesión.
+  \item Tras la autenticación, el sistema le dirigirá automáticamente al panel correspondiente a su rol (administrador, profesional o paciente).
+\end{itemize}
+
+\subsection*{Uso para administradores}
+
+Desde el panel de administración el usuario puede:
+
+\begin{itemize}
+  \item Crear nuevos usuarios indicando nombre, apellidos, correo, contraseña y rol.
+  \item Activar o desactivar cuentas existentes cuando sea necesario.
+  \item Vincular pacientes con profesionales mediante una interfaz de asignación sencilla.
+  \item Configurar parámetros globales del sistema, como la política de retención de vídeos o límites de almacenamiento.
+\end{itemize}
+
+El panel muestra además un resumen de estadísticas básicas del sistema, como el número de usuarios registrados o el volumen de sesiones programadas.
+
+\subsection*{Uso para profesionales sanitarios}
+
+En el área de profesional, el flujo típico de trabajo es el siguiente:
+
+\begin{itemize}
+  \item Consultar la lista de pacientes asignados y sus sesiones pendientes o completadas.
+  \item Crear nuevos ejercicios terapéuticos subiendo un vídeo demostrativo y rellenando los datos básicos (nombre, descripción, tipo, duración).
+  \item Definir sesiones terapéuticas combinando varios ejercicios y asignarlas a pacientes concretos, indicando fecha y hora programadas.
+  \item Revisar las sesiones completadas, reproducir los vídeos grabados por el paciente y registrar evaluaciones con una puntuación numérica y comentarios.
+  \item Visualizar gráficos de evolución temporal para analizar el progreso de cada paciente a lo largo de varias sesiones.
+\end{itemize}
+
+\subsection*{Uso para pacientes}
+
+El área de paciente está simplificada y adaptada para facilitar su manejo:
+
+\begin{itemize}
+  \item En el \textbf{dashboard} inicial se muestran las sesiones pendientes en un calendario de varias semanas, junto con un acceso rápido a las evaluaciones recientes y a los gráficos de evolución.
+  \item Al seleccionar una sesión pendiente, la aplicación muestra una pantalla dividida en dos partes: el vídeo demostrativo del ejercicio y la imagen de la cámara del paciente. Durante la sesión, el sistema graba automáticamente la ejecución de cada ejercicio.
+  \item Una vez completada la sesión, el paciente puede consultar las evaluaciones que el profesional haya registrado, incluyendo puntuaciones y comentarios, y revisar gráficos que resumen su progresión en el tiempo.
+\end{itemize}
+
+\subsection*{Uso del mando SNES}
+
+Para los pacientes que utilizan un mando tipo SNES, la interfaz permite navegar sin necesidad de ratón:
+
+\begin{itemize}
+  \item La cruceta se emplea para moverse entre los distintos elementos de la pantalla (botones, enlaces, tarjetas de sesión).
+  \item El botón \textbf{A} se utiliza para seleccionar y confirmar acciones.
+  \item El botón \textbf{B} se reserva para acciones secundarias cuando están disponibles.
+  \item El botón \textbf{Y} permite retroceder o cancelar en determinadas pantallas.
+\end{itemize}
+
+El mando está activo en las principales pantallas del área de paciente (inicio, listado de sesiones, ejecución de ejercicios y vista de progreso), de modo que el usuario pueda completar una sesión completa sin necesidad de utilizar el teclado o el ratón.
+Este esquema de control busca reducir al mínimo el número de movimientos finos necesarios y mantener siempre visibles las opciones disponibles en pantalla.
 
