@@ -126,22 +126,225 @@ Para ejecutar \textit{TerapiTrack} en un entorno local se recomienda el siguient
 
 Para el despliegue en producción, el proyecto incluye un \texttt{Procfile} preparado para Heroku y está configurado para utilizar PostgreSQL como motor de base de datos en lugar de SQLite. La configuración concreta del entorno (URL de la base de datos, claves de Cloudinary, etc.) se define mediante variables de entorno en la plataforma de despliegue.
 
+\subsection{Despliegue en Heroku}
+
+Para el despliegue en producción se ha utilizado Heroku como plataforma PaaS. El repositorio está configurado con un \texttt{Procfile} de tipo \texttt{web} y un fichero \texttt{runtime.txt} que fija la versión de Python \cite{HerokuDocs}. La Figura~\ref{fig:heroku-deploy} muestra un ejemplo de despliegue desde la rama \texttt{Pruebas} a la aplicación \texttt{terapitrack-tfg}, donde se instalan las dependencias listadas en \texttt{requirements.txt} y se lanza el proceso \texttt{gunicorn}.
+
+Una vez desplegada la aplicación, las variables de entorno (\texttt{SECRET\_KEY}, \texttt{DATABASE\_URL}, \texttt{CLOUDINARY\_*}) se configuran mediante \texttt{heroku config:set}. Además, se ha añadido el addon \texttt{heroku-postgresql} para trabajar con PostgreSQL en producción, como se ilustra en la Figura~\ref{fig:heroku-postgres}, y se han realizado pruebas de inspección remota de ficheros y vídeos en el directorio \texttt{src/static/videos/} mediante el comando \texttt{heroku run} \cite{HerokuDocs}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{img/heroku_deploy.png}
+  \caption{Despliegue de la aplicación en Heroku e instalación de dependencias desde \texttt{requirements.txt}.}
+  \label{fig:heroku-deploy}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{img/heroku_postgres.png}
+  \caption{Creación del addon \texttt{heroku-postgresql} y configuración de variables de entorno en Heroku.}
+  \label{fig:heroku-postgres}
+\end{figure}
+
+
 \section{Pruebas del sistema}
 
-Las pruebas automatizadas de \textit{TerapiTrack} se han implementado con Pytest, combinando pruebas unitarias sobre los modelos y pruebas de integración sobre los controladores más relevantes. El objetivo principal es verificar que la lógica de negocio funciona según lo esperado y que los cambios en el código no introducen regresiones en los flujos básicos del sistema.
+Las pruebas automatizadas de \textit{TerapiTrack} se han implementado con Pytest, combinando pruebas unitarias sobre los modelos y pruebas de integración sobre los controladores más relevantes \cite{PytestDocs}. El objetivo principal es verificar que la lógica de negocio funciona según lo esperado y que los cambios en el código no introducen regresiones en los flujos básicos del sistema.
 
 La ejecución de la batería completa de pruebas puede realizarse con el siguiente comando:
 
 \begin{verbatim}
-pytest tests/ -v --cov=src --cov-report=html
+pytest --cov=src --cov-report=html
 \end{verbatim}
 
-Con esta orden se genera un informe de cobertura en la carpeta \texttt{htmlcov}, que puede abrirse en el navegador para analizar qué partes del código están cubiertas por pruebas y cuáles convendría reforzar. En el momento de cierre del TFG, los modelos principales alcanzan una cobertura cercana al 100\% y los controladores críticos (gestión de usuarios, sesiones y evaluaciones) cuentan con pruebas representativas de los flujos esenciales.
+Con esta orden se genera un informe de cobertura en la carpeta \texttt{htmlcov}, que puede abrirse en el navegador para analizar qué partes del código están cubiertas por pruebas y cuáles convendría reforzar. En la versión final del proyecto se han definido 198 pruebas y se ha alcanzado una cobertura global del 99\,\%, con todos los modelos y las funciones auxiliares al 100\,\% y los controladores principales (administrador, profesional, paciente y autenticación) en torno al 99\,\% de líneas cubiertas \cite{GithubTerapitrack}. La Figura~\ref{fig:coverage-html} recoge el informe de cobertura generado por \texttt{coverage.py}.
 
-También es posible ejecutar únicamente las pruebas asociadas a un módulo o componente concreto, por ejemplo:
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{img/cobertura_html.png}
+  \caption{Informe HTML de cobertura con 99\,\% de líneas cubiertas en el proyecto.}
+  \label{fig:coverage-html}
+\end{figure}
 
-\begin{verbatim}
-pytest tests/test_admin_controlador.py -v
-\end{verbatim}
+\subsection{Pruebas manuales con \texttt{flask shell}}
 
-Esta organización de pruebas facilita el mantenimiento y evolución del sistema, ya que permite comprobar de forma rápida el impacto de cambios localizados en la lógica de negocio o en la estructura de datos antes de integrarlos en la rama principal del repositorio.
+Además de las pruebas automáticas, se utilizó \texttt{flask shell} para comprobar manualmente la integridad del modelo de datos \cite{GithubTerapitrack}. A partir de una base de datos limpia se crearon un usuario, un paciente y un profesional, verificando las relaciones inversas \texttt{usuario.paciente} y \texttt{usuario.profesional}. A continuación se registró un ejercicio y se asoció al profesional mediante la tabla intermedia \texttt{Ejercicio\_Profesional}, comprobando que los métodos auxiliares \texttt{to\_dict} y \texttt{total\_pacientes} devolvían los campos esperados.
+
+Posteriormente se creó una sesión terapéutica, se añadieron ejercicios a través de \texttt{Ejercicio\_Sesion} y se verificó que los métodos \texttt{duracion\_legible} y \texttt{es\_pendiente} devolvían información coherente con los datos almacenados. Finalmente se añadió una evaluación y un vídeo de respuesta para esa sesión, comprobando los métodos \texttt{es\_aprobado} y \texttt{resumen}, así como la ruta y la fecha de expiración del vídeo en la tabla \texttt{VideoRespuesta}. Estos pasos se resumen en la Figura~\ref{fig:flask-shell-pruebas}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{img/prueba_flask_shell.png}
+  \caption{Pruebas manuales en \texttt{flask shell} creando usuarios, sesiones, evaluaciones y vídeos de respuesta.}
+  \label{fig:flask-shell-pruebas}
+\end{figure}
+
+\subsection{Pruebas SQL con DB Browser for SQLite}
+
+Como complemento a las pruebas anteriores, se ejecutaron sentencias SQL directamente sobre la base de datos SQLite utilizando DB Browser for SQLite \cite{DBBrowser}. El objetivo era validar operaciones típicas de mantenimiento (actualizaciones y consultas) y comprobar que las restricciones de clave primaria y foránea no impedían los cambios habituales.
+
+En primer lugar se actualizó el nombre y los apellidos de un usuario mediante una sentencia \texttt{UPDATE} y se verificó el resultado con una consulta \texttt{SELECT} sobre la tabla \texttt{Usuario}. De forma similar, se modificó el estado de una sesión de \texttt{PENDIENTE} a \texttt{COMPLETADA} y se actualizó la fecha de asignación en la tabla \texttt{Sesion}. Por último, se cambió la puntuación y los comentarios de una evaluación específica en la tabla \texttt{Evaluacion}, comprobando que los nuevos valores se almacenaban correctamente y que la fecha de evaluación se mantenía consistente. La Figura~\ref{fig:dbbrowser-actualizaciones} muestra uno de estos ejemplos.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{img/dbbrowser_actualizaciones.png}
+  \caption{Actualización de una evaluación y verificación del resultado mediante consulta SQL en DB Browser for SQLite.}
+  \label{fig:dbbrowser-actualizaciones}
+\end{figure}
+
+
+\section{Pantallas de autenticación y perfil}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{img/perfil.png}
+  \caption{Vista de perfil del usuario autenticado con sus datos básicos.}
+  \label{fig:perfil}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{img/cambiar_contraseña.png}
+  \caption{Formulario para cambiar la contraseña desde el perfil de usuario.}
+  \label{fig:cambiar-contraseña}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{img/recuperar_contraseña.png}
+  \caption{Pantalla de recuperación de contraseña mediante correo electrónico.}
+  \label{fig:recuperar-contraseña}
+\end{figure}
+
+
+\section{Pantallas del panel de administración}
+
+En esta sección se incluyen capturas adicionales del panel de administración de TerapiTrack que complementan la descripción general realizada en la memoria.\cite{GithubTerapitrack}
+Estas imágenes permiten apreciar con más detalle las operaciones de alta, consulta y edición de usuarios, así como las estadísticas globales del sistema.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{img/admin_crear_usuario.png}
+  \caption{Formulario de creación de un nuevo usuario administrador.}
+  \label{fig:admin-crear-usuario}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{img/admin_ver_usuario.png}
+  \caption{Vista de detalle de un usuario administrador con sus datos principales.}
+  \label{fig:admin-ver-usuario}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{img/admin_editar_usuario.png}
+  \caption{Pantalla de edición de los datos de un profesional sanitario.}
+  \label{fig:admin-editar-usuario}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{img/admin_estadisticas.png}
+  \caption{Panel de estadísticas del sistema con distribución de roles y registros por mes.}
+  \label{fig:admin-estadisticas}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{img/admin_desvincular.png}
+  \caption{Diálogo de confirmación para la desvinculación de un paciente y su profesional.}
+  \label{fig:admin-desvincular}
+\end{figure}
+
+\section{Pantallas del panel del profesional}
+
+En esta sección se recogen capturas adicionales del área del profesional que complementan la descripción resumida incluida en el capítulo de aspectos relevantes.\cite{GithubTerapitrack} Muestran con más detalle la biblioteca de ejercicios, la creación de nuevos recursos y las vistas de evaluación.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{img/profesional_ejercicios.png}
+  \caption{Biblioteca de ejercicios terapéuticos con filtros por tipo, duración y buscador por nombre.}
+  \label{fig:prof-ejercicios}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{img/profesional_crear_new_ejercicio.png}
+  \caption{Formulario para crear un nuevo ejercicio con nombre, descripción, tipo y vídeo demostrativo.}
+  \label{fig:prof-crear-ejercicio}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{img/profesional_ver_sesion.png}
+  \caption{Detalle de una sesión programada con la información del paciente y los ejercicios que la componen.}
+  \label{fig:prof-ver-sesion}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{img/profesional_ejecutar_sesion.png}
+  \caption{Ejecución de una sesión con el vídeo en directo del paciente y el listado de ejercicios pendientes.}
+  \label{fig:prof-ejecutar-sesion}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{img/profesional_evaluar_sesion.png}
+  \caption{Pantalla de evaluación de una sesión completada, con acceso a los vídeos de cada ejercicio.}
+  \label{fig:prof-evaluar-sesion}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{img/profesional_ver_evaluacion.png}
+  \caption{Vista de una evaluación ya registrada con la puntuación final y los comentarios del profesional.}
+  \label{fig:prof-ver-evaluacion}
+\end{figure}
+
+\section{Pantallas del panel del paciente}
+
+En esta sección se incluyen capturas adicionales del área del paciente que complementan la descripción general realizada en la memoria.\cite{GithubTerapitrack}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{img/paciente_dashboard.png}
+  \caption{Panel principal del paciente con accesos a ejercicios, sesiones, progreso y ayuda.}
+  \label{fig:paciente-dashboard}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{img/paciente_mis_sesiones.png}
+  \caption{Pantalla \emph{Mis sesiones} con calendario y detalle de la sesión seleccionada.}
+  \label{fig:paciente-mis-sesiones}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{img/paciente_ejercicios.png}
+  \caption{Listado \emph{Mis ejercicios} con tarjetas de ejercicios y navegación mediante mando SNES.}
+  \label{fig:paciente-ejercicios}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{img/paciente_progreso.png}
+  \caption{Vista \emph{Mi progreso} con indicadores numéricos y gráfica de evolución.}
+  \label{fig:paciente-progreso}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{img/paciente_ayuda.png}
+  \caption{Guía de uso del mando SNES con la función de cada botón.}
+  \label{fig:paciente-ayuda}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{img/paciente_ejecutar_sesion.png}
+  \caption{Ejecución de una sesión desde el punto de vista del paciente, con su vídeo en directo.}
+  \label{fig:paciente-ejecutar-sesion}
+\end{figure}
