@@ -1,4 +1,4 @@
-ntr\capitulo{5}{Aspectos relevantes del desarrollo del proyecto}
+\capitulo{5}{Aspectos relevantes del desarrollo del proyecto}
 
 Este capítulo describe los aspectos más significativos del desarrollo de TerapiTrack desde un punto de vista práctico.
 Se presentan las decisiones adoptadas en cuanto al ciclo de vida del proyecto, la arquitectura de la aplicación, el diseño del modelo de datos y la implementación de los flujos de uso más relevantes, así como algunos problemas encontrados y las soluciones que se han aplicado en cada caso.
@@ -22,7 +22,7 @@ Una vez que se retomó la rutina de commits más frecuentes, toda esa actividad 
 
 Aunque no siempre se ha logrado, en la última fase se intentó corregir esta situación manteniendo una rutina más disciplinada: cuando se completaba una tarea se procuraba hacer un commit con un mensaje descriptivo y, en la medida de lo posible, realizar el \textit{push} y la actualización del estado de la tarea en Jira de forma casi simultánea.
 A raíz de esta experiencia, se ha tomado conciencia de la importancia de mantener una cierta disciplina en el uso de las herramientas de control de versiones: realizar commits con cierta frecuencia, escribir mensajes claros y mantener sincronizado el estado de las tareas en Jira con los cambios reales en el código.
-La rama \texttt{Pruebas} se integrará en \texttt{main} mediante un merge final justo antes de la entrega del proyecto, momento en el que el historial completo de desarrollo quedará reflejado en la rama principal y visible en el repositorio para futuras consultas o ampliaciones del sistema \cite{GithubTerapitrack,JiraTerapitrack}.
+La rama \texttt{Pruebas} se integrará en \texttt{main} mediante un merge final justo antes de la entrega del proyecto, momento en el que el historial completo de desarrollo quedará reflejado en la rama principal y visible en el repositorio para futuras consultas o ampliaciones del sistema \cite{JiraTerapitrack,GithubTerapitrack}.
 
 \section{Arquitectura y organización del código}
 
@@ -190,7 +190,7 @@ El administrador dispone de un panel de control desde el que puede consultar de 
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{img/admin_dashboard.png}
-  \caption{Panel principal de administración con métricas globales y accesos rápidos a las tareas de gestión.}
+  \caption{Panel principal de administración con métricas y accesos rápidos.}
   \label{fig:admin-dashboard}
 \end{figure}
 
@@ -199,7 +199,7 @@ Desde el menú de usuarios, el administrador puede buscar, filtrar y gestionar t
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\textwidth]{img/admin_usuarios.png}
-  \caption{Pantalla de gestión de usuarios con filtros por rol y estado y acciones de consulta, edición y desactivación.}
+  \caption{Pantalla de gestión de usuarios con filtros y acciones de edición.}
   \label{fig:admin-usuarios}
 \end{figure}
 
@@ -209,14 +209,14 @@ En la Figura~\ref{fig:admin-vinculaciones} se aprecia el listado de vinculacione
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{img/admin_vinculaciones.png}
-  \caption{Listado de vinculaciones paciente-profesional con filtros por profesional y fecha de asignación.}
+  \caption{Listado de vinculaciones paciente‑profesional con filtros básicos.}
   \label{fig:admin-vinculaciones}
 \end{figure}
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{img/admin_vincular.png}
-  \caption{Formulario para crear una nueva vinculación terapéutica entre un paciente y un profesional.}
+  \caption{Formulario de creación de una nueva vinculación terapéutica.}
   \label{fig:admin-vincular}
 \end{figure}
 
@@ -225,7 +225,7 @@ Por último, el administrador puede configurar parámetros globales como la pol�
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{img/admin_configuración.png}
-  \caption{Pantalla de configuración del sistema con la política de retención de vídeos y otros parámetros globales.}
+  \caption{Pantalla de configuración del sistema y política de retención de vídeos.}
   \label{fig:admin-configuracion}
 \end{figure}
 
@@ -236,7 +236,7 @@ El profesional dispone de un panel desde el que puede ver de un vistazo cuántos
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{img/profesional_dashboard.png}
-  \caption{Panel principal del profesional con resumen de pacientes asignados, sesiones pendientes y evaluaciones por realizar.}
+  \caption{Panel principal del profesional con resumen de pacientes y sesiones.}
   \label{fig:prof-dashboard}
 \end{figure}
 
@@ -245,7 +245,7 @@ Desde el menú \emph{Mis pacientes}, el profesional puede filtrar por nombre, co
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{img/profesional_pacientes.png}
-  \caption{Pantalla \emph{Mis pacientes} con filtros avanzados y acciones para ver progreso o crear nuevas sesiones.}
+  \caption{Pantalla \emph{Mis pacientes} con filtros y acceso al progreso.}
   \label{fig:prof-pacientes}
 \end{figure}
 
@@ -254,7 +254,7 @@ Las sesiones se gestionan desde un listado que permite filtrar por estado, pacie
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{img/profesional_sesiones.png}
-  \caption{Listado de sesiones programadas con filtros por estado, paciente y fechas.}
+  \caption{Listado de sesiones programadas con filtros básicos.}
   \label{fig:prof-sesiones}
 \end{figure}
 
@@ -263,7 +263,7 @@ La creación de una nueva sesión se realiza mediante un formulario en el que se
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{img/profesional_crear_new_sesion.png}
-  \caption{Formulario para crear una nueva sesión terapéutica seleccionando paciente, fecha y ejercicios.}
+  \caption{Formulario de creación de una nueva sesión terapéutica.}
   \label{fig:prof-crear-sesion}
 \end{figure}
 
@@ -272,7 +272,7 @@ Para revisar la evolución de un paciente, el profesional dispone de una vista e
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{img/profesional_ver_progreso.png}
-  \caption{Pantalla de progreso del paciente con gráfica temporal de las puntuaciones de sus sesiones.}
+  \caption{Pantalla de progreso del paciente con gráfica temporal de puntuaciones.}
   \label{fig:prof-progreso}
 \end{figure}
 
@@ -281,7 +281,7 @@ Finalmente, la evaluación detallada de cada ejercicio se apoya en una vista que
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{img/profesional_evaluar_ejercicio.png}
-  \caption{Evaluación de un ejercicio con el vídeo demostrativo y la grabación del paciente en paralelo.}
+  \caption{Evaluación de un ejercicio con vídeo demostrativo y grabación del paciente.}
   \label{fig:prof-evaluar-ejercicio}
 \end{figure}
 

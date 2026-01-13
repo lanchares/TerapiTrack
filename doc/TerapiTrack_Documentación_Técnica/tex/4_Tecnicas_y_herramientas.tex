@@ -37,7 +37,7 @@ Durante el desarrollo local se ha utilizado \textbf{SQLite} como motor de base d
 SQLite es un sistema de base de datos relacional embebido que almacena toda la información en un único fichero en disco y no requiere un servidor independiente, lo que simplifica la configuración del entorno de trabajo.
 
 Para el despliegue en la nube se ha configurado la aplicación para trabajar con \textbf{PostgreSQL}, un gestor de bases de datos relacional de código abierto ampliamente usado en entornos de producción.
-En Heroku se emplea el complemento de base de datos PostgreSQL, al que la aplicación se conecta mediante la cadena de conexión definida en las variables de entorno \cite{HerokuDashboard,HerokuTerapitrackApp}.
+En Heroku se emplea el complemento de base de datos PostgreSQL, al que la aplicación se conecta mediante la cadena de conexión definida en las variables de entorno \cite{HerokuTerapitrackApp,HerokuDashboard}.
 
 La selección del motor de base de datos en cada entorno se realiza a través del fichero \texttt{config.py}, donde se define la \texttt{SQLALCHEMY\_DATABASE\_URI}.
 Además, se dispone del script \texttt{poblar\_bd.py}, que permite inicializar la base de datos con datos de ejemplo (usuarios, pacientes, ejercicios, sesiones y evaluaciones) para facilitar las pruebas.
@@ -65,7 +65,7 @@ Entre las vistas más relevantes se encuentran los distintos paneles de control 
 Para el diseño visual se ha empleado \textbf{Bootstrap}, un \emph{framework} CSS que ofrece componentes predefinidos (botones, menús, rejillas, formularios) y un sistema de diseño adaptable a diferentes tamaños de pantalla \cite{pressman_ingenieria_sw}. 
 Sobre Bootstrap se han aplicado temas de \textbf{Bootswatch}, que proporcionan estilos alternativos listos para usar sin modificar el marcado HTML \cite{Bootswatch}.
 
-El uso de estos componentes facilita mantener una apariencia coherente en toda la aplicación y aplicar criterios básicos de accesibilidad, como tamaños de fuente adecuados, contraste suficiente y distribución ordenada de los elementos en la interfaz \cite{wcag22,telehealth_accessibility}.
+El uso de estos componentes facilita mantener una apariencia coherente en toda la aplicación y aplicar criterios básicos de accesibilidad, como tamaños de fuente adecuados, contraste suficiente y distribución ordenada de los elementos en la interfaz \cite{telehealth_accessibility,wcag22}.
 
 \subsection{Soporte para mando SNES}
 
@@ -81,7 +81,7 @@ Esta funcionalidad se ha implementado mediante un módulo JavaScript que escucha
 Las pruebas automáticas se han realizado con \textbf{Pytest}, un marco de testing para Python que permite definir casos de prueba como funciones y agruparlos en módulos dentro de la carpeta \texttt{tests} \cite{PytestDocs}.
 Pytest ofrece utilidades para preparar datos de prueba mediante \textit{fixtures}, parametrizar pruebas y generar informes con el resultado de la ejecución \cite{PytestDocs}.
 
-En el contexto de TerapiTrack se ha utilizado para comprobar el funcionamiento de los modelos de datos y algunos de los flujos principales definidos en los controladores (gestión de usuarios, sesiones y evaluaciones), reduciendo el riesgo de introducir errores al modificar el código.\cite{PytestDocs,GithubTerapitrack}
+En el contexto de TerapiTrack se ha utilizado para comprobar el funcionamiento de los modelos de datos y algunos de los flujos principales definidos en los controladores (gestión de usuarios, sesiones y evaluaciones), reduciendo el riesgo de introducir errores al modificar el código.\cite{GithubTerapitrack,PytestDocs}
 
 \section{Despliegue e infraestructura}
 
@@ -107,7 +107,7 @@ Durante el desarrollo también se han utilizado varias herramientas de apoyo:
 
 \begin{itemize}
     \item \textbf{Visual Studio Code}: Entorno de desarrollo integrado utilizado como editor principal para el código Python, las plantillas y los ficheros de configuración, con extensiones específicas para Flask, Git y trabajo con SQLite.
-    \item \textbf{LaTeX Workshop y Overleaf}: Herramientas para la edición y compilación de la memoria y los anexos en \LaTeX{}, combinando el trabajo local en Visual Studio Code con la plataforma colaborativa Overleaf \cite{OverleafEditor,UbuPlantillaLatex}. 
+    \item \textbf{LaTeX Workshop y Overleaf}: Herramientas para la edición y compilación de la memoria y los anexos en \LaTeX{}, combinando el trabajo local en Visual Studio Code con la plataforma colaborativa Overleaf \cite{UbuPlantillaLatex,OverleafEditor}. 
     \item \textbf{Draw.io}: Aplicación para la creación de diagramas, utilizada para representar la arquitectura general del sistema, el modelo de datos y los principales flujos de uso.
 \end{itemize}
 

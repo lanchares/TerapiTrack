@@ -4,14 +4,14 @@ Primero se abordan nociones relacionadas con la enfermedad de Parkinson y la reh
 
 \section{Enfermedades degenerativas y enfermedad de Parkinson}
 Las enfermedades degenerativas son trastornos en los que determinadas estructuras del organismo se deterioran de forma progresiva, lo que provoca una pérdida lenta pero continua de funciones.
-Cuando el sistema nervioso central se ve afectado, este deterioro suele traducirse en problemas de movimiento, equilibrio, memoria o comunicación que requieren tratamientos prolongados y un seguimiento estrecho \cite{who_parkinson_2023,ninds_parkinson}.
+Cuando el sistema nervioso central se ve afectado, este deterioro suele traducirse en problemas de movimiento, equilibrio, memoria o comunicación que requieren tratamientos prolongados y un seguimiento estrecho \cite{ninds_parkinson,who_parkinson_2023}.
 
 La enfermedad de Parkinson es un trastorno neurodegenerativo crónico que afecta principalmente al control del movimiento.
 Se caracteriza por temblor en reposo, rigidez muscular, lentitud en la iniciación de los movimientos y alteraciones del equilibrio, y actualmente no tiene cura.
 La combinación de tratamiento farmacológico y programas de rehabilitación específicos permite reducir la intensidad de los síntomas, mantener la autonomía durante más tiempo y mejorar la calidad de vida de los pacientes \cite{cleveland_parkinson,who_parkinson_2023}.
 
 \section{Terapia ocupacional y rehabilitación}
-La terapia ocupacional es una disciplina sanitaria que ayuda a las personas a participar de forma lo más independiente posible en las actividades significativas de su vida diaria, adaptando tanto las tareas como el entorno cuando existe una enfermedad, lesión o discapacidad \cite{nbcot_ot,rehab_hss}.
+La terapia ocupacional es una disciplina sanitaria que ayuda a las personas a participar de forma lo más independiente posible en las actividades significativas de su vida diaria, adaptando tanto las tareas como el entorno cuando existe una enfermedad, lesión o discapacidad \cite{rehab_hss,nbcot_ot}.
 En pacientes con enfermedad de Parkinson, la terapia ocupacional trabaja aspectos como el vestido, la higiene personal, la movilidad en el hogar o la organización de rutinas, con el objetivo de prolongar la autonomía en las actividades básicas y sociales \cite{rehab_hss}.
 
 La rehabilitación de trastornos del movimiento suele combinar fisioterapia, terapia ocupacional, ejercicio físico estructurado y, en algunos casos, logopedia.
@@ -26,22 +26,22 @@ Permite reducir desplazamientos, facilita la adherencia al tratamiento y hace po
 
 \section{Accesibilidad y usabilidad en aplicaciones sanitarias}
 Las aplicaciones orientadas a la salud deben diseñarse pensando en usuarios con diferentes capacidades motoras, sensoriales o cognitivas, y también en personas de edad avanzada con poca experiencia en el uso de ordenadores o dispositivos móviles.
-Ni la edad ni el nivel de conocimiento tecnológico deberían convertirse en una barrera a la hora de acceder a programas de telerehabilitación \cite{rosen2009_telerehab_technologies,telehealth_accessibility}.
+Ni la edad ni el nivel de conocimiento tecnológico deberían convertirse en una barrera a la hora de acceder a programas de telerehabilitación \cite{telehealth_accessibility,rosen2009_telerehab_technologies}.
 
 Los estándares de accesibilidad web, como las pautas WCAG, recogen cuatro principios generales que sirven de guía para el diseño de interfaces accesibles \cite{wcag22}.
 
 \begin{itemize}
     \item \textbf{Perceptibilidad}: La información y los componentes de la interfaz deben presentarse de forma que puedan percibirse por distintos tipos de usuarios, por ejemplo cuidando el contraste de color, el tamaño de la tipografía o el uso de textos alternativos en imágenes \cite{wcag22}.
-    \item \textbf{Operabilidad}: Los controles deben poder manejarse con diferentes dispositivos de entrada (ratón, teclado, pantallas táctiles o mandos) y con un número reducido de acciones, algo especialmente relevante en personas con limitaciones motoras \cite{rosen2009_telerehab_technologies,telehealth_accessibility}.
+    \item \textbf{Operabilidad}: Los controles deben poder manejarse con diferentes dispositivos de entrada (ratón, teclado, pantallas táctiles o mandos) y con un número reducido de acciones, algo especialmente relevante en personas con limitaciones motoras \cite{telehealth_accessibility,rosen2009_telerehab_technologies}.
     \item \textbf{Comprensibilidad}: Los textos, mensajes de error y flujos de navegación han de ser claros y coherentes, evitando tecnicismos innecesarios y sobrecarga de información \cite{wcag22}.
     \item \textbf{Robustez}: El contenido debe mostrarse correctamente en distintos navegadores y dispositivos, y ser compatible con tecnologías de apoyo como lectores de pantalla o ampliadores de pantalla \cite{wcag22}.
 \end{itemize}
 
 Estos principios han guiado el diseño de la interfaz de TerapiTrack, priorizando menús sencillos, textos claros y un número reducido de acciones por pantalla. \cite{GithubTerapitrack}
 
-\section{Patrones de diseño y arquitectura Modelo–Vista–Controlador}
+\section{Patrones de diseño y arquitectura Modelo-Vista-Controlador}
 En el desarrollo de aplicaciones web es habitual apoyarse en patrones de diseño que separan responsabilidades y facilitan la evolución del sistema.
-Uno de los más extendidos es el patrón Modelo–Vista–Controlador (MVC), que organiza la aplicación en tres componentes principales \cite{gamma_design_patterns}:
+Uno de los más extendidos es el patrón Modelo-Vista-Controlador (MVC), que organiza la aplicación en tres componentes principales \cite{gamma_design_patterns}:
 
 \begin{itemize}
     \item \textbf{Modelo}: Representa los datos y las reglas de negocio asociadas a cada entidad del dominio, incluyendo la definición de estructuras de almacenamiento y restricciones de integridad.
