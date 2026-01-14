@@ -1,47 +1,56 @@
 \capitulo{3}{Conceptos teóricos}
+
 En este capítulo se revisan los conceptos teóricos básicos que sirven de soporte al proyecto TerapiTrack, tanto en su diseño como en su implementación.
 Primero se abordan nociones relacionadas con la enfermedad de Parkinson y la rehabilitación, y después se describen los principios de accesibilidad, los patrones de diseño y los modelos de datos que se han tenido en cuenta durante el desarrollo.
 
 \section{Enfermedades degenerativas y enfermedad de Parkinson}
+
 Las enfermedades degenerativas son trastornos en los que determinadas estructuras del organismo se deterioran de forma progresiva, lo que provoca una pérdida lenta pero continua de funciones.
-Cuando el sistema nervioso central se ve afectado, este deterioro suele traducirse en problemas de movimiento, equilibrio, memoria o comunicación que requieren tratamientos prolongados y un seguimiento estrecho \cite{ninds_parkinson,who_parkinson_2023}.
+Cuando el sistema nervioso central se ve afectado, este deterioro suele traducirse en problemas de movimiento, equilibrio, memoria o comunicación que requieren tratamientos prolongados y un seguimiento estrecho~\cite{ninds_parkinson,who_parkinson_2023}.
 
 La enfermedad de Parkinson es un trastorno neurodegenerativo crónico que afecta principalmente al control del movimiento.
 Se caracteriza por temblor en reposo, rigidez muscular, lentitud en la iniciación de los movimientos y alteraciones del equilibrio, y actualmente no tiene cura.
-La combinación de tratamiento farmacológico y programas de rehabilitación específicos permite reducir la intensidad de los síntomas, mantener la autonomía durante más tiempo y mejorar la calidad de vida de los pacientes \cite{cleveland_parkinson,who_parkinson_2023}.
+Aunque puede aparecer en adultos jóvenes, afecta sobre todo a personas de edad avanzada; se estima que aproximadamente una de cada cien personas mayores de 60 años y en torno a un 2\% de la población española mayor de 65 años padecen la enfermedad,
+lo que implica que muchos pacientes presentan limitaciones de movilidad y dependen de terceras personas para desplazarse, especialmente cuando viven en ámbitos rurales~\cite{medicosypacientes_parkinson_mayores60,sen_parkinson_2porciento,who_parkinson_2023}.
+
+La combinación de tratamiento farmacológico y programas de rehabilitación específicos permite reducir la intensidad de los síntomas, mantener la autonomía durante más tiempo y mejorar la calidad de vida de los pacientes~\cite{cleveland_parkinson,who_parkinson_2023}.
 
 \section{Terapia ocupacional y rehabilitación}
-La terapia ocupacional es una disciplina sanitaria que ayuda a las personas a participar de forma lo más independiente posible en las actividades significativas de su vida diaria, adaptando tanto las tareas como el entorno cuando existe una enfermedad, lesión o discapacidad \cite{rehab_hss,nbcot_ot}.
-En pacientes con enfermedad de Parkinson, la terapia ocupacional trabaja aspectos como el vestido, la higiene personal, la movilidad en el hogar o la organización de rutinas, con el objetivo de prolongar la autonomía en las actividades básicas y sociales \cite{rehab_hss}.
+
+La terapia ocupacional es una disciplina sanitaria que ayuda a las personas a mantener o mejorar su autonomía en las actividades significativas de su vida diaria, adaptando tanto las tareas como el entorno cuando existe una enfermedad, lesión o discapacidad~\cite{rehab_hss,nbcot_ot}.
+En pacientes con enfermedad de Parkinson, la terapia ocupacional trabaja aspectos como vestirse, la higiene personal, la movilidad dentro del domicilio o la organización de rutinas, con el objetivo de prolongar la autonomía en las actividades básicas y sociales~\cite{rehab_hss}.
 
 La rehabilitación de trastornos del movimiento suele combinar fisioterapia, terapia ocupacional, ejercicio físico estructurado y, en algunos casos, logopedia.
-Este tipo de intervención requiere sesiones frecuentes y un seguimiento continuado, por lo que acceder de forma regular a los servicios especializados resulta especialmente complicado para pacientes que viven lejos de los centros de referencia o que tienen dificultades para desplazarse \cite{parkinson_telerehab_review}.
+Este tipo de intervención requiere sesiones frecuentes y un seguimiento continuado, por lo que acceder de forma regular a los servicios especializados resulta especialmente complicado para pacientes que viven lejos de los centros de referencia o que tienen dificultades para desplazarse~\cite{parkinson_telerehab_review}.
 
 \section{Telemedicina y telerehabilitación}
-La telemedicina hace referencia al uso de las tecnologías de la información y la comunicación para prestar servicios sanitarios a distancia, permitiendo que paciente y profesional interactúen sin encontrarse en el mismo lugar físico \cite{rosen2009_telerehab_technologies}.
-Dentro de este ámbito, la telerehabilitación se centra en el diseño, la supervisión y la evaluación de programas de rehabilitación mediante herramientas remotas, como videoconferencia o plataformas web específicas \cite{rosen2009_telerehab_technologies}.
+
+La telemedicina hace referencia al uso de las tecnologías de la información y la comunicación para prestar servicios sanitarios a distancia, permitiendo que paciente y profesional interactúen sin encontrarse en el mismo lugar físico.
+Dentro de este ámbito, la telerehabilitación se centra en el diseño, la supervisión y la evaluación de programas de rehabilitación mediante herramientas remotas, como videoconferencia o plataformas web específicas~\cite{rosen2009_telerehab_technologies}.
 
 En el caso de la enfermedad de Parkinson, la telerehabilitación ofrece la posibilidad de mantener la frecuencia de las terapias aunque el paciente resida en la “España vaciada” o tenga movilidad reducida.
-Permite reducir desplazamientos, facilita la adherencia al tratamiento y hace posible que el profesional revise de forma diferida los ejercicios realizados en casa \cite{parkinson_telerehab_review,parkinson_telerehab_protocol}.
+Permite reducir desplazamientos, facilita la adherencia al tratamiento y hace posible que el profesional revise de forma diferida los ejercicios realizados en casa~\cite{parkinson_telerehab_review,parkinson_telerehab_protocol}.
 
 \section{Accesibilidad y usabilidad en aplicaciones sanitarias}
-Las aplicaciones orientadas a la salud deben diseñarse pensando en usuarios con diferentes capacidades motoras, sensoriales o cognitivas, y también en personas de edad avanzada con poca experiencia en el uso de ordenadores o dispositivos móviles.
-Ni la edad ni el nivel de conocimiento tecnológico deberían convertirse en una barrera a la hora de acceder a programas de telerehabilitación \cite{telehealth_accessibility,rosen2009_telerehab_technologies}.
 
-Los estándares de accesibilidad web, como las pautas WCAG, recogen cuatro principios generales que sirven de guía para el diseño de interfaces accesibles \cite{wcag22}.
+Las aplicaciones orientadas a la salud deben diseñarse pensando en usuarios con diferentes capacidades motoras, sensoriales o cognitivas, y también en personas de distintas edades, incluidas aquellas con poca experiencia en el uso de ordenadores o dispositivos móviles.
+Ni la edad ni el nivel de conocimiento tecnológico deberían convertirse en una barrera a la hora de acceder a programas de telerehabilitación~\cite{telehealth_accessibility}.
+
+Los estándares de accesibilidad web, como las pautas WCAG, recogen cuatro principios generales que sirven de guía para el diseño de interfaces accesibles~\cite{wcag22}.
 
 \begin{itemize}
-    \item \textbf{Perceptibilidad}: La información y los componentes de la interfaz deben presentarse de forma que puedan percibirse por distintos tipos de usuarios, por ejemplo cuidando el contraste de color, el tamaño de la tipografía o el uso de textos alternativos en imágenes \cite{wcag22}.
-    \item \textbf{Operabilidad}: Los controles deben poder manejarse con diferentes dispositivos de entrada (ratón, teclado, pantallas táctiles o mandos) y con un número reducido de acciones, algo especialmente relevante en personas con limitaciones motoras \cite{telehealth_accessibility,rosen2009_telerehab_technologies}.
-    \item \textbf{Comprensibilidad}: Los textos, mensajes de error y flujos de navegación han de ser claros y coherentes, evitando tecnicismos innecesarios y sobrecarga de información \cite{wcag22}.
-    \item \textbf{Robustez}: El contenido debe mostrarse correctamente en distintos navegadores y dispositivos, y ser compatible con tecnologías de apoyo como lectores de pantalla o ampliadores de pantalla \cite{wcag22}.
+    \item \textbf{Perceptibilidad}: La información y los componentes de la interfaz deben presentarse de forma que puedan percibirse por distintos tipos de usuarios, por ejemplo cuidando el contraste de color, el tamaño de la tipografía o el uso de textos alternativos en imágenes~\cite{wcag22}.
+    \item \textbf{Operabilidad}: Los controles deben poder manejarse con diferentes dispositivos de entrada (ratón, teclado, pantallas táctiles, o mandos) y con un número reducido de acciones, algo especialmente relevante en personas con limitaciones motoras~\cite{telehealth_accessibility,rosen2009_telerehab_technologies}.
+    \item \textbf{Comprensibilidad}: Los textos, mensajes de error y flujos de navegación han de ser claros y coherentes, evitando tecnicismos innecesarios y sobrecarga de información~\cite{wcag22}.
+    \item \textbf{Robustez}: El contenido debe mostrarse correctamente en distintos navegadores y dispositivos, y ser compatible con tecnologías de apoyo como lectores de pantalla o ampliadores de pantalla~\cite{wcag22}.
 \end{itemize}
 
-Estos principios han guiado el diseño de la interfaz de TerapiTrack, priorizando menús sencillos, textos claros y un número reducido de acciones por pantalla. \cite{GithubTerapitrack}
+Estos principios han guiado el diseño de la interfaz de TerapiTrack, priorizando menús sencillos, textos claros y un número reducido de acciones por pantalla~\cite{GithubTerapitrack}.
 
 \section{Patrones de diseño y arquitectura Modelo-Vista-Controlador}
-En el desarrollo de aplicaciones web es habitual apoyarse en patrones de diseño que separan responsabilidades y facilitan la evolución del sistema.
-Uno de los más extendidos es el patrón Modelo-Vista-Controlador (MVC), que organiza la aplicación en tres componentes principales \cite{gamma_design_patterns}:
+
+En el desarrollo de aplicaciones de software es habitual apoyarse en patrones de diseño que separan responsabilidades y facilitan la evolución del sistema; en el caso de TerapiTrack, esto se traduce en el uso de una arquitectura de estilo Modelo-Vista-Controlador (MVC)~\cite{gamma_design_patterns}.
+Este patrón organiza la aplicación en tres componentes principales:
 
 \begin{itemize}
     \item \textbf{Modelo}: Representa los datos y las reglas de negocio asociadas a cada entidad del dominio, incluyendo la definición de estructuras de almacenamiento y restricciones de integridad.
@@ -49,23 +58,29 @@ Uno de los más extendidos es el patrón Modelo-Vista-Controlador (MVC), que org
     \item \textbf{Controlador}: Actúa como intermediario entre el modelo y la vista, recibiendo las peticiones del usuario, invocando la lógica necesaria y seleccionando la respuesta adecuada.
 \end{itemize}
 
-Este tipo de arquitectura favorece que el código relacionado con la persistencia de datos, la lógica de aplicación y la interfaz de usuario pueda evolucionar de manera relativamente independiente, algo especialmente útil en proyectos que pueden ampliarse en el futuro \cite{gamma_design_patterns}.
+Este tipo de arquitectura favorece que el código relacionado con la persistencia de datos, la lógica de aplicación y la interfaz de usuario pueda evolucionar de manera relativamente independiente, algo especialmente útil en proyectos que pueden ampliarse en el futuro~\cite{gamma_design_patterns}.
 
 \section{Bases de datos relacionales}
-Las bases de datos relacionales permiten organizar la información en tablas relacionadas entre sí mediante claves primarias y foráneas, garantizando la integridad de los datos mediante restricciones y reglas de consistencia \cite{date_db}.
-Este modelo es el que se ha aplicado en TerapiTrack para organizar usuarios, pacientes, ejercicios, sesiones y evaluaciones.
+
+Las bases de datos relacionales permiten organizar la información en tablas relacionadas entre sí mediante claves primarias y foráneas, garantizando la integridad de los datos mediante restricciones y reglas de consistencia.~\cite{date_db}
+Este modelo es el que se ha aplicado en TerapiTrack para organizar usuarios, pacientes, profesionales sanitarios, ejercicios, sesiones, evaluaciones y vídeos de respuesta.
+
+En este contexto aparecen relaciones de distinto tipo: \textbf{uno a muchos}, como la que se da entre un paciente y las sesiones que tiene programadas o entre un ejercicio y las veces que se incluye en distintas sesiones;
+\textbf{uno a uno}, como la que existe entre la tabla de usuarios y las tablas de paciente o profesional, donde cada registro de usuario se especializa en un único tipo de perfil;
+y \textbf{muchos a muchos}, como ocurre al vincular pacientes con varios profesionales sanitarios o al asociar ejercicios concretos a distintas sesiones.~\cite{date_db}
 
 La \textbf{normalización} es el proceso mediante el cual se descompone la información en tablas más pequeñas para reducir la redundancia y evitar anomalías en las operaciones de inserción, actualización y borrado.
-Aplicar niveles adecuados de normalización ayuda a mantener la coherencia de los datos y a simplificar su mantenimiento a largo plazo \cite{date_db}.
+En la práctica, esto implica diseñar el esquema de manera que cumpla distintas formas normales (primera, segunda, tercera, etc.), decidiendo qué atributos deben ir en cada tabla y cómo se relacionan entre sí, algo que suele ser una de las partes más delicadas del modelado de datos.~\cite{date_db}
 
-Una \textbf{relación de muchos a muchos} aparece cuando varios registros de una tabla pueden asociarse con varios registros de otra.
-En estos casos se introduce una tabla intermedia que almacena los pares de elementos relacionados y permite gestionar de forma clara y trazable esas asociaciones (por ejemplo, la vinculación entre pacientes y profesionales o la asignación de ejercicios a sesiones) \cite{date_db}.
+En el caso de las relaciones de muchos a muchos se introduce una tabla intermedia que almacena los pares de elementos relacionados y permite gestionar de forma clara y trazable esas asociaciones (por ejemplo, \textit{Paciente\_Profesional} para la vinculación entre pacientes y profesionales
+o \textit{Ejercicio\_Sesion} para la asignación de ejercicios a sesiones), manteniendo al mismo tiempo las formas normales y la integridad referencial del modelo de datos.~\cite{date_db}
 
 \section{Validación y pruebas de software}
+
 La validación de un sistema de software busca comprobar que la solución desarrollada cumple los requisitos definidos y que se comporta de forma correcta en los escenarios de uso previstos.
-Para ello se utilizan diferentes tipos de pruebas, que pueden combinarse según las necesidades del proyecto \cite{pressman_ingenieria_sw}.
+Para ello se utilizan diferentes tipos de pruebas, que pueden combinarse según las necesidades del proyecto~\cite{pressman_ingenieria_sw}.
 
 Entre las más habituales se encuentran las \textbf{pruebas unitarias}, centradas en módulos o funciones concretas; las \textbf{pruebas de integración}, que comprueban el funcionamiento conjunto de varios componentes; y las \textbf{pruebas funcionales} o de sistema, orientadas a verificar flujos de usuario o casos de uso completos.
-Automatizar parte de estas pruebas permite detectar errores de diseño o programación de manera temprana y reduce el riesgo de fallos en fases avanzadas del desarrollo \cite{pressman_ingenieria_sw}.
+Automatizar parte de estas pruebas permite detectar errores de diseño o programación de manera temprana y reduce el riesgo de fallos en fases avanzadas del desarrollo~\cite{pressman_ingenieria_sw}.
 
 Este conjunto de conceptos proporciona el contexto teórico y tecnológico que sustenta la memoria y ayuda a entender las decisiones que se detallan en los capítulos posteriores.

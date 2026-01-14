@@ -1,37 +1,41 @@
 \capitulo{2}{Objetivos del proyecto}
 
-Este capítulo recoge los objetivos que se persiguen con la realización del proyecto.\cite{GithubTerapitrack}
-En primer lugar se presentan los objetivos funcionales, que describen qué se espera que ofrezca la aplicación a sus usuarios.\cite{GithubTerapitrack}
-A continuación se detallan los objetivos técnicos, relacionados con la forma de construir y desplegar el sistema, y por último se recogen los objetivos personales planteados para el desarrollo del trabajo.\cite{GithubTerapitrack}
+Este capítulo recoge los objetivos que se persiguen con la realización del proyecto.
+En primer lugar se presentan los objetivos funcionales, que describen qué se espera que ofrezca la aplicación a sus usuarios.
+A continuación se detallan los objetivos técnicos, relacionados con la forma de construir y desplegar el sistema, y por último se recogen los objetivos personales planteados para el desarrollo del trabajo~\cite{GithubTerapitrack}.
 
 \section{Objetivos funcionales}
 
 \begin{itemize}
-    \item Gestionar diferentes perfiles de usuario (administrador, paciente y profesionales sanitarios) con permisos diferenciados según su rol.\cite{GithubTerapitrack}
-    \item Permitir la vinculación de pacientes con los profesionales responsables de su seguimiento terapéutico.\cite{GithubTerapitrack}
-    \item Ofrecer una biblioteca de ejercicios y recursos terapéuticos en formato audiovisual, organizada y filtrable según las necesidades de cada paciente.\cite{GithubTerapitrack}
-    \item Facilitar la creación y programación de sesiones personalizadas de rehabilitación, formadas por combinaciones de ejercicios.\cite{GithubTerapitrack}
-    \item Registrar la realización de las sesiones y asociar las grabaciones de los ejercicios al historial de cada paciente, para su posterior revisión y evaluación.\cite{GithubTerapitrack}
-    \item Proporcionar a los pacientes un entorno sencillo donde puedan consultar sus sesiones programadas, realizar los ejercicios guiados por vídeo y revisar la evolución de sus evaluaciones.\cite{GithubTerapitrack}
-    \item Asegurar la trazabilidad básica de la evolución terapéutica, ofreciendo a los profesionales una visión estructurada de las sesiones realizadas y de las puntuaciones registradas.\cite{GithubTerapitrack}
+  \item Gestionar diferentes perfiles de usuario (administrador, paciente y profesionales sanitarios) con permisos diferenciados según su rol.
+  \item Permitir la vinculación de pacientes con los profesionales responsables de su seguimiento terapéutico.
+  \item Ofrecer una biblioteca de ejercicios y recursos terapéuticos en formato audiovisual, organizada y filtrable según las necesidades de cada paciente, utilizando vídeos demostrativos configurables según el criterio de los profesionales sanitarios.
+  \item Facilitar la creación y programación de sesiones personalizadas de rehabilitación, formadas por combinaciones de ejercicios.
+  \item Registrar la realización de las sesiones y asociar las grabaciones de los ejercicios al historial de cada paciente, para su posterior revisión y evaluación.
+  \item Proporcionar a los pacientes un entorno sencillo donde puedan consultar sus sesiones programadas, realizar los ejercicios guiados por vídeo y revisar la evolución de sus evaluaciones.
+  \item Asegurar la trazabilidad básica de la evolución terapéutica, ofreciendo a los profesionales una visión estructurada de las sesiones realizadas y de las puntuaciones registradas.
 \end{itemize}
+En conjunto, estos objetivos funcionales se han definido a partir de las necesidades detectadas en el contexto del proyecto y de las características de TerapiTrack recogidas en la documentación técnica~\cite{GithubTerapitrack}.
 
 \section{Objetivos técnicos}
 
 \begin{itemize}
-    \item Construir una aplicación web modular que facilite el mantenimiento y la incorporación de nuevas funcionalidades en el futuro.\cite{GithubTerapitrack, pressman_ingenieria_sw}
-    \item Diseñar e implementar una base de datos relacional que modele usuarios, pacientes, profesionales, ejercicios, sesiones y evaluaciones, garantizando la integridad de los datos clínicos manejados.\cite{date_db}
-    \item Desarrollar una interfaz web accesible y clara, especialmente pensada para pacientes con posibles dificultades motoras o cognitivas.\cite{telehealth_accessibility,wcag22}
-    \item Incorporar mecanismos de autenticación, control de acceso por roles y cifrado de contraseñas que contribuyan a la protección de la información sensible.\cite{pressman_ingenieria_sw}
-    \item Preparar la aplicación para su despliegue en un entorno en la nube, permitiendo el acceso remoto al sistema desde distintos dispositivos.\cite{HerokuTerapitrackApp}
-    \item Definir y ejecutar una batería de pruebas sobre los componentes principales del sistema (modelos, controladores y flujos de usuario) que ayude a detectar fallos tanto de diseño como de programación y a comprobar su correcto funcionamiento.\cite{PytestDocs}
+  \item Construir una aplicación web modular que facilite el mantenimiento y la incorporación de nuevas funcionalidades en el futuro.
+  \item Diseñar e implementar una base de datos relacional que modele usuarios, pacientes, profesionales, ejercicios, sesiones y evaluaciones, garantizando la integridad de los datos clínicos manejados.
+  \item Desarrollar una interfaz web accesible y clara, especialmente pensada para pacientes con posibles dificultades motoras o cognitivas.
+  \item Incorporar mecanismos de autenticación, control de acceso por roles y cifrado de contraseñas que contribuyan a la protección de la información sensible.
+  \item Preparar la aplicación para su despliegue en un entorno en la nube, permitiendo el acceso remoto al sistema desde distintos dispositivos.
+  \item Definir y ejecutar una batería de pruebas sobre los componentes principales del sistema (modelos, controladores y flujos de usuario) que ayude a detectar fallos, tanto de diseño como de programación, y a comprobar su correcto funcionamiento.
 \end{itemize}
+Por su parte, los objetivos técnicos se apoyan en principios clásicos de ingeniería del software, en el diseño de bases de datos y en buenas prácticas de accesibilidad y despliegue web descritas en la bibliografía consultada~\cite{date_db,telehealth_accessibility,pressman_ingenieria_sw,PytestDocs,HerokuTerapitrackApp,wcag22}.
 
 \section{Objetivos personales}
 
 \begin{itemize}
-    \item Aplicar de forma integrada los conocimientos adquiridos a lo largo del Grado en un proyecto completo, desde el análisis de requisitos hasta el despliegue de la aplicación.\cite{GithubTerapitrack}
-    \item Profundizar en el desarrollo de aplicaciones web orientadas al ámbito sanitario y a la telerehabilitación.\cite{cubo2023_telerehab_parkinson}
-    \item Mejorar la capacidad de trabajo autónomo, planificación y gestión del tiempo en un proyecto de larga duración.\cite{JiraTerapitrack}
-    \item Adquirir experiencia práctica en el uso de herramientas profesionales de desarrollo, control de versiones y documentación técnica.\cite{GithubTerapitrack}
+  \item Aplicar de forma integrada los conocimientos adquiridos a lo largo del Grado en un proyecto completo, desde el análisis de requisitos hasta el despliegue de la aplicación.
+  \item Profundizar en el desarrollo de aplicaciones web orientadas al ámbito sanitario y a la telerehabilitación.
+  \item Mejorar la capacidad de trabajo autónomo, planificación y gestión del tiempo en un proyecto de larga duración.
+  \item Adquirir experiencia práctica en el uso de herramientas profesionales de desarrollo, control de versiones y documentación técnica.
+  \item Contribuir, en la medida de lo posible, a mejorar el día a día de las personas que necesitan rehabilitación, desarrollando una herramienta que facilite el seguimiento de las terapias en su propio domicilio.
 \end{itemize}
+Finalmente, los objetivos personales reflejan el interés por el ámbito sanitario y la telerehabilitación, así como la voluntad de consolidar habilidades profesionales y aportar una solución útil dentro de la colaboración con el Hospital Universitario de Burgos~\cite{JiraTerapitrack,cubo2023_telerehab_parkinson,GithubTerapitrack}.
