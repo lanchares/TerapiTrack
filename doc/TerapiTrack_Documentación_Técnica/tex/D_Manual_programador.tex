@@ -189,7 +189,7 @@ Posteriormente se creó una sesión terapéutica, se añadieron ejercicios a tra
 
 \subsection{Pruebas SQL con DB Browser for SQLite}
 
-Como complemento a las pruebas anteriores, se ejecutaron sentencias SQL directamente sobre la base de datos SQLite utilizando DB Browser for SQLite \cite{dbbrowser_sqlite}. El objetivo era validar operaciones típicas de mantenimiento (actualizaciones y consultas) y comprobar que las restricciones de clave primaria y foránea no impedían los cambios habituales.
+Como complemento a las pruebas anteriores, se ejecutaron sentencias SQL directamente sobre la base de datos SQLite utilizando DB Browser for SQLite \cite{DBBrowser}. El objetivo era validar operaciones típicas de mantenimiento (actualizaciones y consultas) y comprobar que las restricciones de clave primaria y foránea no impedían los cambios habituales.
 
 En primer lugar se actualizó el nombre y los apellidos de un usuario mediante una sentencia \texttt{UPDATE} y se verificó el resultado con una consulta \texttt{SELECT} sobre la tabla \texttt{Usuario}. De forma similar, se modificó el estado de una sesión de \texttt{PENDIENTE} a \texttt{COMPLETADA} y se actualizó la fecha de asignación en la tabla \texttt{Sesion}. Por último, se cambió la puntuación y los comentarios de una evaluación específica en la tabla \texttt{Evaluacion}, comprobando que los nuevos valores se almacenaban correctamente y que la fecha de evaluación se mantenía consistente. La Figura~\ref{fig:dbbrowser-actualizaciones} muestra uno de estos ejemplos.
 

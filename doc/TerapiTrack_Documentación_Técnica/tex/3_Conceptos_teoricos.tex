@@ -28,7 +28,7 @@ Este tipo de intervención requiere sesiones frecuentes y un seguimiento continu
 La telemedicina hace referencia al uso de las tecnologías de la información y la comunicación para prestar servicios sanitarios a distancia, permitiendo que paciente y profesional interactúen sin encontrarse en el mismo lugar físico.
 Dentro de este ámbito, la telerehabilitación se centra en el diseño, la supervisión y la evaluación de programas de rehabilitación mediante herramientas remotas, como videoconferencia o plataformas web específicas~\cite{rosen2009_telerehab_technologies}.
 
-En el caso de la enfermedad de Parkinson, la telerehabilitación ofrece la posibilidad de mantener la frecuencia de las terapias aunque el paciente resida en la “España vaciada” o tenga movilidad reducida.
+En el caso de la enfermedad de Parkinson, la telerehabilitación ofrece la posibilidad de mantener la frecuencia de las terapias aunque el paciente resida en la <<España vaciada>> o tenga movilidad reducida.
 Permite reducir desplazamientos, facilita la adherencia al tratamiento y hace posible que el profesional revise de forma diferida los ejercicios realizados en casa~\cite{parkinson_telerehab_review,parkinson_telerehab_protocol}.
 
 \section{Accesibilidad y usabilidad en aplicaciones sanitarias}
@@ -36,7 +36,7 @@ Permite reducir desplazamientos, facilita la adherencia al tratamiento y hace po
 Las aplicaciones orientadas a la salud deben diseñarse pensando en usuarios con diferentes capacidades motoras, sensoriales o cognitivas, y también en personas de distintas edades, incluidas aquellas con poca experiencia en el uso de ordenadores o dispositivos móviles.
 Ni la edad ni el nivel de conocimiento tecnológico deberían convertirse en una barrera a la hora de acceder a programas de telerehabilitación~\cite{telehealth_accessibility}.
 
-Los estándares de accesibilidad web, como las pautas WCAG, recogen cuatro principios generales que sirven de guía para el diseño de interfaces accesibles~\cite{wcag22}.
+Los estándares de accesibilidad web, como las pautas Web Content Accessibility Guidelines (WCAG), recogen cuatro principios generales que sirven de guía para el diseño de interfaces accesibles~\cite{wcag22}.
 
 \begin{itemize}
     \item \textbf{Perceptibilidad}: La información y los componentes de la interfaz deben presentarse de forma que puedan percibirse por distintos tipos de usuarios, por ejemplo cuidando el contraste de color, el tamaño de la tipografía o el uso de textos alternativos en imágenes~\cite{wcag22}.
@@ -62,18 +62,19 @@ Este tipo de arquitectura favorece que el código relacionado con la persistenci
 
 \section{Bases de datos relacionales}
 
-Las bases de datos relacionales permiten organizar la información en tablas relacionadas entre sí mediante claves primarias y foráneas, garantizando la integridad de los datos mediante restricciones y reglas de consistencia.~\cite{date_db}
+Las bases de datos relacionales permiten organizar la información en tablas relacionadas entre sí mediante claves primarias y foráneas, garantizando la integridad de los datos mediante restricciones y reglas de consistencia~\cite{date_db}.
 Este modelo es el que se ha aplicado en TerapiTrack para organizar usuarios, pacientes, profesionales sanitarios, ejercicios, sesiones, evaluaciones y vídeos de respuesta.
 
-En este contexto aparecen relaciones de distinto tipo: \textbf{uno a muchos}, como la que se da entre un paciente y las sesiones que tiene programadas o entre un ejercicio y las veces que se incluye en distintas sesiones;
+En este contexto aparecen relaciones de distinto tipo: \textbf{uno a muchos}, como la que se da entre un paciente y las sesiones que tiene programadas, o entre un profesional sanitario y las sesiones que coordina;
 \textbf{uno a uno}, como la que existe entre la tabla de usuarios y las tablas de paciente o profesional, donde cada registro de usuario se especializa en un único tipo de perfil;
-y \textbf{muchos a muchos}, como ocurre al vincular pacientes con varios profesionales sanitarios o al asociar ejercicios concretos a distintas sesiones.~\cite{date_db}
+y \textbf{muchos a muchos}, como ocurre al vincular pacientes con varios profesionales sanitarios o al asociar ejercicios concretos a distintas sesiones, que se representan mediante tablas intermedias específicas~\cite{date_db}.
 
 La \textbf{normalización} es el proceso mediante el cual se descompone la información en tablas más pequeñas para reducir la redundancia y evitar anomalías en las operaciones de inserción, actualización y borrado.
-En la práctica, esto implica diseñar el esquema de manera que cumpla distintas formas normales (primera, segunda, tercera, etc.), decidiendo qué atributos deben ir en cada tabla y cómo se relacionan entre sí, algo que suele ser una de las partes más delicadas del modelado de datos.~\cite{date_db}
+En términos prácticos, suele implicar diseñar el esquema de forma que cumpla las principales formas normales: primera forma normal (1FN), que exige atributos con valores atómicos;
+segunda forma normal (2FN), que elimina dependencias parciales respecto a claves compuestas; y tercera forma normal (3FN), que evita dependencias transitivas entre atributos que no forman parte de la clave~\cite{date_db}.
 
-En el caso de las relaciones de muchos a muchos se introduce una tabla intermedia que almacena los pares de elementos relacionados y permite gestionar de forma clara y trazable esas asociaciones (por ejemplo, \textit{Paciente\_Profesional} para la vinculación entre pacientes y profesionales
-o \textit{Ejercicio\_Sesion} para la asignación de ejercicios a sesiones), manteniendo al mismo tiempo las formas normales y la integridad referencial del modelo de datos.~\cite{date_db}
+En el caso de TerapiTrack, estas formas normales se han tenido en cuenta al distribuir los atributos en tablas especializadas y al introducir tablas intermedias como \textit{Paciente\_Profesional} o \textit{Ejercicio\_Sesion},
+lo que facilita mantener la coherencia y la trazabilidad del modelo de datos~\cite{date_db}.
 
 \section{Validación y pruebas de software}
 

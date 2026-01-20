@@ -12,7 +12,7 @@ Aunque se ha utilizado la estructura de sprints para organizar el proyecto, la e
 
 \subsubsection{Sprint 1: Configuración inicial (11--17 marzo 2025)}
 
-Este primer sprint se dedicó a poner en marcha el entorno de trabajo y a conocer las tecnologías básicas del proyecto. Se configuró el entorno con Flask, se creó el repositorio en GitHub y se definió una estructura inicial de carpetas y dependencias.\cite{flask_doc} Paralelamente se revisó la documentación de Flask y Jinja y se realizaron las primeras pruebas de conexión con SQLite para comprobar la persistencia de datos.\cite{flask_doc,jinja_doc_es}
+Este primer sprint se dedicó a poner en marcha el entorno de trabajo y a conocer las tecnologías básicas del proyecto. Se configuró el entorno con Flask, se creó el repositorio en GitHub y se definió una estructura inicial de carpetas y dependencias.\cite{FlaskDocs} Paralelamente se revisó la documentación de Flask y Jinja y se realizaron las primeras pruebas de conexión con SQLite para comprobar la persistencia de datos.\cite{FlaskDocs,JinjaDocs}
 
 Quedaron pendientes tareas como el diseño completo de la base de datos y la documentación detallada de requisitos, que se trasladaron al sprint siguiente. El gráfico burndown muestra que la mayor parte del trabajo se concentró al final del periodo, algo lógico en esta fase inicial de familiarización con las herramientas.
 
@@ -24,7 +24,7 @@ Quedaron pendientes tareas como el diseño completo de la base de datos y la doc
 
 \subsubsection{Sprint 2: Estudio (18--24 marzo 2025)}
 
-En el segundo sprint el esfuerzo se centró en profundizar en las tecnologías clave y en definir con más detalle el modelo de datos. Se completó el estudio práctico de Flask, SQLAlchemy y Jinja mediante ejemplos y pequeñas pruebas, se diseñó la base de datos y se elaboró el primer modelo entidad--relación.\cite{flask_doc,sqlalchemy_doc,jinja_doc_es} También se validó la integración entre Flask y SQLite con pruebas de lectura y escritura, apoyándose en herramientas como DB Browser for SQLite para inspeccionar la base de datos.\cite{dbbrowser_sqlite}
+En el segundo sprint el esfuerzo se centró en profundizar en las tecnologías clave y en definir con más detalle el modelo de datos. Se completó el estudio práctico de Flask, SQLAlchemy y Jinja mediante ejemplos y pequeñas pruebas, se diseñó la base de datos y se elaboró el primer modelo entidad--relación.\cite{FlaskDocs,SQLAlchemyDocs,JinjaDocs} También se validó la integración entre Flask y SQLite con pruebas de lectura y escritura, apoyándose en herramientas como DB Browser for SQLite para inspeccionar la base de datos.\cite{DBBrowser}
 
 Algunas tareas de implementación de modelos en SQLAlchemy no llegaron a completarse y se arrastraron al sprint 3, donde se terminó de consolidar la capa de datos. El burndown refleja que las finalizaciones se concentran al final del sprint, más como registro de lo realizado que como una ejecución estricta del plan diario.
 
@@ -36,7 +36,7 @@ Algunas tareas de implementación de modelos en SQLAlchemy no llegaron a complet
 
 \subsubsection{Sprint 3: Diseño (25--31 marzo 2025)}
 
-El tercer sprint se orientó al diseño detallado del sistema y a la implementación de los primeros modelos completos. Se ampliaron y ajustaron las tablas de la base de datos, se implementaron los modelos principales (usuario, paciente, profesional) en SQLAlchemy y se comprobó la estabilidad de la integración con SQLite.\cite{sqlalchemy_doc} Además, se avanzó en el diseño de las plantillas de Jinja y se revisó la documentación de requisitos para alinearla con las decisiones tomadas.\cite{jinja_doc_es}
+El tercer sprint se orientó al diseño detallado del sistema y a la implementación de los primeros modelos completos. Se ampliaron y ajustaron las tablas de la base de datos, se implementaron los modelos principales (usuario, paciente, profesional) en SQLAlchemy y se comprobó la estabilidad de la integración con SQLite.\cite{SQLAlchemyDocs} Además, se avanzó en el diseño de las plantillas de Jinja y se revisó la documentación de requisitos para alinearla con las decisiones tomadas.\cite{JinjaDocs}
 
 La creación de un sistema de permisos basado en Flask-Login quedó únicamente esbozada en este sprint y se abordó con más profundidad en los siguientes.\cite{flask_login} El gráfico burndown muestra cómo gran parte de los puntos de historia se cierran hacia el final, cuando se integran y prueban los distintos elementos de diseño.
 
@@ -48,7 +48,7 @@ La creación de un sistema de permisos basado en Flask-Login quedó únicamente 
 
 \subsubsection{Sprint 4: Base de datos (2--7 abril 2025)}
 
-En el sprint 4 se consolidó el trabajo previo sobre la base de datos y se empezó a reforzar la capa de seguridad y pruebas. Se completó la definición del modelo relacional, se ajustaron las relaciones entre entidades y se mejoró la integración con SQLAlchemy.\cite{sqlalchemy_doc} También se avanzó en la definición de permisos por rol y se continuó actualizando la documentación funcional y técnica.
+En el sprint 4 se consolidó el trabajo previo sobre la base de datos y se empezó a reforzar la capa de seguridad y pruebas. Se completó la definición del modelo relacional, se ajustaron las relaciones entre entidades y se mejoró la integración con SQLAlchemy.\cite{SQLAlchemyDocs} También se avanzó en la definición de permisos por rol y se continuó actualizando la documentación funcional y técnica.
 
 Las pruebas unitarias sobre los modelos y la redacción sistemática de la memoria en \LaTeX{} comenzaron en este sprint pero se fueron extendiendo a los posteriores.
 
@@ -60,7 +60,7 @@ Las pruebas unitarias sobre los modelos y la redacción sistemática de la memor
 
 \subsubsection{Sprint 5: Diseño de la interfaz (8--13 abril 2025)}
 
-El quinto sprint se centró en la parte visible de la aplicación. Se diseñó la interfaz de administración de usuarios, se trabajó en los formularios y en la validación básica de datos, y se fueron integrando estos elementos con la capa de modelos existente.\cite{flask_doc,flask_login} También se revisaron los requisitos funcionales para asegurarse de que la interfaz cubría los flujos principales de gestión.
+El quinto sprint se centró en la parte visible de la aplicación. Se diseñó la interfaz de administración de usuarios, se trabajó en los formularios y en la validación básica de datos, y se fueron integrando estos elementos con la capa de modelos existente.\cite{FlaskDocs,flask_login} También se revisaron los requisitos funcionales para asegurarse de que la interfaz cubría los flujos principales de gestión.
 
 Algunas tareas de pruebas unitarias y de depuración más exhaustiva quedaron pendientes y se trasladaron a sprints posteriores.
 
@@ -195,9 +195,9 @@ En conjunto, combinando el coste de personal, la amortización de hardware, la p
 
 El desarrollo de \textit{TerapiTrack} se ha llevado a cabo utilizando de forma casi exclusiva software libre y de código abierto, lo que ha permitido reducir significativamente los costes de licenciamiento y facilita tanto la explotación académica como un eventual despliegue profesional sin restricciones legales importantes.
 
-El backend está construido sobre Python y el microframework Flask para la gestión de rutas y controladores, mientras que la persistencia de datos se resuelve con SQLAlchemy sobre SQLite.\cite{flask_doc,sqlalchemy_doc} Estas tecnologías fundamentales se distribuyen bajo licencias permisivas de tipo BSD o MIT, que autorizan el uso, modificación y redistribución del software siempre que se mantengan los avisos de derechos de autor y las notas de licencia de los autores originales.
+El backend está construido sobre Python y el microframework Flask para la gestión de rutas y controladores, mientras que la persistencia de datos se resuelve con SQLAlchemy sobre SQLite.\cite{FlaskDocs,SQLAlchemyDocs} Estas tecnologías fundamentales se distribuyen bajo licencias permisivas de tipo BSD o MIT, que autorizan el uso, modificación y redistribución del software siempre que se mantengan los avisos de derechos de autor y las notas de licencia de los autores originales.
 
-Flask se apoya en varias bibliotecas del ecosistema Pallets que se utilizan de forma indirecta a través del framework. Werkzeug proporciona la infraestructura WSGI de bajo nivel para gestionar peticiones y respuestas HTTP, cookies y depuración. Jinja2 actúa como motor de plantillas para la generación de vistas HTML. Click gestiona la interfaz de línea de comandos, ItsDangerous se encarga de la firma segura de tokens, y MarkupSafe proporciona funciones de escape para prevenir inyecciones de código.\cite{flask_doc,jinja_doc_es} Todas estas dependencias se distribuyen bajo licencias permisivas, por lo que su presencia en el proyecto no introduce restricciones adicionales.
+Flask se apoya en varias bibliotecas del ecosistema Pallets que se utilizan de forma indirecta a través del framework. Werkzeug proporciona la infraestructura WSGI de bajo nivel para gestionar peticiones y respuestas HTTP, cookies y depuración. Jinja2 actúa como motor de plantillas para la generación de vistas HTML. Click gestiona la interfaz de línea de comandos, ItsDangerous se encarga de la firma segura de tokens, y MarkupSafe proporciona funciones de escape para prevenir inyecciones de código.\cite{FlaskDocs,JinjaDocs} Todas estas dependencias se distribuyen bajo licencias permisivas, por lo que su presencia en el proyecto no introduce restricciones adicionales.
 
 Para el control de acceso de usuarios se emplean Flask-Login para la gestión de sesiones, Flask-WTF y WTForms para la validación de formularios, y bcrypt junto con Flask-Bcrypt para el cifrado robusto de contraseñas.\cite{flask_login} Estas herramientas se publican bajo licencias MIT o BSD, permitiendo su integración en proyectos propios sin obligación de publicar el código fuente, siempre que se conserven las atribuciones exigidas.
 
