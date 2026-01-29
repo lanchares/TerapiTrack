@@ -102,7 +102,7 @@
         <strong>🎮 Navegación:</strong><br>
         ← → : Mover entre ejercicios<br>
         A : Ver ejercicio<br>
-        X : Pausar/Reanudar vídeo<br>
+        X : Pausar/Reanudar/Repetir vídeo<br>
         ↑ ↓ : Bajar/Subir en la pantalla<br>
         Y : Volver
     </div>
@@ -315,14 +315,31 @@ document.addEventListener('DOMContentLoaded', function() {
         const video = modalContent.querySelector('video');
         if (!video) return;
         
-        if (video.paused) {
+        // Si el vídeo ha terminado, reiniciarlo desde el principio
+        if (video.ended) {
+            video.currentTime = 0;
             video.play();
-            showVideoStatus('▶️');
+            showVideoStatus('🔄 Reiniciando');
+            console.log('🔄 Video reiniciado');
+            return;
+        }
+        
+        // Si está en pausa o pausado, reproducir
+        if (video.paused) {
+            video.play().then(() => {
+                showVideoStatus('▶️');
+                console.log('▶️ Video reanudado');
+            }).catch(err => {
+                console.error('Error al reproducir:', err);
+            });
         } else {
+            // Si está reproduciéndose, pausar
             video.pause();
             showVideoStatus('⏸️');
+            console.log('⏸️ Video pausado');
         }
     }
+
 
     function showVideoStatus(icon) {
         const overlay = document.createElement('div');
