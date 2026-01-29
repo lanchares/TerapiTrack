@@ -353,81 +353,39 @@ document.addEventListener('DOMContentLoaded', function() {
             paused: video.paused,
             ended: video.ended,
             currentTime: video.currentTime.toFixed(2),
-            duration: video.duration.toFixed(2),
-            readyState: video.readyState
+            duration: video.duration.toFixed(2)
         });
         
         // Si el vídeo ha terminado, reiniciarlo
         if (video.ended) {
             console.log('Vídeo terminado, reiniciando...');
             video.currentTime = 0;
-            
-            const playPromise = video.play();
-            if (playPromise !== undefined) {
-                playPromise.then(() => {
-                    showVideoStatus('🔄');
-                    console.log('Video reiniciado correctamente');
-                }).catch(err => {
-                    console.error('Error al reiniciar:', err);
-                    showVideoStatus('❌');
-                });
-            }
+            video.play().then(() => {
+                showVideoStatus('🔄');
+                console.log('Video reiniciado correctamente');
+            }).catch(err => {
+                console.error('Error al reiniciar:', err);
+                showVideoStatus('❌');
+            });
             return;
         }
         
         // Toggle play/pause
         if (video.paused) {
             console.log('Intentando reproducir...');
-            const playPromise = video.play();
-            
-            if (playPromise !== undefined) {
-                playPromise.then(() => {
-                    showVideoStatus('▶️');
-                    console.log('Video reanudado en', video.currentTime.toFixed(2));
-                }).catch(err => {
-                    console.error('Error al reproducir:', err.name, err.message);
-                    showVideoStatus('❌');
-                });
-            }
+            video.play().then(() => {
+                showVideoStatus('▶️');
+                console.log('Video reanudado en', video.currentTime.toFixed(2));
+            }).catch(err => {
+                console.error('Error al reproducir:', err);
+                showVideoStatus('❌');
+            });
         } else {
-            console.log('Intentando pausar...');
-            
-            try {
-                video.pause();
-                
-                // Verificar que realmente se pausó
-                setTimeout(() => {
-                    if (video.paused) {
-                        showVideoStatus('⏸️');
-                        console.log('Video pausado correctamente en', video.currentTime.toFixed(2));
-                    } else {
-                        console.error('El video no se pausó, forzando...');
-                        video.pause();
-                        video.currentTime = video.currentTime; // Fuerza actualización
-                        showVideoStatus('⏸️');
-                    }
-                }, 100);
-                
-            } catch (err) {
-                console.error('Error al pausar:', err);
-            }
+            console.log('Pausando video...');
+            video.pause();
+            showVideoStatus('⏸️');
+            console.log('Video pausado en', video.currentTime.toFixed(2));
         }
-        
-        console.log('Estado del vídeo DESPUÉS:', {
-            paused: video.paused,
-            currentTime: video.currentTime.toFixed(2)
-        });
-    }
-
-    function showVideoStatus(icon) {
-        const overlay = document.createElement('div');
-        overlay.className = 'video-status-overlay';
-        overlay.textContent = icon;
-        document.body.appendChild(overlay);
-        
-        setTimeout(() => {
-            overlay.remove();
-        }, 1000);
     }
 
     // Función global para acceso desde otros contextos
