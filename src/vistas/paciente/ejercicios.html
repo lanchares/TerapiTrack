@@ -102,6 +102,7 @@
         <strong>🎮 Navegación:</strong><br>
         ← → : Mover entre ejercicios<br>
         A : Ver ejercicio<br>
+        X : Pausar/Reanudar vídeo<br>
         ↑ ↓ : Bajar/Subir en la pantalla<br>
         Y : Volver
     </div>
@@ -171,6 +172,26 @@
     position: relative;
 }
 
+.video-status-overlay {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 2rem 3rem;
+    border-radius: 1rem;
+    font-size: 3rem;
+    z-index: 3000;
+    animation: fadeInOut 1s;
+    pointer-events: none;
+}
+
+@keyframes fadeInOut {
+    0%, 100% { opacity: 0; }
+    20%, 80% { opacity: 1; }
+}
+
 /* Capa con icono de play encima del vídeo */
 .play-overlay {
     text-shadow: 0 0 10px rgba(0,0,0,0.8);
@@ -222,7 +243,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let selectedExerciseIndex = 0;
     let currentEjercicio = null;
     let gamepadIndex = null;
-    let lastButtonStates = { Y: false, A: false, left: false, right: false, up: false, down: false };
+    let lastButtonStates = { Y: false, A: false, X: false, left: false, right: false, up: false, down: false };
     
     console.log(`Found ${exerciseWrappers.length} exercises for navigation`);
     
@@ -288,6 +309,35 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+    function togglePlayPause() {
+        if (!modal.classList.contains('show')) return;
+        
+        const video = modalContent.querySelector('video');
+        if (!video) return;
+        
+        if (video.paused) {
+            video.play();
+            showVideoStatus('▶️');
+        } else {
+            video.pause();
+            showVideoStatus('⏸️');
+        }
+    }
+
+    function showVideoStatus(icon) {
+        const overlay = document.createElement('div');
+        overlay.className = 'video-status-overlay';
+        overlay.textContent = icon;
+        document.body.appendChild(overlay);
+        
+        setTimeout(() => {
+            overlay.remove();
+        }, 1000);
+    }
+
+    // Función global para acceso desde otros contextos
+    window.togglePlayPause = togglePlayPause;
+
     // Función global para el botón "×" del modal
     window.cerrarEjercicioGrande = cerrarEjercicioGrande;
     
@@ -335,7 +385,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const up    = axisY < -0.5;
         const down  = axisY >  0.5;
 
-        const states = { Y: btnY, A: btnA, left, right, up, down };
+        const states = { Y: btnY, A: btnA, X: btnX, left, right, up, down };
 
         // Y: volver (si modal abierto, cierra; si no, vuelve a dashboard)
         if (states.Y && !lastButtonStates.Y) {
@@ -349,6 +399,11 @@ document.addEventListener('DOMContentLoaded', function() {
         // A: abrir detalle del ejercicio seleccionado (solo si modal cerrado)
         if (states.A && !lastButtonStates.A && !modal.classList.contains('show')) {
             mostrarEjercicioGrande();
+        }
+
+        // X: pausar/reanudar vídeo (solo si modal abierto)
+        if (states.X && !lastButtonStates.X && modal.classList.contains('show')) {
+            togglePlayPause();
         }
 
         if (!modal.classList.contains('show')) {
