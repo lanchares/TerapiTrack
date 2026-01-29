@@ -305,9 +305,23 @@ document.addEventListener('DOMContentLoaded', function() {
         // Listener para cuando el vídeo termine
         const video = document.getElementById('main-video');
         if (video) {
+            // Forzar que el vídeo responda a comandos
+            video.addEventListener('loadedmetadata', function() {
+                console.log('Video metadata cargada, duración:', video.duration);
+            });
+            
             video.addEventListener('ended', function() {
-                showVideoStatus('Completado - Pulsa X para repetir');
+                showVideoStatus('Completado');
                 console.log('Video terminado');
+            });
+            
+            // Listeners de debug
+            video.addEventListener('pause', function() {
+                console.log('Evento PAUSE disparado en', video.currentTime);
+            });
+            
+            video.addEventListener('play', function() {
+                console.log('Evento PLAY disparado en', video.currentTime);
             });
         }
     }
@@ -324,7 +338,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function togglePlayPause() {
-        if (!modal.classList.contains('show')) return;
+        if (!modal.classList.contains('show')) {
+            console.log('Modal cerrado, ignorando togglePlayPause');
+            return;
+        }
         
         const video = document.getElementById('main-video');
         if (!video) {
@@ -332,38 +349,74 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        console.log('Video state:', {
+        console.log('Estado del vídeo ANTES:', {
             paused: video.paused,
             ended: video.ended,
-            currentTime: video.currentTime
+            currentTime: video.currentTime.toFixed(2),
+            duration: video.duration.toFixed(2),
+            readyState: video.readyState
         });
         
-        // Si el vídeo ha terminado, reiniciarlo desde el principio
+        // Si el vídeo ha terminado, reiniciarlo
         if (video.ended) {
+            console.log('Vídeo terminado, reiniciando...');
             video.currentTime = 0;
-            video.play().then(() => {
-                showVideoStatus('🔄');
-                console.log('🔄 Video reiniciado');
-            }).catch(err => {
-                console.error('Error al reiniciar:', err);
-            });
+            
+            const playPromise = video.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    showVideoStatus('🔄');
+                    console.log('Video reiniciado correctamente');
+                }).catch(err => {
+                    console.error('Error al reiniciar:', err);
+                    showVideoStatus('❌');
+                });
+            }
             return;
         }
         
         // Toggle play/pause
         if (video.paused) {
-            video.play().then(() => {
-                showVideoStatus('▶️');
-                console.log('▶️ Video reanudado');
-            }).catch(err => {
-                console.error('Error al reproducir:', err);
-                showVideoStatus('❌ Error');
-            });
+            console.log('Intentando reproducir...');
+            const playPromise = video.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    showVideoStatus('▶️');
+                    console.log('Video reanudado en', video.currentTime.toFixed(2));
+                }).catch(err => {
+                    console.error('Error al reproducir:', err.name, err.message);
+                    showVideoStatus('❌');
+                });
+            }
         } else {
-            video.pause();
-            showVideoStatus('⏸️');
-            console.log('⏸️ Video pausado en', video.currentTime);
+            console.log('Intentando pausar...');
+            
+            try {
+                video.pause();
+                
+                // Verificar que realmente se pausó
+                setTimeout(() => {
+                    if (video.paused) {
+                        showVideoStatus('⏸️');
+                        console.log('Video pausado correctamente en', video.currentTime.toFixed(2));
+                    } else {
+                        console.error('El video no se pausó, forzando...');
+                        video.pause();
+                        video.currentTime = video.currentTime; // Fuerza actualización
+                        showVideoStatus('⏸️');
+                    }
+                }, 100);
+                
+            } catch (err) {
+                console.error('Error al pausar:', err);
+            }
         }
+        
+        console.log('Estado del vídeo DESPUÉS:', {
+            paused: video.paused,
+            currentTime: video.currentTime.toFixed(2)
+        });
     }
 
     function showVideoStatus(icon) {
