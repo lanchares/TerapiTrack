@@ -16,19 +16,21 @@ Para muchos de estos pacientes, viajar hasta la ciudad únicamente para realizar
 
 El proyecto en el que se enmarca este Trabajo de Fin de Grado forma parte de una colaboración más amplia con el Servicio de Neurología del Hospital Universitario de Burgos, liderada por la doctora Esther Cubo.
 El objetivo general de esta colaboración es mejorar la calidad de vida de las personas con enfermedad de Parkinson mediante el uso de herramientas de inteligencia artificial y de telemedicina, trabajando en tres líneas principales: la detección temprana de la enfermedad a partir de pruebas que miden la bradicinesia, la detección de caídas y la aplicación de programas de telerehabilitación con retroalimentación automática~\cite{nunez2021_tfg_ejercicios,cubo2023_telerehab_parkinson,garrido2021_tfm_infraestructura,ramirez2021_tfm_detectron,espinosa2022_tfg_deteccion}.
-Dentro de este conjunto de proyectos, el TFG se sitúa en esta última línea y se centra en el desarrollo de una aplicación web que permita a los pacientes realizar en su domicilio ejercicios de rehabilitación guiados por vídeos preparados por neurólogos y terapeutas del hospital~\cite{GithubTerapitrack}.
+Dentro de este conjunto de proyectos, el TFG se sitúa en esta última línea y se centra en el desarrollo de una aplicación web que permita a los pacientes realizar en su domicilio ejercicios de rehabilitación, guiados por vídeos preparados por neurólogos y terapeutas del hospital~\cite{GithubTerapitrack}.
 
 \section{Propuesta de solución}
 
 El objetivo principal de TerapiTrack es acercar la rehabilitación y el control terapéutico al entorno cotidiano del paciente, ofreciendo una aplicación web que organice de forma sencilla las sesiones de ejercicios y permita registrar su realización en el domicilio.
 El desarrollo de la aplicación se ha apoyado en una fase de diseño especialmente extensa, en la que durante las primeras semanas del proyecto se han definido con detalle los requisitos y las entidades clave del dominio (usuarios, pacientes, profesionales, ejercicios, sesiones, evaluaciones y vídeos de respuesta), así como los actores implicados y los casos de uso más relevantes del proceso de telerehabilitación.
-A partir de este análisis se han construido el modelo entidad-relación y su correspondiente esquema relacional normalizado, que sustentan la base de datos de TerapiTrack y garantizan la coherencia de la información clínica manejada.
+A partir de este análisis se han construido el modelo entidad-relación y su correspondiente esquema relacional normalizado, que sustentan la base de datos de TerapiTrack, garantizando la coherencia de la información clínica manejada.
 Estos modelos, junto con los principales diagramas de actividad y la arquitectura modular del sistema, han guiado el diseño de los distintos paneles de usuario y de los flujos de interacción que se describen en los capítulos posteriores y en la documentación técnica de los anexos~\cite{GithubTerapitrack}.
 
-Sobre esta base de diseño, se ha desarrollado la base funcional de la aplicación, estructurada en tres paneles diferenciados para administrador, profesional sanitario y paciente.
-El administrador puede gestionar usuarios, roles y vinculaciones entre pacientes y profesionales, así como configurar parámetros generales del sistema, como las políticas de retención de vídeos o ciertos límites de almacenamiento.
-El profesional dispone de herramientas para mantener su lista de pacientes, crear y catalogar ejercicios a partir de vídeos, programar sesiones terapéuticas personalizadas y revisar posteriormente las grabaciones y evaluaciones asociadas.
+Sobre esta base de diseño, se ha desarrollado la base funcional de la aplicación, estructurada en tres paneles diferenciados: administrador, profesional sanitario y paciente.
+El administrador puede gestionar usuarios, roles y vinculaciones entre pacientes y profesionales, así como configurar parámetros generales del sistema (como por ejemplo, las políticas de retención de vídeos o ciertos límites de almacenamiento).
+El profesional dispone de herramientas para mantener su lista de pacientes, crear y catalogar ejercicios a partir de vídeos, programar sesiones terapéuticas personalizadas y revisar posteriormente las grabaciones y evaluarlas.
 Por su parte, el paciente accede a un panel simplificado desde el que puede consultar sus próximas sesiones, ejecutar los ejercicios guiados por vídeo y visualizar de forma clara su evolución a partir de las evaluaciones registradas.
+
+Se repite
 
 Entre las principales funcionalidades que aporta la herramienta se encuentran gestionar usuarios y roles (administrador, profesional y paciente), controlando el acceso mediante autenticación y decoradores específicos por tipo de usuario; permitir que los profesionales sanitarios creen ejercicios en vídeo, organicen sesiones personalizadas y las asignen a sus pacientes;
 registrar la realización de las sesiones y asociar las grabaciones de los ejercicios al historial de cada paciente, facilitando su posterior evaluación; y presentar a cada paciente un entorno simplificado donde pueda consultar la planificación, realizar los ejercicios y revisar su progreso a lo largo del tiempo~\cite{GithubTerapitrack}.
@@ -43,6 +45,6 @@ Para facilitar la validación, el uso y la posible evolución del sistema, se en
   \item Un manual de instalación y de usuario, con instrucciones paso a paso para desplegar la aplicación y una guía básica para cada tipo de usuario.
   \item Un resumen de las pruebas realizadas sobre el sistema, tanto automatizadas con \textit{pytest} como manuales sobre el modelo de datos y las operaciones habituales, junto con los resultados obtenidos.
   \item Varios vídeos breves que muestran el funcionamiento de las distintas partes de TerapiTrack (panel de administrador, profesional y paciente), de manera que el tribunal pueda hacerse una idea clara de la aplicación sin tener que levantar todo el entorno.
-  \item Un breve documento de credenciales, incluido en el repositorio del proyecto bajo el nombre \texttt{CREDENCIALES.md}, que recoge la URL de despliegue y las cuentas de acceso de prueba para los distintos perfiles (administrador, profesional y paciente).
+  \item Un breve documento de credenciales, incluido en el repositorio del proyecto bajo el nombre \texttt{CREDENCIALES.md}, que recoge la URL de despliegue y las cuentas de acceso de prueba para los distintos perfiles.
 \end{itemize}
 El objetivo de este material adicional es que cualquier persona interesada pueda entender con rapidez el alcance del proyecto, comprobar su funcionamiento y disponer de una base sobre la que seguir trabajando~\cite{GithubTerapitrack}.

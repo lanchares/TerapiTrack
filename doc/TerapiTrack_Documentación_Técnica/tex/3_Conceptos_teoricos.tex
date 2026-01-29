@@ -39,10 +39,10 @@ Ni la edad ni el nivel de conocimiento tecnológico deberían convertirse en una
 Los estándares de accesibilidad web, como las pautas Web Content Accessibility Guidelines (WCAG), recogen cuatro principios generales que sirven de guía para el diseño de interfaces accesibles~\cite{wcag22}.
 
 \begin{itemize}
-    \item \textbf{Perceptibilidad}: La información y los componentes de la interfaz deben presentarse de forma que puedan percibirse por distintos tipos de usuarios, por ejemplo cuidando el contraste de color, el tamaño de la tipografía o el uso de textos alternativos en imágenes~\cite{wcag22}.
-    \item \textbf{Operabilidad}: Los controles deben poder manejarse con diferentes dispositivos de entrada (ratón, teclado, pantallas táctiles, o mandos) y con un número reducido de acciones, algo especialmente relevante en personas con limitaciones motoras~\cite{telehealth_accessibility,rosen2009_telerehab_technologies}.
-    \item \textbf{Comprensibilidad}: Los textos, mensajes de error y flujos de navegación han de ser claros y coherentes, evitando tecnicismos innecesarios y sobrecarga de información~\cite{wcag22}.
-    \item \textbf{Robustez}: El contenido debe mostrarse correctamente en distintos navegadores y dispositivos, y ser compatible con tecnologías de apoyo como lectores de pantalla o ampliadores de pantalla~\cite{wcag22}.
+    \item \textbf{Perceptibilidad}: la información y los componentes de la interfaz deben presentarse de forma que puedan percibirse por distintos tipos de usuarios, por ejemplo cuidando el contraste de color, el tamaño de la tipografía o el uso de textos alternativos en imágenes~\cite{wcag22}.
+    \item \textbf{Operabilidad}: los controles deben poder manejarse con diferentes dispositivos de entrada (ratón, teclado, pantallas táctiles, o mandos) y con un número reducido de acciones, algo especialmente relevante en personas con limitaciones motoras~\cite{telehealth_accessibility,rosen2009_telerehab_technologies}.
+    \item \textbf{Comprensibilidad}: los textos, mensajes de error y flujos de navegación han de ser claros y coherentes, evitando tecnicismos innecesarios y sobrecarga de información~\cite{wcag22}.
+    \item \textbf{Robustez}: el contenido debe mostrarse correctamente en distintos navegadores y dispositivos, y ser compatible con tecnologías de apoyo como lectores de pantalla o ampliadores de pantalla~\cite{wcag22}.
 \end{itemize}
 
 Estos principios han guiado el diseño de la interfaz de TerapiTrack, priorizando menús sencillos, textos claros y un número reducido de acciones por pantalla~\cite{GithubTerapitrack}.
@@ -53,9 +53,9 @@ En el desarrollo de aplicaciones de software es habitual apoyarse en patrones de
 Este patrón organiza la aplicación en tres componentes principales:
 
 \begin{itemize}
-    \item \textbf{Modelo}: Representa los datos y las reglas de negocio asociadas a cada entidad del dominio, incluyendo la definición de estructuras de almacenamiento y restricciones de integridad.
-    \item \textbf{Vista}: Define cómo se presenta la información al usuario, normalmente mediante páginas web o plantillas que muestran formularios, listados y mensajes.
-    \item \textbf{Controlador}: Actúa como intermediario entre el modelo y la vista, recibiendo las peticiones del usuario, invocando la lógica necesaria y seleccionando la respuesta adecuada.
+    \item \textbf{Modelo}: representa los datos y las reglas de negocio asociadas a cada entidad del dominio, incluyendo la definición de estructuras de almacenamiento y restricciones de integridad.
+    \item \textbf{Vista}: define cómo se presenta la información al usuario, normalmente mediante páginas web o plantillas que muestran formularios, listados y mensajes.
+    \item \textbf{Controlador}: actúa como intermediario entre el modelo y la vista, recibiendo las peticiones del usuario, invocando la lógica necesaria y seleccionando la respuesta adecuada.
 \end{itemize}
 
 Este tipo de arquitectura favorece que el código relacionado con la persistencia de datos, la lógica de aplicación y la interfaz de usuario pueda evolucionar de manera relativamente independiente, algo especialmente útil en proyectos que pueden ampliarse en el futuro~\cite{gamma_design_patterns}.

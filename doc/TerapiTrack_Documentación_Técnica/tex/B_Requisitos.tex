@@ -2,9 +2,10 @@
 
 \section{Introducción}
 
-En este anexo se recogen los requisitos funcionales y no funcionales definidos para el desarrollo de \textit{TerapiTrack}, así como la especificación detallada de los casos de uso principales del sistema.
+En este anexo se recogen los requisitos funcionales y no funcionales definidos para el desarrollo de TerapiTrack, así como la especificación detallada de los casos de uso principales del sistema.
 
-Estos requisitos se elaboraron durante la fase de análisis y diseño del proyecto, a partir de los objetivos generales y del contexto de uso descritos en la memoria. A partir de ellos se ha ido tomando decisiones sobre la arquitectura y la implementación de la aplicación web, de manera que cada módulo desarrollado responde a necesidades previamente identificadas y no a decisiones improvisadas durante la programación.
+Estos requisitos se elaboraron durante la fase de análisis y diseño del proyecto, a partir de los objetivos generales y del contexto de uso descritos en la memoria.
+A partir de ellos se ha ido tomando decisiones sobre la arquitectura y la implementación de la aplicación web, de manera que cada módulo desarrollado responde a necesidades previamente identificadas y no a decisiones improvisadas durante la programación.
 
 \section{Objetivos generales}
 El sistema persigue los siguientes objetivos principales:
@@ -47,7 +48,7 @@ El sistema persigue los siguientes objetivos principales:
   \item \textbf{RF4.1}: El sistema grabará automáticamente la ejecución de ejercicios mediante cámara del dispositivo.
   \item \textbf{RF4.2}: El sistema almacenará vídeos con identificador único vinculado a sesión y ejercicio.
   \item \textbf{RF4.3}: Los profesionales reproducirán vídeos grabados desde panel de evaluación.
-  \item \textbf{RF4.4}: Los profesionales evaluarán desempeño mediante puntuación (1–5) y comentarios.
+  \item \textbf{RF4.4}: Los profesionales evaluarán desempeño mediante puntuación (1-5) y comentarios.
   \item \textbf{RF4.5}: Los pacientes consultarán evaluaciones históricas con puntuaciones y comentarios.
   \item \textbf{RF4.6}: El sistema generará gráficos de progresión temporal para visualizar evolución.
 \end{itemize}
@@ -100,16 +101,14 @@ El sistema persigue los siguientes objetivos principales:
   \item \textbf{RNF5.2}: Registros de actividad para análisis y diagnóstico de incidencias.
 \end{itemize}
 
-\raggedbottom        
-\setlength{\parskip}{0pt}
-
 \section{Especificación de requisitos}
 
-Esta sección recoge los principales casos de uso del sistema y define cómo interactúan los actores con la aplicación para satisfacer los requisitos funcionales descritos en el catálogo anterior. Cada caso de uso se presenta de forma estructurada, indicando sus precondiciones, flujo de acciones, postcondiciones y relación con los requisitos asociados.
+Esta sección recoge los principales casos de uso del sistema y define cómo interactúan los actores con la aplicación para satisfacer los requisitos funcionales descritos en el catálogo anterior.
+Cada caso de uso se presenta de forma estructurada, indicando sus precondiciones, flujo de acciones, postcondiciones y relación con los requisitos asociados.
 
 \subsection{Actores del sistema}
 
-En el sistema \textit{TerapiTrack} intervienen los siguientes actores principales:
+En el sistema TerapiTrack intervienen los siguientes actores principales:
 
 \begin{itemize}
   \item \textbf{Administrador}: Gestiona los usuarios de la plataforma, las configuraciones globales y las vinculaciones entre pacientes y profesionales.
@@ -119,16 +118,30 @@ En el sistema \textit{TerapiTrack} intervienen los siguientes actores principale
 
 \subsection{Diagrama de casos de uso}
 
-En la Figura \ref{fig:casos-uso-terapitrack} se representa de forma global
-cómo interactúan los actores con los principales casos de uso del sistema,
-agrupados por módulos funcionales.
+En las Figuras~\ref{fig:casos-uso-admin}, \ref{fig:casos-uso-profesional} y \ref{fig:casos-uso-paciente} se representan los principales casos de uso del sistema agrupados por actor, lo que facilita la lectura de las relaciones y de los módulos funcionales implicados en cada rol.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=1.1\textwidth,height=2.7\textheight,keepaspectratio]{Diagrama_CasosDeUso.png}
-  \caption{Diagrama de casos de uso del sistema \textit{TerapiTrack}.}
-  \label{fig:casos-uso-terapitrack}
+  \includegraphics[width=0.9\textwidth]{Diagrama_CasosUso_admin.png}
+  \caption{Casos de uso asociados al actor Administrador.}
+  \label{fig:casos-uso-admin}
 \end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{Diagrama_CasosUso_profesional.png}
+  \caption{Casos de uso asociados al actor Profesional sanitario.}
+  \label{fig:casos-uso-profesional}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{Diagrama_CasosUso_paciente.png}
+  \caption{Casos de uso asociados al actor Paciente.}
+  \label{fig:casos-uso-paciente}
+\end{figure}
+
+En las tablas~\ref{tab:cu-1-iniciar-sesion} a \ref{tab:cu-9-2-graficos-progreso} se detalla la especificación de los principales casos de uso del sistema, incluyendo precondiciones, flujo de acciones y postcondiciones asociadas a cada requisito funcional.
 
 % Caso de Uso 1 -> Iniciar sesión
 \begin{table}[p]
@@ -156,6 +169,7 @@ agrupados por módulos funcionales.
 \bottomrule
 \end{tabularx}
 \caption{CU-1 Iniciar sesión.}
+\label{tab:cu-1-iniciar-sesion}
 \end{table}
 % Caso de Uso 2.1 -> Crear usuario
 \begin{table}[p]
@@ -187,6 +201,7 @@ agrupados por módulos funcionales.
 \bottomrule
 \end{tabularx}
 \caption{CU-2.1 Crear usuario.}
+\label{tab:cu-2-1-crear-usuario}
 \end{table}
 % Caso de Uso 2.2 -> Activar/desactivar usuario
 \begin{table}[p]
@@ -214,6 +229,7 @@ agrupados por módulos funcionales.
 \bottomrule
 \end{tabularx}
 \caption{CU-2.2 Activar/desactivar usuario.}
+\label{tab:cu-2-2-activar-usuario}
 \end{table}
 % Caso de Uso 2.3 -> Vincular paciente con profesional
 \begin{table}[p]
@@ -242,6 +258,7 @@ agrupados por módulos funcionales.
 \bottomrule
 \end{tabularx}
 \caption{CU-2.3 Vincular paciente con profesional.}
+\label{tab:cu-2-3-vincular}
 \end{table}
 % Caso de Uso 3 -> Configurar sistema
 \begin{table}[p]
@@ -269,6 +286,7 @@ agrupados por módulos funcionales.
 \bottomrule
 \end{tabularx}
 \caption{CU-3 Configurar sistema.}
+\label{tab:cu-3-config-sistema}
 \end{table}
 % Caso de Uso 4.1 -> Crear ejercicio
 \begin{table}[p]
@@ -297,6 +315,7 @@ agrupados por módulos funcionales.
 \bottomrule
 \end{tabularx}
 \caption{CU-4.1 Crear ejercicio.}
+\label{tab:cu-4-1-crear-ejercicio}
 \end{table}
 % Caso de Uso 4.2 -> Consultar biblioteca de ejercicios
 \begin{table}[p]
@@ -326,6 +345,7 @@ agrupados por módulos funcionales.
 \bottomrule
 \end{tabularx}
 \caption{CU-4.2 Consultar biblioteca de ejercicios.}
+\label{tab:cu-4-2-consultar-ejercicio}
 \end{table}
 % Caso de Uso 5.1 -> Crear sesión terapéutica
 \begin{table}[p]
@@ -354,6 +374,7 @@ agrupados por módulos funcionales.
 \bottomrule
 \end{tabularx}
 \caption{CU-5.1 Crear sesión terapéutica.}
+\label{tab:cu-5-1-crear-sesion}
 \end{table}
 % Caso de Uso 5.2 -> Asignar sesión a paciente
 \begin{table}[p]
@@ -382,6 +403,7 @@ agrupados por módulos funcionales.
 \bottomrule
 \end{tabularx}
 \caption{CU-5.2 Asignar sesión a paciente.}
+\label{tab:cu-5-2-asignar-sesion}
 \end{table}
 % Caso de Uso 5.3 -> Consultar sesiones programadas
 \begin{table}[p]
@@ -409,6 +431,7 @@ agrupados por módulos funcionales.
 \bottomrule
 \end{tabularx}
 \caption{CU-5.3 Consultar sesiones programadas.}
+\label{tab:cu-5-3-consultar-sesion}
 \end{table}
 % Caso de Uso 6 -> Realizar sesión
 \begin{table}[p]
@@ -438,6 +461,7 @@ agrupados por módulos funcionales.
 \bottomrule
 \end{tabularx}
 \caption{CU-6 Realizar sesión.}
+\label{tab:cu-6-realizar-sesion}
 \end{table}
 % Caso de Uso 7 -> Grabar respuesta de ejercicio
 \begin{table}[p]
@@ -461,12 +485,13 @@ agrupados por módulos funcionales.
 \item Almacena el vídeo 
 \item Genera URL de almacenamiento
 \end{enumerate}\\
-\textbf{Postcondición} & Video\_Respuesta almacenado y accesible para evaluación \\
+\textbf{Postcondición} & VideoRespuesta almacenado y accesible para evaluación \\
 \textbf{Excepciones} & Ninguna \\
 \textbf{Importancia} & Alta \\
 \bottomrule
 \end{tabularx}
 \caption{CU-7 Grabar respuesta de ejercicio.}
+\label{tab:cu-7-grabar-ejercicio}
 \end{table}
 % Caso de Uso 8.1 -> Visualizar vídeos de respuesta
 \begin{table}[p]
@@ -495,6 +520,7 @@ agrupados por módulos funcionales.
 \bottomrule
 \end{tabularx}
 \caption{CU-8.1 Visualizar vídeos de respuesta.}
+\label{tab:cu-8-1-ver-videos}
 \end{table}
 % Caso de Uso 8.2 -> Registrar evaluación
 \begin{table}[p]
@@ -523,6 +549,7 @@ agrupados por módulos funcionales.
 \bottomrule
 \end{tabularx}
 \caption{CU-8.2 Registrar evaluación.}
+\label{tab:cu-8-2-registrar-evaluacion}
 \end{table}
 % Caso de Uso 9.1 -> Ver historial de evaluaciones
 \begin{table}[p]
@@ -550,6 +577,7 @@ agrupados por módulos funcionales.
 \bottomrule
 \end{tabularx}
 \caption{CU-9.1 Ver historial de evaluaciones.}
+\label{tab:cu-9-1-historial-evaluaciones}
 \end{table}
 % Caso de Uso 9.2 -> Visualizar gráficos de progreso
 \begin{table}[p]
@@ -577,4 +605,5 @@ agrupados por módulos funcionales.
 \bottomrule
 \end{tabularx}
 \caption{CU-9.2 Visualizar gráficos de progreso.}
+\label{tab:cu-9-2-graficos-progreso}
 \end{table}

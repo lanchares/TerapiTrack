@@ -2,7 +2,7 @@
 
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org/)
 [![Flask](https://img.shields.io/badge/Flask-3.1.0-green.svg)](https://flask.palletsprojects.com/)
-[![License](https://img.shields.io/badge/License-TFG-orange.svg)]()
+[![License](https://img.shields.io/badge/License-MIT-orange.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/Tests-99%25%20Coverage-brightgreen.svg)]()
 
 Sistema web de gestión de terapias de rehabilitación online para pacientes con dificultades motoras.
@@ -275,7 +275,9 @@ Incluye:
 
 ## Licencia
 
-Proyecto desarrollado como Trabajo Fin de Grado. Sin licencia pública por el momento.
+Este proyecto se distribuye bajo la licencia MIT.
+
+El texto completo de la licencia se encuentra en el archivo [`LICENSE`](LICENSE) incluido en este repositorio.
 
 ---
 

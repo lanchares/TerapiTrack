@@ -111,7 +111,7 @@ Finalmente se optó por modelar ambas relaciones como muchos a muchos mediante t
 Esta última tabla actúa como punto de unión entre el plan terapéutico (la sesión) y el contenido concreto (los ejercicios), y permitió reutilizar un mismo ejercicio en varias sesiones distintas sin duplicar información.
 
 La parte más delicada llegó al integrar en el modelo la información del desempeño del paciente a lo largo del tiempo.
-En los primeros bocetos solo existía una entidad de \texttt{Progreso}, que concentraba tanto la referencia al ejercicio y al paciente como la puntuación, los comentarios del profesional y la ruta del video de respuesta, lo que dificultaba separar el hecho de haber realizado un ejercicio de la valoración que se hacía sobre él.
+En los primeros bocetos solo existía una entidad de \texttt{Progreso}, que concentraba tanto la referencia al ejercicio y al paciente como la puntuación, los comentarios del profesional y la ruta del vídeo de respuesta, lo que dificultaba separar el hecho de haber realizado un ejercicio de la valoración que se hacía sobre él.
 Tras varias pruebas se reorganizó esta parte introduciendo las entidades \texttt{VideoRespuesta} y \texttt{Evaluacion}, ambas asociadas a la tabla intermedia \texttt{Ejercicio\_Sesion}.
 De este modo, cada ejercicio de cada sesión puede tener su propia grabación y, opcionalmente, una evaluación asociada, lo que refleja mejor el flujo real del tratamiento y evita inconsistencias cuando se añaden, modifican o repiten sesiones.
 
@@ -348,9 +348,11 @@ El sistema se ha probado de forma continua durante el desarrollo, combinando pru
 Se ha implementado un conjunto de pruebas unitarias en la carpeta \texttt{tests}, que cubre las operaciones básicas de los modelos (creación, actualización, borrado y consultas) y varios de los flujos principales de los controladores~\cite{PytestDocs}.
 Para ejecutarlas se utiliza el comando \texttt{pytest tests/ -v --cov=src --cov-report=html}, que genera un informe de cobertura por fichero en formato HTML~\cite{PytestDocs}.
 
-En la versión final del proyecto se han definido 190 pruebas y se ha alcanzado una cobertura global del 99\%, con todos los modelos y las funciones auxiliares al 100\% y los controladores principales (administrador, profesional, paciente y autenticación) en torno al 99\% de líneas cubiertas.
+En la versión final del proyecto se han definido 190 tests y se ha alcanzado una cobertura global del 99\%, con todos los modelos y las funciones auxiliares al 100\% y los controladores principales (administrador, profesional, paciente y autenticación) en torno al 99\% de líneas cubiertas.
 Aunque esta cobertura no garantiza que el código esté libre de errores, sí proporciona una red de seguridad que facilita realizar cambios sin romper funcionalidades ya existentes~\cite{PytestDocs}.
 En la práctica, estas pruebas permitieron detectar regresiones al refactorizar controladores y modelos, corrigiéndose varios fallos de validación y de control de acceso antes de desplegar nuevas versiones~\cite{GithubTerapitrack}.
+
+La Figura~\ref{fig:cobertura-tests} resume la cobertura de pruebas unitarias obtenida con \texttt{pytest}, mostrando que los modelos y funciones auxiliares alcanzan el 100\,\% y los controladores en torno al 99\,\%~\cite{GithubTerapitrack}.
 
 \begin{figure}[H]
   \centering
@@ -367,15 +369,15 @@ Estas pruebas han permitido detectar problemas que no eran evidentes en el entor
 
 \subsubsection{Análisis estático con SonarQube}
 
-Además de las pruebas automatizadas con \texttt{pytest}, se realizó un análisis estático del código utilizando SonarQube con el objetivo de detectar \emph{code smells}, posibles errores y problemas de mantenibilidad~\cite{GithubTerapitrack}.
-Para ello se configuró un proyecto específico para \textit{TerapiTrack}, se lanzó el escaneo sobre el código de \texttt{src} y se revisaron los informes generados en la interfaz web de la herramienta.
+Además de las pruebas automatizadas con \texttt{pytest}, se realizó un análisis estático del código utilizando SonarQube como se puede ver en la figura~\ref{fig:cobertura-tests} con el objetivo de detectar \emph{code smells}, posibles errores y problemas de mantenibilidad~\cite{GithubTerapitrack}.
+Para ello se configuró un proyecto específico para TerapiTrack, se lanzó el escaneo sobre el código de \texttt{src} y se revisaron los informes generados en la interfaz web de la herramienta.
 
 El resultado del análisis indicó que no se detectaban vulnerabilidades de seguridad ni errores críticos, y que la mayor parte de las incidencias correspondían a recomendaciones de estilo (nombres de variables, longitud de funciones o duplicidad leve de código). Estas observaciones se utilizaron para refactorizar algunos controladores y modelos, mejorando la legibilidad y reduciendo el acoplamiento entre módulos, aunque se mantuvieron ciertos \emph{smells} considerados aceptables para el alcance de un prototipo académico.
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.9\textwidth]{img/sonarqube_resumen.png}
-  \caption{Resumen del análisis estático de \textit{TerapiTrack} en SonarQube.}
+  \caption{Resumen del análisis estático de TerapiTrack en SonarQube.}
   \label{fig:sonarqube-resumen}
 \end{figure}
 

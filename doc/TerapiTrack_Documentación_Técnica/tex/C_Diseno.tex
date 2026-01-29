@@ -2,255 +2,316 @@
 
 \section{Introducción}
 
-Este anexo recoge el diseño técnico del sistema \textit{TerapiTrack}, incluyendo la estructura de datos, la arquitectura general y los principales procedimientos implementados. El objetivo es documentar las decisiones de diseño que permiten garantizar la robustez, escalabilidad y mantenibilidad del sistema, así como mostrar la coherencia entre el modelo de datos, los casos de uso y la implementación realizada. 
+Este anexo recoge el diseño técnico del sistema TerapiTrack, incluyendo la estructura de datos, la arquitectura general y los principales procedimientos implementados.
+El objetivo es documentar las decisiones de diseño que permiten garantizar la robustez, escalabilidad y mantenibilidad del sistema, así como mostrar la coherencia entre el modelo de datos, los casos de uso y la implementación realizada. 
 
 \section{Diseño de datos}
 
-El diseño de datos se ha realizado siguiendo un enfoque relacional, asegurando la integridad y normalización de la información mediante claves primarias, foráneas y restricciones de unicidad y dominio. A continuación se presentan los principales diagramas y el diccionario de datos que describen cómo se modelan usuarios, pacientes, profesionales, ejercicios, sesiones y evaluaciones dentro de la aplicación. 
+El diseño de datos se ha realizado siguiendo un enfoque relacional, asegurando la integridad y normalización de la información mediante claves primarias, foráneas y restricciones de unicidad y dominio.
+Este modelo se ha implementado inicialmente sobre SQLite en desarrollo y es compatible con PostgreSQL en el despliegue en producción, aprovechando la capa de abstracción que proporciona SQLAlchemy~\cite{SQLAlchemyDocs}.
+A continuación, se presentan los principales diagramas y el diccionario de datos que describen cómo se modelan usuarios, pacientes, profesionales, ejercicios, sesiones, evaluaciones y vídeos de respuesta dentro de la aplicación. 
 
 \subsection{Diagrama entidad-relación}
 
-El diagrama entidad-relación representa las entidades conceptuales del sistema (Usuario, Paciente, Profesional, Sesión, Ejercicio, Vídeo de respuesta, Evaluación, etc.) y las relaciones existentes entre ellas. En él se distinguen claramente las relaciones uno a uno (por ejemplo, Usuario–Paciente o Usuario–Profesional), las relaciones muchos a muchos resueltas mediante tablas intermedias (Paciente–Profesional, Sesión–Ejercicio) y las restricciones principales que garantizan la trazabilidad de cada sesión y de sus ejercicios asociados. Esta representación facilita la comprensión de cómo se vinculan los datos clínicos con los usuarios y las sesiones terapéuticas. 
+El diagrama entidad-relación de la Figura~\ref{fig:er-terapitrack} representa las entidades conceptuales del sistema y las relaciones existentes entre ellas.
+En él se distinguen claramente las relaciones uno a uno (por ejemplo, Usuario-Paciente o Usuario-Profesional), las relaciones muchos a muchos resueltas mediante tablas intermedias (Paciente-Profesional, Sesión-Ejercicio) y las restricciones principales que garantizan la trazabilidad de cada sesión y de sus ejercicios asociados.
+Esta representación facilita la comprensión de cómo se vinculan los datos clínicos con los usuarios y las sesiones terapéuticas. 
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{Diagrama Entidad-Relacion.png}
   \caption{Diagrama entidad-relación del sistema.}
+  \label{fig:er-terapitrack}
 \end{figure}
 
 \subsection{Diagrama relacional}
 
-El diagrama relacional muestra la traducción del modelo conceptual a tablas concretas de una base de datos relacional, indicando claves primarias, claves foráneas e índices relevantes. En él puede verse cómo se han introducido tablas puente para las relaciones muchos a muchos (como \texttt{Paciente\_Profesional} o \texttt{Ejercicio\_Sesion}) y cómo se asegura la integridad referencial entre sesiones, ejercicios, vídeos y evaluaciones. Asimismo, el diagrama refleja el uso de campos de estado, fechas y restricciones de dominio que permiten controlar el ciclo de vida de las sesiones y la expiración de los vídeos.
+El diagrama relacional de la Figura~\ref{fig:relacional-terapitrack} muestra la traducción del modelo conceptual a tablas concretas de una base de datos relacional, indicando claves primarias, claves foráneas e índices relevantes.
+En él puede verse cómo se han introducido tablas puente para las relaciones muchos a muchos (como \texttt{Paciente\_Profesional} o \texttt{Ejercicio\_Sesion}) y cómo se asegura la integridad referencial entre sesiones, ejercicios, vídeos y evaluaciones.
+Asimismo, el diagrama refleja el uso de campos de estado, fechas y restricciones de dominio que permiten controlar el ciclo de vida de las sesiones y la expiración de los vídeos.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=1.3\textwidth]{Diagrama Relacional.png}
+  \includegraphics[width=\columnwidth]{Diagrama Relacional.png}
   \caption{Diagrama relacional de la base de datos.}
+  \label{fig:relacional-terapitrack}
 \end{figure}
-
 
 \subsection{Diccionario de datos}
 
-El diccionario de datos detalla la estructura de cada tabla, sus campos, tipos de datos, claves y restricciones. A continuación se resumen las principales entidades del sistema:
+El diccionario de datos detalla la estructura de cada tabla, sus campos, tipos de datos, claves y restricciones.
+A continuación, en las tablas~\ref{tab:dd-usuario} a \ref{tab:dd-evaluacion} se detalla el diccionario de datos completo del sistema, incluyendo campos, tipos, claves y restricciones de cada entidad.
+Todas las fechas se almacenan en formato ISO extendido YYYY-MM-DD.
+
+\setlength{\tabcolsep}{4pt}      % menos espacio horizontal
+\renewcommand{\arraystretch}{1.25} % un poco más de altura de fila
 
 % ---------- TABLA Usuario ----------
 \begin{table}[H]
 \small
 \centering
-\begin{tabular}{|p{2.6cm}|p{1.2cm}|p{1.3cm}|p{3.8cm}|p{5.3cm}|}
+\begin{tabularx}{\columnwidth}{|l|c|X|X|}
 \hline
-\textbf{Campo} & \textbf{Tipo} & \textbf{PK/FK} & \textbf{Restricciones} & \textbf{Descripción} \\
+\textbf{Campo} & \textbf{Tipo} & \textbf{Restricciones} & \textbf{Descripción} \\
 \hline
-Id & integer & PK & autoincrement, not null & Identificador único del usuario \\
-Nombre & text &  & not null & Nombre del usuario \\
-Apellidos & text &  & not null & Apellidos del usuario \\
-Email & text &  & unique, not null & Correo electrónico de acceso \\
-Contrasena & text &  & not null & Contraseña cifrada \\
-Rol\_Id & integer &  & not null, check (0,1,2) & Rol: 0=Admin, 1=Paciente, 2=Profesional \\
-Fecha\_Registro & text &  & not null & Fecha de alta (YYYY-MM-DD) \\
-Estado & integer &  & not null, check (0,1) & 0=Inactivo, 1=Activo \\
+Id & integer & PK, AIncr, NN & Id único del usuario. \\
+Nombre & text & NN & Nombre del usuario. \\
+Apellidos & text & NN & Apellidos del usuario. \\
+Email & text & unique, NN & Correo de acceso. \\
+Contrasena & text & NN & Contraseña cifrada. \\
+Rol\_Id & integer & NN, check & Rol del usuario.\\
+Fecha\_Registro & text & NN & Fecha de alta. \\
+Estado & integer & NN, check & Estado de la cuenta.\\
 \hline
-\end{tabular}
-\caption{Diccionario de datos de la tabla \texttt{Usuario}}
+\end{tabularx}
+\caption{Diccionario de datos de la tabla \texttt{Usuario}.}
+\label{tab:dd-usuario}
 \end{table}
 
 % ---------- TABLA Paciente ----------
 \begin{table}[H]
 \small
 \centering
-\begin{tabular}{|p{3.1cm}|p{1.2cm}|p{1.3cm}|p{3.5cm}|p{4.5cm}|}
+\begin{tabularx}{\columnwidth}{|l|c|X|X|}
 \hline
-\textbf{Campo} & \textbf{Tipo} & \textbf{PK/FK} & \textbf{Restricciones} & \textbf{Descripción} \\
+\textbf{Campo} & \textbf{Tipo} & \textbf{Restricciones} & \textbf{Descripción} \\
 \hline
-Usuario\_Id & integer & PK, FK & fk $\rightarrow$ Usuario(Id), not null & Identificador (FK \texttt{Usuario}) \\
-Fecha\_Nacimiento & text &  & not null & Fecha de nacimiento (YYYY-MM-DD) \\
-Condicion\_Medica & text &  &  & Condición médica principal \\
-Notas & text &  &  & Observaciones adicionales \\
+Usuario\_Id & integer & PK, FK, NN & Id del paciente. \\
+Fecha\_Nacimiento & text & NN & Fecha de nacimiento. \\
+Condicion\_Medica & text & & Condición médica. \\
+Notas & text & & Observ. adicionales. \\
 \hline
-\end{tabular}
-\caption{Diccionario de datos de la tabla \texttt{Paciente}}
+\end{tabularx}
+\caption{Diccionario de datos de la tabla \texttt{Paciente}.}
+\label{tab:dd-paciente}
 \end{table}
 
 % ---------- TABLA Profesional ----------
 \begin{table}[H]
 \small
 \centering
-\begin{tabular}{|p{2.8cm}|p{1.2cm}|p{1.3cm}|p{5.5cm}|p{3.2cm}|}
+\begin{tabularx}{\columnwidth}{|l|c|X|X|}
 \hline
-\textbf{Campo} & \textbf{Tipo} & \textbf{PK/FK} & \textbf{Restricciones} & \textbf{Descripción} \\
+\textbf{Campo} & \textbf{Tipo} & \textbf{Restricciones} & \textbf{Descripción} \\
 \hline
-Usuario\_Id & integer & PK, FK & fk $\rightarrow$ Usuario(Id), not null & Identificador (FK \texttt{Usuario}) \\
-Especialidad & text &  & not null & Especialidad del profesional \\
-Tipo\_Profesional & text &  & check ('MEDICO', 'TERAPEUTA', 'ENFERMERO', 'PSICOLOGO'), not null & Tipo de profesional sanitario \\
+Usuario\_Id & integer & PK, FK, NN & Id del profesional. \\
+Especialidad & text & NN & Especialidad profesional. \\
+Tipo\_Profesional & text & NN, check & Tipo de profesional. \\
 \hline
-\end{tabular}
-\caption{Diccionario de datos de la tabla \texttt{Profesional}}
+\end{tabularx}
+\caption{Diccionario de datos de la tabla \texttt{Profesional}.}
+\label{tab:dd-profesional}
 \end{table}
 
 % ---------- TABLA Paciente_Profesional ----------
 \begin{table}[H]
 \small
 \centering
-\begin{tabular}{|p{2.9cm}|p{1.2cm}|p{1.3cm}|p{5.0cm}|p{3.2cm}|}
+\begin{tabularx}{\columnwidth}{|l|c|X|X|}
 \hline
-\textbf{Campo} & \textbf{Tipo} & \textbf{PK/FK} & \textbf{Restricciones} & \textbf{Descripción} \\
+\textbf{Campo} & \textbf{Tipo} & \textbf{Restricciones} & \textbf{Descripción} \\
 \hline
-Paciente\_Id & integer & PK, FK & fk $\rightarrow$ Paciente(Usuario\_Id), not null & Identificador (FK \texttt{Paciente}) \\
-Profesional\_Id & integer & PK, FK & fk $\rightarrow$ Profesional(Usuario\_Id), not null & Identificador (FK \texttt{Profesional}) \\
-Fecha\_Asignacion & text &  & not null & Fecha de asignación (YYYY-MM-DD) \\
+Paciente\_Id & integer & PK, FK, NN & Id del paciente. \\
+Profesional\_Id & integer & PK, FK, NN & Id del profesional. \\
+Fecha\_Asignacion & text & NN & Fecha de asignación. \\
 \hline
-\end{tabular}
-\caption{Diccionario de datos de la tabla \texttt{Paciente\_Profesional}}
+\end{tabularx}
+\caption{Diccionario de datos de la tabla \texttt{Paciente\_Profesional}.}
+\label{tab:dd-paciente-profesional}
 \end{table}
 
 % ---------- TABLA Ejercicio ----------
 \begin{table}[H]
 \small
 \centering
-\begin{tabular}{|p{1.9cm}|p{1.2cm}|p{1.3cm}|p{3.8cm}|p{5.1cm}|}
+\begin{tabularx}{\columnwidth}{|l|c|X|X|}
 \hline
-\textbf{Campo} & \textbf{Tipo} & \textbf{PK/FK} & \textbf{Restricciones} & \textbf{Descripción} \\
+\textbf{Campo} & \textbf{Tipo} & \textbf{Restricciones} & \textbf{Descripción} \\
 \hline
-Id & integer & PK & autoincrement, not null & Identificador del ejercicio \\
-Nombre & text &  & not null & Nombre del ejercicio \\
-Descripcion & text &  & not null & Descripción del ejercicio \\
-Tipo & text &  & not null & Tipo o categoría del ejercicio \\
-Video & text &  & not null & Ruta al vídeo demostrativo \\
-Duracion & integer &  & not null & Duración estimada (segundos) \\
+Id & integer & PK, AIncr, NN & Id del ejercicio. \\
+Nombre & text & NN & Nombre del ejercicio. \\
+Descripcion & text & NN & Descripción del ejercicio. \\
+Tipo & text & NN & Tipo del ejercicio. \\
+Video & text & NN & Ruta al vídeo demostrativo. \\
+Duracion & integer & NN & Duración en segundos. \\
 \hline
-\end{tabular}
-\caption{Diccionario de datos de la tabla \texttt{Ejercicio}}
+\end{tabularx}
+\caption{Diccionario de datos de la tabla \texttt{Ejercicio}.}
+\label{tab:dd-ejercicio}
 \end{table}
 
 % ---------- TABLA Ejercicio_Profesional ----------
 \begin{table}[H]
 \small
 \centering
-\begin{tabular}{|p{2.0cm}|p{1.2cm}|p{1.3cm}|p{5.2cm}|p{3.1cm}|}
+\begin{tabularx}{\columnwidth}{|l|c|X|X|}
 \hline
-\textbf{Campo} & \textbf{Tipo} & \textbf{PK/FK} & \textbf{Restricciones} & \textbf{Descripción} \\
+\textbf{Campo} & \textbf{Tipo} & \textbf{Restricciones} & \textbf{Descripción} \\
 \hline
-Usuario\_Id & integer & PK, FK & fk $\rightarrow$ Profesional(Usuario\_Id), not null & Identificador (FK \texttt{Profesional}) \\
-Ejercicio\_Id & integer & PK, FK & fk $\rightarrow$ Ejercicio(Id), not null & Identificador (FK \texttt{Ejercicio}) \\
+Usuario\_Id & integer & PK, FK, NN & Id del profesional. \\
+Ejercicio\_Id & integer & PK, FK, NN & Id del ejercicio asociado. \\
 \hline
-\end{tabular}
-\caption{Diccionario de datos de la tabla \texttt{Ejercicio\_Profesional}}
+\end{tabularx}
+\caption{Diccionario de datos de la tabla \texttt{Ejercicio\_Profesional}.}
+\label{tab:dd-ejercicio-profesional}
 \end{table}
 
 % ---------- TABLA Sesion ----------
 \begin{table}[H]
 \small
 \centering
-\begin{tabular}{|p{3.1cm}|p{1.2cm}|p{1.3cm}|p{5.2cm}|p{4.4cm}|}
+\begin{tabularx}{\columnwidth}{|l|c|X|X|}
 \hline
-\textbf{Campo} & \textbf{Tipo} & \textbf{PK/FK} & \textbf{Restricciones} & \textbf{Descripción} \\
+\textbf{Campo} & \textbf{Tipo} & \textbf{Restricciones} & \textbf{Descripción} \\
 \hline
-Id & integer & PK & autoincrement, not null & Identificador de la sesión \\
-Paciente\_Id & integer & FK & fk $\rightarrow$ Paciente(Usuario\_Id), not null & Paciente al que se asigna la sesión \\
-Profesional\_Id & integer & FK & fk $\rightarrow$ Profesional(Usuario\_Id), not null & Profesional responsable \\
-Fecha\_Creacion & text &  & not null & Fecha de creación (YYYY-MM-DD) \\
-Estado & text &  & check ('PENDIENTE', 'COMPLETADA', 'CANCELADA'), not null & Estado de la sesión \\
-Fecha\_Programada & text &  & not null & Fecha programada (YYYY-MM-DD) \\
+Id & integer & PK, AIncr, NN & Id de la sesión. \\
+Paciente\_Id & integer & FK, NN & Paciente asociado. \\
+Profesional\_Id & integer & FK, NN & Profesional asociado. \\
+Fecha\_Creacion & text & NN & Fecha de creación. \\
+Estado & text & NN, check & Estado de la sesión. \\
+Fecha\_Programada & text & NN & Fecha programada. \\
 \hline
-\end{tabular}
-\caption{Diccionario de datos de la tabla \texttt{Sesion}}
+\end{tabularx}
+\caption{Diccionario de datos de la tabla \texttt{Sesion}.}
+\label{tab:dd-sesion}
 \end{table}
 
 % ---------- TABLA Ejercicio_Sesion ----------
 \begin{table}[H]
 \small
 \centering
-\begin{tabular}{|p{2.1cm}|p{1.2cm}|p{1.3cm}|p{4.7cm}|p{5.7cm}|}
+\begin{tabularx}{\columnwidth}{|l|c|X|X|}
 \hline
-\textbf{Campo} & \textbf{Tipo} & \textbf{PK/FK} & \textbf{Restricciones} & \textbf{Descripción} \\
+\textbf{Campo} & \textbf{Tipo} & \textbf{Restricciones} & \textbf{Descripción} \\
 \hline
-Id & integer & PK & autoincrement, not null & Identificador del ejercicio en sesión \\
-Sesion\_Id & integer & FK & fk $\rightarrow$ Sesion(Id), not null & FK a \texttt{Sesion} \\
-Ejercicio\_Id & integer & FK & fk $\rightarrow$ Ejercicio(Id), not null & FK a \texttt{Ejercicio} \\
+Id & integer & PK, AIncr, NN & Id del ejercicio en sesión. \\
+Sesion\_Id & integer & FK, NN & Sesión a la que pertenece. \\
+Ejercicio\_Id & integer & FK, NN & Ejercicio asociado. \\
 \hline
-\end{tabular}
-\caption{Diccionario de datos de la tabla \texttt{Ejercicio\_Sesion}}
+\end{tabularx}
+\caption{Diccionario de datos de la tabla \texttt{Ejercicio\_Sesion}.}
+\label{tab:dd-ejercicio-sesion}
 \end{table}
 
-% ---------- TABLA Video_Respuesta ----------
+% ---------- TABLA VideoRespuesta ----------
 \begin{table}[H]
 \small
 \centering
-\begin{tabular}{|p{3.7cm}|p{1.2cm}|p{1.3cm}|p{4.5cm}|p{4.2cm}|}
+\begin{tabularx}{\columnwidth}{|l|c|X|X|}
 \hline
-\textbf{Campo} & \textbf{Tipo} & \textbf{PK/FK} & \textbf{Restricciones} & \textbf{Descripción} \\
+\textbf{Campo} & \textbf{Tipo} & \textbf{Restricciones} & \textbf{Descripción} \\
 \hline
-Ejercicio\_Sesion\_Id & integer & PK, FK & fk $\rightarrow$ Ejercicio\_Sesion(Id), not null & Identificador (FK \texttt{Ejercicio\_Sesion}) \\
-Ruta\_Almacenamiento & text &  & not null & Ruta del archivo de vídeo \\
-Fecha\_Expiracion & text &  &  & Fecha de expiración (YYYY-MM-DD) \\
+Ejercicio\_Sesion\_Id & integer & PK, FK, NN & Ejercicio en sesión. \\
+Ruta\_Almacenamiento & text & NN & Ruta del archivo. \\
+Fecha\_Expiracion & text & & Fecha de expiración. \\
 \hline
-\end{tabular}
-\caption{Diccionario de datos de la tabla \texttt{Video\_Respuesta}}
+\end{tabularx}
+\caption{Diccionario de datos de la tabla \texttt{VideoRespuesta}.}
+\label{tab:dd-videoRespuesta}
 \end{table}
 
 % ---------- TABLA Evaluacion ----------
 \begin{table}[H]
 \small
 \centering
-\begin{tabular}{|p{3.3cm}|p{1.2cm}|p{1.3cm}|p{4.3cm}|p{4.0cm}|}
+\begin{tabularx}{\columnwidth}{|l|c|X|X|}
 \hline
-\textbf{Campo} & \textbf{Tipo} & \textbf{PK/FK} & \textbf{Restricciones} & \textbf{Descripción} \\
+\textbf{Campo} & \textbf{Tipo} & \textbf{Restricciones} & \textbf{Descripción} \\
 \hline
-Ejercicio\_Sesion\_Id & integer & PK, FK & fk $\rightarrow$ Ejercicio\_Sesion(Id), not null & Identificador (FK \texttt{Ejercicio\_Sesion}) \\
-Puntuacion & numeric &  & check (>=1 and <=5), not null & Puntuación (1–5) asignada por profesional \\
-Comentarios & text &  &  & Observaciones de la evaluación \\
-Fecha\_Evaluacion & text &  & not null & Fecha de evaluación (YYYY-MM-DD) \\
+Ejercicio\_Sesion\_Id & integer & PK, FK, NN & Ejercicio en sesión. \\
+Puntuacion & numeric & NN, check & Puntuación ejercicio. \\
+Comentarios & text & & Observ. evaluación. \\
+Fecha\_Evaluacion & text & NN & Fecha de evaluación. \\
 \hline
-\end{tabular}
-\caption{Diccionario de datos de la tabla \texttt{Evaluacion}}
+\end{tabularx}
+\caption{Diccionario de datos de la tabla \texttt{Evaluacion}.}
+\label{tab:dd-evaluacion}
 \end{table}
-
+   
 \textbf{Leyenda de simbología:}
 \begin{itemize}
-  \item PK: Clave primaria (Primary Key).
+  \item AIncr: Incremento automático de la clave primaria.
+  \item Check: Restricción que limita los valores permitidos de un campo. 
+        En este sistema se aplica a:
+        \begin{itemize}
+          \item \texttt{Usuario.Rol\_Id}: \{0=Admin, 1=Paciente, 2=Profesional\}.
+          \item \texttt{Usuario.Estado}: \{0 = Inactivo, 1 = Activo\}.
+          \item \texttt{Profesional.Tipo\_Profesional}: \{'MEDICO', 'TERAPEUTA', 'ENFERMERO', 'PSICOLOGO'\}.
+          \item \texttt{Sesion.Estado}: \{'PEND.', 'COMPL.', 'CANCEL.'\}.
+          \item \texttt{Evaluacion.Puntuacion}: valores enteros en el rango [1, 5].
+        \end{itemize}
   \item FK: Clave foránea (Foreign Key).
+  \item NN: No puede ser un valor nulo.
+  \item PK: Clave primaria (Primary Key).
   \item Unique: Valor único en la tabla.
-  \item Check: Restricción de valores permitidos.
-  \item Autoincrement: Incremento automático de la clave primaria.
-  \item Not null: No puede ser un valor nulo.
+\end{itemize}
+
+
+Las claves foráneas indicadas en la columna \textit{Restricciones} definen las siguientes relaciones entre tablas:
+\begin{itemize}
+  \item Paciente.Usuario\_Id $\rightarrow$ Usuario.Id
+  \item Profesional.Usuario\_Id $\rightarrow$ Usuario.Id
+  \item Paciente\_Profesional.Paciente\_Id $\rightarrow$ Paciente.Usuario\_Id
+  \item Paciente\_Profesional.Profesional\_Id $\rightarrow$ Profesional.Usuario\_Id
+  \item Sesion.Paciente\_Id $\rightarrow$ Paciente.Usuario\_Id
+  \item Sesion.Profesional\_Id $\rightarrow$ Profesional.Usuario\_Id
+  \item Ejercicio\_Sesion.Sesion\_Id $\rightarrow$ Sesion.Id
+  \item Ejercicio\_Sesion.Ejercicio\_Id $\rightarrow$ Ejercicio.Id
+  \item VideoRespuesta.Ejercicio\_Sesion\_Id $\rightarrow$ Ejercicio\_Sesion.Id
+  \item Evaluacion.Ejercicio\_Sesion\_Id $\rightarrow$ Ejercicio\_Sesion.Id
 \end{itemize}
 
 \section{Diseño arquitectónico}
 
-El sistema sigue una arquitectura modular basada en el patrón Modelo–Vista–Controlador (MVC), que facilita la separación de responsabilidades y la escalabilidad del desarrollo. En el caso de \textit{TerapiTrack}, esta arquitectura se implementa sobre Flask mediante módulos y \textit{blueprints} que agrupan funcionalidades por dominios (usuarios, sesiones, ejercicios, evaluaciones).
-
+El sistema sigue una arquitectura modular basada en el patrón Modelo-Vista-Controlador (MVC), que separa los datos y la lógica de negocio de la presentación.
+En TerapiTrack, los modelos de SQLAlchemy actúan como \textit{Modelo}, los \textit{blueprints} y controladores de Flask como \textit{Controlador}, y las plantillas Jinja junto con los recursos estáticos como \textit{Vista}, organizados en módulos por dominios~\cite{SQLAlchemyDocs, FlaskDocs}.
 A nivel lógico, la arquitectura se organiza en tres capas principales:
 
 \begin{itemize}
-  \item \textbf{Capa de presentación}: Incluye las vistas de Flask y las plantillas Jinja que generan las páginas HTML. En ella se definen los formularios, los mensajes de validación y los componentes visuales construidos con Bootstrap y Bootswatch, diferenciando las interfaces de administrador, profesional y paciente.
-  \item \textbf{Capa de negocio}: Implementada en los \textit{blueprints} de \texttt{src/controladores}, contiene la lógica de aplicación: gestión de usuarios y roles, asignación de pacientes a profesionales, planificación de sesiones, grabación y evaluación de ejercicios, así como las comprobaciones de permisos antes de cada operación.
-  \item \textbf{Capa de datos}: Formada por los modelos SQLAlchemy de \texttt{src/modelos} y por la base de datos SQLite. Se encarga de mapear las entidades del diccionario de datos a tablas, aplicar las restricciones de integridad definidas en el diseño de datos y proporcionar métodos para consultas y actualizaciones transaccionales.
+  \item \textbf{Capa de presentación}: Incluye las vistas de Flask y las plantillas Jinja que generan las páginas HTML,
+  donde se definen los formularios, los mensajes de validación y los componentes visuales construidos con Bootstrap y Bootswatch,
+  diferenciando las interfaces de administrador, profesional y paciente, y se corresponde principalmente con la carpeta \texttt{src/vistas}.
+  \item \textbf{Capa de negocio}: Implementada en los \textit{blueprints} de la carpeta \texttt{src/controladores}, contiene la lógica de aplicación: gestión de usuarios y roles, asignación de pacientes a profesionales, planificación de sesiones, grabación y evaluación de ejercicios,
+  así como las comprobaciones de permisos antes de cada operación.
+  \item \textbf{Capa de datos}: Formada por los modelos SQLAlchemy de \texttt{src/modelos} y por la base de datos SQLite.
+  Mapea las entidades del diccionario de datos a tablas, aplica las restricciones de integridad y proporciona métodos para consultas y actualizaciones transaccionales.
 \end{itemize}
 
 La estructura de carpetas del proyecto refleja esta organización:
 
 \begin{itemize}
+  \item \texttt{config}: Ficheros de configuración de la aplicación (parámetros de entorno, configuración de Flask y la base de datos).
+  \item \texttt{doc}: Documentación técnica y memoria del proyecto.
+  \item \texttt{prototipos}: Scripts y pruebas iniciales utilizados durante el desarrollo.
   \item \texttt{src/modelos}: Definición de entidades y relaciones (modelos SQLAlchemy) correspondientes a las tablas del diccionario de datos.
   \item \texttt{src/controladores}: Lógica de negocio, rutas y \textit{blueprints} de Flask, incluyendo la gestión de autenticación, permisos y validación de formularios.
   \item \texttt{src/vistas}: Plantillas HTML, ficheros estáticos (CSS, JS) y recursos gráficos empleados para construir la interfaz web.
-  \item \texttt{src/tests}: Pruebas unitarias y de integración sobre modelos y controladores, que permiten comprobar la corrección de la lógica implementada.
-\end{itemize}
+  \item \texttt{src/static}: Recursos estáticos (CSS, JS e imágenes) utilizados por las vistas.
+  \item \texttt{tests}: Pruebas unitarias e integración sobre modelos y controladores.\end{itemize}
 
-De forma transversal a estas capas, el sistema incorpora varios servicios comunes. La autenticación y gestión de sesión de usuarios se resuelve mediante Flask‑Login, combinada con una tabla de \texttt{Usuario} que almacena contraseñas cifradas y un campo de rol que condiciona el acceso a cada sección de la aplicación. La validación de formularios se apoya en WTForms y en comprobaciones adicionales en los controladores para garantizar la coherencia de los datos antes de almacenarlos en la base de datos. Además, la aplicación está preparada para su despliegue en un entorno \textit{Platform as a Service} como Heroku, donde el servidor Flask se expone a través de un servidor WSGI y se configuran las credenciales y rutas de base de datos mediante variables de entorno.
-
+De forma transversal a estas capas, el sistema incorpora varios servicios comunes.
+La autenticación y gestión de sesión de usuarios se resuelve mediante Flask-Login, combinada con una tabla de \texttt{Usuario} que almacena contraseñas cifradas y un campo de rol que condiciona el acceso a cada sección de la aplicación.
+La validación de formularios se apoya en WTForms y en comprobaciones adicionales en los controladores para garantizar la coherencia de los datos antes de almacenarlos en la base de datos.
+Además, la aplicación está preparada para su despliegue en un entorno \textit{Platform as a Service} como Heroku, donde el servidor Flask se expone a través de un servidor WSGI y se configuran las credenciales y rutas de base de datos mediante variables de entorno.
 
 \section{Diseño procedimental}
 
 En esta sección se describen los principales flujos y procedimientos implementados, que se apoyan en la arquitectura anterior y en el modelo de datos descrito:
 
 \begin{itemize}
-  \item \textbf{Gestión de usuarios}: Incluye el alta, baja lógica, modificación y autenticación de usuarios, con control de roles y permisos. El flujo típico comienza con el administrador creando una cuenta, continúa con el acceso del usuario mediante correo y contraseña, y termina con la asignación de un panel específico según su rol.
-  \item \textbf{Asignación de pacientes a profesionales}: El administrador establece relaciones muchos a muchos entre pacientes y profesionales mediante la tabla \texttt{Paciente\_Profesional}, permitiendo que un profesional gestione a varios pacientes y que un paciente pueda estar vinculado a diferentes perfiles sanitarios.
-  \item \textbf{Gestión de ejercicios y sesiones}: Los profesionales crean ejercicios con su vídeo demostrativo y configuran sesiones terapéuticas combinando varios ejercicios. Posteriormente asignan estas sesiones a pacientes concretos, definiendo fechas programadas y controlando el estado de cada sesión (pendiente, completada o cancelada).
-  \item \textbf{Grabación y evaluación}: Durante la realización de una sesión, el sistema registra la ejecución de cada ejercicio mediante la cámara del dispositivo y almacena el vídeo asociado. Más tarde, los profesionales revisan esos vídeos, asignan una puntuación y añaden comentarios, generando un histórico de evaluaciones que se utiliza para visualizar la evolución del paciente a lo largo del tiempo.
+  \item \textbf{Gestión de usuarios}: Incluye el alta, desactivación, modificación y autenticación de usuarios, con control de roles y permisos.
+  El flujo típico comienza con el administrador creando una cuenta, continúa con el acceso del usuario mediante correo y contraseña, y termina con la asignación de un panel específico según su rol.
+  \item \textbf{Asignación de pacientes a profesionales}: El administrador establece relaciones muchos a muchos entre pacientes y profesionales mediante la tabla \texttt{Paciente\_Profesional},
+  permitiendo que un profesional gestione a varios pacientes y que un paciente pueda estar vinculado a diferentes perfiles sanitarios.
+  \item \textbf{Gestión de ejercicios y sesiones}: Los profesionales crean ejercicios con su vídeo demostrativo y configuran sesiones terapéuticas combinando varios ejercicios.
+  Posteriormente asignan estas sesiones a pacientes concretos, definiendo fechas programadas y controlando el estado de cada sesión (pendiente, completada o cancelada).
+  \item \textbf{Grabación y evaluación}: Durante la realización de una sesión, el sistema registra la ejecución de cada ejercicio mediante la cámara del dispositivo y almacena el vídeo asociado.
+  Más tarde, los profesionales revisan esos vídeos, asignan una puntuación y añaden comentarios, generando un histórico de evaluaciones que se utiliza para visualizar la evolución del paciente a lo largo del tiempo.
 \end{itemize}
 
-Los diagramas de actividad que se muestran a continuación detallan los principales flujos procedimentales del sistema. En primer lugar se representan la creación de usuarios, la creación de ejercicios y la asignación de sesiones terapéuticas por parte del administrador y los profesionales. A continuación se describen la realización en directo de una sesión por parte del paciente, guiado por el profesional, y la evaluación posterior de los vídeos grabados.
+Los diagramas de actividad que se muestran a continuación detallan los principales flujos procedimentales del sistema.
+En primer lugar se representan la creación de usuarios por parte del administrador, la creación de ejercicios, la vinculación de pacientes y profesionales y la asignación de sesiones terapéuticas por parte de los profesionales (Figuras~\ref{fig:actividad-crear-usuario}, \ref{fig:actividad-crear-ejercicio}, \ref{fig:actividad-vincular} y \ref{fig:actividad-crear-sesion}).
+A continuación se describen la realización en directo de una sesión por parte del paciente, guiado por el profesional, y la evaluación posterior de los vídeos grabados (Figuras~\ref{fig:actividad-realizar-sesion} y \ref{fig:actividad-evaluar-sesion}).
 
 \begin{figure}[H]
   \centering
@@ -261,22 +322,29 @@ Los diagramas de actividad que se muestran a continuación detallan los principa
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.9\textwidth]{img/actividad_crear_ejercicio.png}
+  \includegraphics[height=0.9\textheight]{img/actividad_crear_ejercicio.png}
   \caption{Diagrama de actividad de creación de ejercicio por parte del profesional.}
   \label{fig:actividad-crear-ejercicio}
 \end{figure}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.9\textwidth]{img/actividad_crear_asignar_sesion.png}
+  \includegraphics[height=0.9\textheight]{img/actividad_vincular.png}
+  \caption{Diagrama de actividad de vinculación de pacientes/profesionales.}
+  \label{fig:actividad-vincular}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[height=0.9\textheight]{img/actividad_crear_asignar_sesion.png}
   \caption{Diagrama de actividad de creación y asignación de sesión terapéutica.}
   \label{fig:actividad-crear-sesion}
 \end{figure}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.9\textwidth]{img/actividad_realizar_sesion.png}
-  \caption{Diagrama de actividad de realización de una sesión terapéutica en \textit{TerapiTrack}.}
+  \includegraphics[width=\textwidth]{img/actividad_realizar_sesion.png}
+  \caption{Diagrama de actividad de realización de una sesión terapéutica en TerapiTrack.}
   \label{fig:actividad-realizar-sesion}
 \end{figure}
 
@@ -286,4 +354,3 @@ Los diagramas de actividad que se muestran a continuación detallan los principa
   \caption{Diagrama de actividad de evaluación de una sesión terapéutica por parte del profesional.}
   \label{fig:actividad-evaluar-sesion}
 \end{figure}
-

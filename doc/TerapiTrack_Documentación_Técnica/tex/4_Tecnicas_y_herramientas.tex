@@ -14,11 +14,11 @@ Jira permite crear tareas, agruparlas en sprints, registrar incidencias y visual
 \section{Tecnologías de backend}
 
 \subsection{Python y Flask}
-El \emph{backend} de TerapiTrack está desarrollado en \textbf{Python}, un lenguaje de programación de propósito general muy extendido en el ámbito del desarrollo web, la ciencia de datos y la automatización~\cite{pressman_ingenieria_sw}. 
+El \textit(backend) de TerapiTrack está desarrollado en \textbf{Python}, un lenguaje de programación de propósito general muy extendido en el ámbito del desarrollo web, la ciencia de datos y la automatización~\cite{pressman_ingenieria_sw}. 
 Entre sus ventajas destacan una sintaxis relativamente sencilla y una comunidad amplia que mantiene librerías para la mayoría de necesidades habituales en un proyecto.
 
-Sobre Python se ha utilizado el microframework web \textbf{Flask}~\cite{FlaskDocs}.
-Flask proporciona las piezas básicas para construir una aplicación web: definición de rutas, manejo de peticiones y respuestas HTTP, integración con sistemas de plantillas y soporte para extensiones que cubren necesidades como la autenticación o el acceso a bases de datos~\cite{FlaskDocs,JinjaDocs}.
+Sobre Python se ha utilizado el microframework web \textbf{Flask}, que proporciona las piezas básicas para construir una aplicación web:
+definición de rutas, manejo de peticiones y respuestas HTTP, integración con sistemas de plantillas y soporte para extensiones que cubren necesidades como la autenticación o el acceso a bases de datos~\cite{FlaskDocs,JinjaDocs}.
 
 En el proyecto la aplicación principal se define en \texttt{app.py} y se organiza en varios módulos de controladores que agrupan las rutas según el rol del usuario (\texttt{admin\_controlador.py}, \texttt{profesional\_controlador.py}, \texttt{auth\_controlador.py}, etc.), siguiendo el patrón de \emph{blueprints} descrito en la documentación oficial y en guías prácticas específicas~\cite{FlaskBlueprintsDocs,RealPythonBlueprints}.
 Además, se han definido decoradores propios en \texttt{decoradores.py} para comprobar el rol y otras condiciones de acceso antes de ejecutar determinadas vistas.
@@ -78,10 +78,10 @@ Esta funcionalidad se ha implementado mediante un módulo JavaScript que escucha
 \section{Testing y garantía de calidad}
 
 \subsection{Pytest}
-Las pruebas automáticas se han realizado con \textbf{Pytest}, un marco de testing para Python que permite definir casos de prueba como funciones y agruparlos en módulos dentro de la carpeta \texttt{tests}~\cite{PytestDocs}.
+Las pruebas automáticas se han realizado con \textbf{Pytest}, un marco de testing para Python que permite definir casos de prueba y agruparlos en módulos dentro de la carpeta \texttt{tests}~\cite{PytestDocs}.
 Pytest ofrece utilidades para preparar datos de prueba mediante \textit{fixtures}, parametrizar pruebas y generar informes con el resultado de la ejecución.
 
-En el contexto de TerapiTrack se ha utilizado para comprobar el funcionamiento de los modelos de datos y algunos de los flujos principales definidos en los controladores (gestión de usuarios, sesiones y evaluaciones), reduciendo el riesgo de introducir errores al modificar el código~\cite{GithubTerapitrack}.
+En el contexto de TerapiTrack, se ha utilizado para comprobar el funcionamiento de los modelos de datos y algunos de los flujos principales definidos en los controladores (gestión de usuarios, sesiones y evaluaciones), reduciendo el riesgo de introducir errores al modificar el código~\cite{GithubTerapitrack}.
 
 \section{Despliegue e infraestructura}
 
@@ -97,7 +97,7 @@ Para el almacenamiento de archivos multimedia se ha integrado \textbf{Cloudinary
 
 \subsection{Git y GitHub}
 El código del proyecto se gestiona con \textbf{Git}, un sistema de control de versiones distribuido que mantiene un historial de cambios y permite trabajar con ramas para desarrollar nuevas funcionalidades de forma aislada~\cite{GitDocs}. 
-Como repositorio remoto se ha empleado \textbf{GitHub}, que ofrece alojamiento para el código, sistema de \textit{issues} para registrar tareas e incidencias y herramientas para revisar cambios antes de integrarlos en la rama principal~\cite{GithubTerapitrack}.
+Además, como repositorio remoto se ha empleado \textbf{GitHub}, que ofrece alojamiento para el código, sistema de \textit{issues} para registrar tareas e incidencias y herramientas para revisar cambios antes de integrarlos en la rama principal~\cite{GithubTerapitrack}.
 
 Para el trabajo diario se ha utilizado \textbf{Git Bash} como interfaz de línea de comandos, lo que facilita ejecutar los comandos de Git desde el propio entorno de desarrollo.
 
@@ -106,9 +106,9 @@ Para el trabajo diario se ha utilizado \textbf{Git Bash} como interfaz de línea
 Durante el desarrollo también se han utilizado varias herramientas de apoyo:
 
 \begin{itemize}
-    \item \textbf{Visual Studio Code}: Entorno de desarrollo integrado utilizado como editor principal para el código Python, las plantillas y los ficheros de configuración, con extensiones específicas para Flask, Git y trabajo con SQLite.
-    \item \textbf{LaTeX Workshop y Overleaf}: Herramientas para la edición y compilación de la memoria y los anexos en \LaTeX{}, combinando el trabajo local en Visual Studio Code con la plataforma colaborativa Overleaf~\cite{UbuPlantillaLatex,OverleafEditor}. 
-    \item \textbf{Draw.io}: Aplicación para la creación de diagramas, utilizada para representar la arquitectura general del sistema, el modelo de datos y los principales flujos de uso.
+    \item \textbf{Visual Studio Code}: es un entorno de desarrollo integrado utilizado como editor principal para el código Python, las plantillas y los ficheros de configuración, con extensiones específicas para Flask, Git y trabajo con SQLite.
+    \item \textbf{LaTeX Workshop y Overleaf}: son herramientas para la edición y compilación de la memoria y los anexos en \LaTeX{}, combinando el trabajo local en Visual Studio Code con la plataforma colaborativa Overleaf~\cite{UbuPlantillaLatex,OverleafEditor}. 
+    \item \textbf{Draw.io}: es una aplicación para la creación de diagramas, utilizada para representar la arquitectura general del sistema, el modelo de datos y los principales flujos de uso.
 \end{itemize}
 
 \section{Resumen de herramientas utilizadas}
@@ -135,3 +135,5 @@ Visual Studio Code & Desarrollo & Entorno integrado de edición, depuración y e
 LaTeX Workshop / Overleaf & Documentación & Herramientas para la redacción y compilación de la memoria y los anexos en \LaTeX{}. \\
 Heroku & Despliegue & Plataforma PaaS utilizada para ejecutar la aplicación Flask y la base de datos en la nube. \\
 }
+
+La tabla resume las principales herramientas empleadas en el desarrollo de TerapiTrack, indicando su ámbito de uso y su función principal~\cite{GithubTerapitrack}.
