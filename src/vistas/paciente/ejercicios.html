@@ -280,9 +280,14 @@ document.addEventListener('DOMContentLoaded', function() {
         modalContent.innerHTML = `
             <button onclick="cerrarEjercicioGrande()" style="position: absolute; top: 10px; right: 15px; background: none; border: none; font-size: 2rem; cursor: pointer; color: #666;">&times;</button>
             <h2 style="color: #007bff; margin-bottom: 1rem;">${currentEjercicio.Nombre}</h2>
-            <div style="text-align: center; margin-bottom: 1rem;">
-                <video src="${currentEjercicio.Video}" controls autoplay
-                    style="width: 100%; max-width: 900px; max-height: 70vh; border-radius: 8px;"></video>
+            <div style="text-align: center; margin-bottom: 1rem; position: relative;">
+                <video id="main-video" src="${currentEjercicio.Video}" autoplay
+                    style="width: 100%; max-width: 900px; max-height: 70vh; border-radius: 8px; background: #000;"></video>
+                
+                <!-- Controles personalizados simplificados -->
+                <div style="position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.7); padding: 0.5rem 1rem; border-radius: 0.5rem; color: white; font-size: 0.9rem;">
+                    Usa <strong>X</strong> para pausar/reanudar
+                </div>
             </div>
             <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
                 <span style="background: #17a2b8; color: white; padding: 0.5rem 1rem; border-radius: 1rem; font-size: 0.9rem;">
@@ -296,6 +301,15 @@ document.addEventListener('DOMContentLoaded', function() {
         
         modal.classList.add('show');
         modal.style.display = 'flex';
+        
+        // Listener para cuando el vídeo termine
+        const video = document.getElementById('main-video');
+        if (video) {
+            video.addEventListener('ended', function() {
+                showVideoStatus('Completado - Pulsa X para repetir');
+                console.log('Video terminado');
+            });
+        }
     }
 
     // Cierra el modal y detiene el vídeo interno
@@ -312,34 +326,45 @@ document.addEventListener('DOMContentLoaded', function() {
     function togglePlayPause() {
         if (!modal.classList.contains('show')) return;
         
-        const video = modalContent.querySelector('video');
-        if (!video) return;
+        const video = document.getElementById('main-video');
+        if (!video) {
+            console.error('Video element not found');
+            return;
+        }
+        
+        console.log('Video state:', {
+            paused: video.paused,
+            ended: video.ended,
+            currentTime: video.currentTime
+        });
         
         // Si el vídeo ha terminado, reiniciarlo desde el principio
         if (video.ended) {
             video.currentTime = 0;
-            video.play();
-            showVideoStatus('🔄 Reiniciando');
-            console.log('🔄 Video reiniciado');
+            video.play().then(() => {
+                showVideoStatus('🔄');
+                console.log('🔄 Video reiniciado');
+            }).catch(err => {
+                console.error('Error al reiniciar:', err);
+            });
             return;
         }
         
-        // Si está en pausa o pausado, reproducir
+        // Toggle play/pause
         if (video.paused) {
             video.play().then(() => {
                 showVideoStatus('▶️');
                 console.log('▶️ Video reanudado');
             }).catch(err => {
                 console.error('Error al reproducir:', err);
+                showVideoStatus('❌ Error');
             });
         } else {
-            // Si está reproduciéndose, pausar
             video.pause();
             showVideoStatus('⏸️');
-            console.log('⏸️ Video pausado');
+            console.log('⏸️ Video pausado en', video.currentTime);
         }
     }
-
 
     function showVideoStatus(icon) {
         const overlay = document.createElement('div');
