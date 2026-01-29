@@ -56,8 +56,8 @@
                 <div class="d-flex justify-content-center mb-4">
                     <a href="{{ url_for('paciente.ejercicios') }}" class="snes-btn snes-x" id="btn-ejercicios">
                         <div class="btn-inner">
-                            <span class="btn-letter">X</span>
-                            <span class="btn-label btn-label-big">Ejercicios</span>
+                            <span class="btn-letter-center">X</span>
+                            <span class="btn-label">Ejercicios</span>
                         </div>
                     </a>
                 </div>
@@ -67,8 +67,8 @@
                     <!-- Y: listado de sesiones del paciente -->
                     <a href="{{ url_for('paciente.mis_sesiones') }}" class="snes-btn snes-y me-5" id="btn-sesiones">
                         <div class="btn-inner">
-                            <span class="btn-letter">Y</span>
-                            <span class="btn-label btn-label-big">Mis Sesiones</span>
+                            <span class="btn-letter-center">Y</span>
+                            <span class="btn-label">Mis Sesiones</span>
                         </div>
                     </a>
                     
@@ -77,8 +77,8 @@
                     <!-- A: vista de progreso del paciente -->
                     <a href="{{ url_for('paciente.progreso') }}" class="snes-btn snes-a ms-5" id="btn-progreso">
                         <div class="btn-inner">
-                            <span class="btn-letter">A</span>
-                            <span class="btn-label btn-label-big">Mi Progreso</span>
+                            <span class="btn-letter-center">A</span>
+                            <span class="btn-label">Mi Progreso</span>
                         </div>
                     </a>
                 </div>
@@ -87,8 +87,8 @@
                 <div class="d-flex justify-content-center">
                     <a href="{{ url_for('paciente.ayuda') }}" class="snes-btn snes-b" id="btn-ayuda">
                         <div class="btn-inner">
-                            <span class="btn-letter">B</span>
-                            <span class="btn-label btn-label-big">Ayuda</span>
+                            <span class="btn-letter-center">B</span>
+                            <span class="btn-label">Ayuda</span>
                         </div>
                     </a>
                 </div>
@@ -163,27 +163,19 @@
     padding: 10px;
 }
 
-/* Letra de botón (X, Y, A, B) en la esquina superior */
-.btn-letter {
-    position: absolute;
-    top: 8px;
-    right: 12px;
-    font-size: 1.2rem;
+/* Letra de botón (X, Y, A, B) grande y centrada */
+.btn-letter-center {
+    font-size: 3rem;          
     font-weight: bold;
-    opacity: 0.9;
+    margin-bottom: 5px;
 }
+
 
 /* Etiqueta inferior con el nombre de la sección */
 .btn-label {
     font-size: 0.9rem;
     margin-top: 5px;
     font-weight: 600;
-}
-
-/* Versión grande para el dashboard del paciente */
-.btn-label-big {
-    font-size: 1.2rem;
-    line-height: 1.2;
 }
 
 /* Colores según posición del mando SNES real */
