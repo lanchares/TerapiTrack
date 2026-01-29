@@ -189,20 +189,20 @@ def poblar_datos():
 
     print("Creando ejercicios específicos para Parkinson...")
     ejercicios_data = [
-        {'nombre': 'Flexión de codo asistida', 'descripcion': 'Dobla el codo con ayuda de la otra mano. Sentado o tumbado.', 'tipo': 'Fortalecimiento', 'video': 'flexion_codo.mp4', 'duracion': 43},
-        {'nombre': 'Rotación de muñeca', 'descripcion': 'Rota suavemente la muñeca en círculos, apoyando el antebrazo.', 'tipo': 'Movilidad', 'video': 'rotacion_muneca.mp4', 'duracion': 105},
-        {'nombre': 'Separar y juntar dedos', 'descripcion': 'Abre y cierra los dedos de la mano lentamente.', 'tipo': 'Movilidad', 'video': 'dedos.mp4', 'duracion': 85},
-        {'nombre': 'Flexión de tobillo', 'descripcion': 'Mueve el pie hacia arriba y abajo desde la cama o silla.', 'tipo': 'Movilidad', 'video': 'flexion_tobillo.mp4', 'duracion': 15},
-        {'nombre': 'Respiración profunda', 'descripcion': 'Inspira por la nariz y suelta el aire por la boca lentamente.', 'tipo': 'Relajación', 'video': 'respiracion_profunda.mp4', 'duracion': 59},
-        {'nombre': 'Encoger hombros', 'descripcion': 'Lleva los hombros hacia las orejas y relájalos.', 'tipo': 'Movilidad', 'video': 'hombros.mp4', 'duracion': 10},
-        {'nombre': 'Giro de cabeza', 'descripcion': 'Gira la cabeza suavemente a un lado y luego al otro.', 'tipo': 'Movilidad', 'video': 'giro_cabeza.mp4', 'duracion': 57},
-        {'nombre': 'Marcha en el lugar', 'descripcion': 'Simula caminar levantando alternadamente los pies.', 'tipo': 'Equilibrio', 'video': 'marcha_sentado.mp4', 'duracion': 25},
-        {'nombre': 'Expresión facial', 'descripcion': 'Ejercicios de músculos faciales: sonreír, fruncir ceño, abrir ojos.', 'tipo': 'Movilidad', 'video': 'expresion_facial.mp4', 'duracion': 350},
-        {'nombre': 'Vocalizaciones', 'descripcion': 'Ejercicios de voz: decir "AH" fuerte y claro durante 10 segundos.', 'tipo': 'Relajación', 'video': 'vocalizaciones.mp4', 'duracion': 326},
-        {'nombre': 'Pasos amplios', 'descripcion': 'Caminar con pasos exagerados para mejorar la longitud del paso.', 'tipo': 'Equilibrio', 'video': 'pasos_amplios.mp4', 'duracion': 162},
-        {'nombre': 'Balanceo de brazos', 'descripcion': 'Caminar balanceando exageradamente los brazos alternos.', 'tipo': 'Equilibrio', 'video': 'balanceo_brazos.mp4', 'duracion': 55},
-        {'nombre': 'Levantarse de silla', 'descripcion': 'Práctica de levantarse y sentarse sin usar las manos.', 'tipo': 'Fortalecimiento', 'video': 'levantarse_silla.mp4', 'duracion': 69},
-        {'nombre': 'Aplausos rítmicos', 'descripcion': 'Aplaudir siguiendo diferentes ritmos y velocidades.', 'tipo': 'Movilidad', 'video': 'aplausos_ritmicos.mp4', 'duracion': 185}
+        {'nombre': 'Flexión de codo asistida', 'descripcion': 'Dobla el codo con ayuda de la otra mano. Sentado o tumbado.', 'tipo': 'Fortalecimiento', 'video': 'flexion_codo.mp4', 'duracion': 19},
+        {'nombre': 'Rotación de muñeca', 'descripcion': 'Rota suavemente la muñeca en círculos, apoyando el antebrazo.', 'tipo': 'Movilidad', 'video': 'rotacion_muneca.mp4', 'duracion': 29},
+        {'nombre': 'Separar y juntar dedos', 'descripcion': 'Abre y cierra los dedos de la mano lentamente.', 'tipo': 'Movilidad', 'video': 'dedos.mp4', 'duracion': 21},
+        {'nombre': 'Flexión de tobillo', 'descripcion': 'Mueve el pie hacia arriba y abajo desde la cama o silla.', 'tipo': 'Movilidad', 'video': 'flexion_tobillo.mp4', 'duracion': 12},
+        {'nombre': 'Respiración profunda', 'descripcion': 'Inspira por la nariz y suelta el aire por la boca lentamente.', 'tipo': 'Relajación', 'video': 'respiracion_profunda.mp4', 'duracion': 29},
+        {'nombre': 'Encoger hombros', 'descripcion': 'Lleva los hombros hacia las orejas y relájalos.', 'tipo': 'Movilidad', 'video': 'hombros.mp4', 'duracion': 18},
+        {'nombre': 'Giro de cabeza', 'descripcion': 'Gira la cabeza suavemente a un lado y luego al otro.', 'tipo': 'Movilidad', 'video': 'giro_cabeza.mp4', 'duracion': 25},
+        {'nombre': 'Marcha en el lugar', 'descripcion': 'Simula caminar levantando alternadamente los pies.', 'tipo': 'Equilibrio', 'video': 'marcha_sentado.mp4', 'duracion': 20},
+        {'nombre': 'Expresión facial', 'descripcion': 'Ejercicios de músculos faciales: sonreír, fruncir ceño, abrir ojos.', 'tipo': 'Movilidad', 'video': 'expresion_facial.mp4', 'duracion': 16},
+        {'nombre': 'Vocalizaciones', 'descripcion': 'Ejercicios de voz: decir "AH" fuerte y claro durante 10 segundos.', 'tipo': 'Relajación', 'video': 'vocalizaciones.mp4', 'duracion': 22},
+        {'nombre': 'Pasos amplios', 'descripcion': 'Caminar con pasos exagerados para mejorar la longitud del paso.', 'tipo': 'Equilibrio', 'video': 'pasos_amplios.mp4', 'duracion': 18},
+        {'nombre': 'Balanceo de brazos', 'descripcion': 'Caminar balanceando exageradamente los brazos alternos.', 'tipo': 'Equilibrio', 'video': 'balanceo_brazos.mp4', 'duracion': 17},
+        {'nombre': 'Levantarse de silla', 'descripcion': 'Práctica de levantarse y sentarse sin usar las manos.', 'tipo': 'Fortalecimiento', 'video': 'levantarse_silla.mp4', 'duracion': 20},
+        {'nombre': 'Aplausos rítmicos', 'descripcion': 'Aplaudir siguiendo diferentes ritmos y velocidades.', 'tipo': 'Movilidad', 'video': 'aplausos_ritmicos.mp4', 'duracion': 16}
     ]
 
     # Crear ejercicios en la base de datos
