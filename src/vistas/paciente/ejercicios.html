@@ -336,6 +336,17 @@ document.addEventListener('DOMContentLoaded', function() {
             video.pause();
         }
     }
+
+    function showVideoStatus(icon) {
+        const overlay = document.createElement('div');
+        overlay.className = 'video-status-overlay';
+        overlay.textContent = icon;
+        document.body.appendChild(overlay);
+        
+        setTimeout(() => {
+            overlay.remove();
+        }, 1000);
+    }
     
     function togglePlayPause() {
         if (!modal.classList.contains('show')) {
