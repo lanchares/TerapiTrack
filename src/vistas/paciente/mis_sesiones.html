@@ -98,6 +98,10 @@
     </div>
 </div>
 
+{% endblock %} 
+
+{% block style %}
+
 <style>
 /* Botón de volver tipo botón Y del mando */
 .snes-back-btn {
@@ -243,6 +247,7 @@
 {% endblock %}
 
 {% block scripts %}
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const backBtn = document.getElementById('btn-back');

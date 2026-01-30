@@ -161,6 +161,10 @@
     </div>
 </div>
 
+{% endblock %}
+
+{% block style %}
+
 <style>
 /* Botón verde tipo botón Y del mando */
 .snes-back-btn {
@@ -385,6 +389,7 @@
 {% endblock %}
 
 {% block scripts %}
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const backBtn = document.getElementById('btn-back');
@@ -441,5 +446,5 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-{% endblock %}
+
 {% endblock %}

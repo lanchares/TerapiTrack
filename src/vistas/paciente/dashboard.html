@@ -117,6 +117,10 @@
     </div>
 </div>
 
+{% endblock %}  
+
+{% block style %}
+
 <style>
 /* Contenedor general del layout SNES */
 .snes-layout {
@@ -231,6 +235,7 @@
 {% endblock %}
 
 {% block scripts %}
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     // Mapeo visual de letras SNES a cada botón de la interfaz
@@ -332,9 +337,6 @@ document.addEventListener('DOMContentLoaded', () => {
         lastButtonStates = states;
         requestAnimationFrame(pollGamepad);
     }
-
-    // Nota: si el mando ya estaba conectado antes de cargar la página,
-    // algunos navegadores requieren pulsar un botón para disparar gamepadconnected.
 });
 </script>
 

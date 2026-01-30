@@ -12,6 +12,9 @@
     <!-- Estilos principales: Bootstrap local + iconos -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <!-- Bolque de estilos especificos para cada vista -->
+    {% block style %}{% endblock %}
 </head>
 <body>
     {# Navbar solo para usuarios autenticados que NO son pacientes (Rol_Id != 1) #}

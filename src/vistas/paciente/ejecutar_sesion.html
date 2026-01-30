@@ -86,6 +86,10 @@
     </div>
 </div>
 
+{% endblock %} 
+
+{% block style %}
+
 <style>
     /* Punto rojo indicador de grabación en curso */
     .recording-dot {
@@ -135,6 +139,7 @@
 {% endblock %}
 
 {% block scripts %}
+
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     // Referencias a elementos de la interfaz de vídeo y cámara
