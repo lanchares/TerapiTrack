@@ -181,8 +181,8 @@ document.addEventListener("DOMContentLoaded", function() {
     let ultimoEjercicioRecibido = null;   // último id aceptado
     let candidatoId = null;               // id que se está comprobando
     let pollsMismoId = 0;                 // número de polls consecutivos con el mismo id candidato
-    const REQUIRED_STABLE_POLLS = 2;
-    const MIN_CHANGE_INTERVAL = 8000;     // milisegundos mínimos entre cambios aceptados
+    const REQUIRED_STABLE_POLLS = 1;
+    const MIN_CHANGE_INTERVAL = 0;     // milisegundos mínimos entre cambios aceptados
     let lastChangeTime = 0;
     let cambioEnProceso = false;
 
