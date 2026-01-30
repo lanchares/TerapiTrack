@@ -232,6 +232,8 @@
 }
 </style>
 
+{% endblock %}
+
 {% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -243,6 +245,9 @@ document.addEventListener('DOMContentLoaded', function() {
     let selectedExerciseIndex = 0;
     let currentEjercicio = null;
     let gamepadIndex = null;
+    let lastXPressTime = 0; 
+    let isProcessingX = false;
+    let isPolling = false;
     let lastButtonStates = { Y: false, A: false, X: false, left: false, right: false, up: false, down: false };
     
     console.log(`Found ${exerciseWrappers.length} exercises for navigation`);
@@ -415,7 +420,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // ---- Gamepad API para navegación en esta pantalla ----
     window.addEventListener('gamepadconnected', (e) => {
+        if (isPolling) {
+            console.log('🎮 Ya hay un polling activo, ignorando nueva conexión');
+            return; // Prevenir múltiples loops
+        }
+        
         gamepadIndex = e.gamepad.index;
+        isPolling = true; // Marcar que ya estamos haciendo polling
         console.log('🎮 Mando conectado (ejercicios):', e.gamepad.id);
         requestAnimationFrame(pollGamepad);
     });
@@ -423,6 +434,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('gamepaddisconnected', () => {
         console.log('🎮 Mando desconectado (ejercicios)');
         gamepadIndex = null;
+        isPolling = false; // Permitir nueva conexión
     });
 
     function pollGamepad() {
@@ -466,8 +478,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // X: pausar/reanudar vídeo (solo si modal abierto)
-        if (states.X && !lastButtonStates.X && modal.classList.contains('show')) {
-            togglePlayPause();
+        if (!states.X && lastButtonStates.X && modal.classList.contains('show')) {
+            if (!isProcessingX) { // Solo procesar si no está bloqueado
+                isProcessingX = true; // Bloquear inmediatamente
+                togglePlayPause();
+                
+                // Desbloquear después de 1 segundo
+                setTimeout(() => {
+                    isProcessingX = false;
+                }, 1000);
+            }
         }
 
         if (!modal.classList.contains('show')) {
@@ -513,5 +533,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-{% endblock %}
 {% endblock %}
