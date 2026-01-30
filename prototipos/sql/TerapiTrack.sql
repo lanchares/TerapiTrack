@@ -71,7 +71,7 @@ CREATE TABLE IF NOT EXISTS "Usuario" (
 	"Apellidos"	TEXT NOT NULL,
 	"Email"	TEXT NOT NULL UNIQUE,
 	"Contraseña"	TEXT NOT NULL,
-	"Rol_Id"	INTEGER NOT NULL CHECK("RolId" IN (0, 1, 2)),
+	"Rol_Id"	INTEGER NOT NULL CHECK("Rol_Id" IN (0, 1, 2)),
 	"Fecha_Registro"	TEXT NOT NULL,
 	"Estado"	INTEGER NOT NULL CHECK("Estado" IN (0, 1)),
 	PRIMARY KEY("Id" AUTOINCREMENT)
