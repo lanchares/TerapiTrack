@@ -1,12 +1,12 @@
 \capitulo{3}{Conceptos teóricos}
 
-En este capítulo se revisan los conceptos teóricos básicos que sirven de soporte al proyecto TerapiTrack, tanto en su diseño como en su implementación.
-Primero se abordan nociones relacionadas con la enfermedad de Parkinson y la rehabilitación, y después se describen los principios de accesibilidad, los patrones de diseño y los modelos de datos que se han tenido en cuenta durante el desarrollo.
+Este capítulo revisa los conceptos teóricos básicos que sirven de soporte a TerapiTrack, tanto en su diseño como en su implementación.
+Primero se abordan nociones relacionadas con la enfermedad de Parkinson y la rehabilitación y, a continuación, se describen los principios de accesibilidad, los patrones de diseño y los modelos de datos que se han tenido en cuenta durante el desarrollo.
 
 \section{Enfermedades degenerativas y enfermedad de Parkinson}
 
 Las enfermedades degenerativas son trastornos en los que determinadas estructuras del organismo se deterioran de forma progresiva, lo que provoca una pérdida lenta pero continua de funciones.
-Cuando el sistema nervioso central se ve afectado, este deterioro suele traducirse en problemas de movimiento, equilibrio, memoria o comunicación que requieren tratamientos prolongados y un seguimiento estrecho~\cite{ninds_parkinson,who_parkinson_2023}.
+Cuando el sistema nervioso central se ve afectado, este deterioro suele traducirse en problemas de movimiento, equilibrio, memoria o comunicación, que requieren tratamientos prolongados y un seguimiento intensivo~\cite{ninds_parkinson,who_parkinson_2023}.
 
 La enfermedad de Parkinson es un trastorno neurodegenerativo crónico que afecta principalmente al control del movimiento.
 Se caracteriza por temblor en reposo, rigidez muscular, lentitud en la iniciación de los movimientos y alteraciones del equilibrio, y actualmente no tiene cura.
@@ -26,26 +26,21 @@ Este tipo de intervención requiere sesiones frecuentes y un seguimiento continu
 \section{Telemedicina y telerehabilitación}
 
 La telemedicina hace referencia al uso de las tecnologías de la información y la comunicación para prestar servicios sanitarios a distancia, permitiendo que paciente y profesional interactúen sin encontrarse en el mismo lugar físico.
-Dentro de este ámbito, la telerehabilitación se centra en el diseño, la supervisión y la evaluación de programas de rehabilitación mediante herramientas remotas, como videoconferencia o plataformas web específicas~\cite{rosen2009_telerehab_technologies}.
+Dentro de este ámbito, la telerehabilitación se centra en el diseño, la supervisión y la evaluación de programas de rehabilitación mediante herramientas remotas, como la videoconferencia o plataformas web específicas~\cite{rosen2009_telerehab_technologies}.
 
 En el caso de la enfermedad de Parkinson, la telerehabilitación ofrece la posibilidad de mantener la frecuencia de las terapias aunque el paciente resida en la <<España vaciada>> o tenga movilidad reducida.
 Permite reducir desplazamientos, facilita la adherencia al tratamiento y hace posible que el profesional revise de forma diferida los ejercicios realizados en casa~\cite{parkinson_telerehab_review,parkinson_telerehab_protocol}.
 
 \section{Accesibilidad y usabilidad en aplicaciones sanitarias}
 
-Las aplicaciones orientadas a la salud deben diseñarse pensando en usuarios con diferentes capacidades motoras, sensoriales o cognitivas, y también en personas de distintas edades, incluidas aquellas con poca experiencia en el uso de ordenadores o dispositivos móviles.
-Ni la edad ni el nivel de conocimiento tecnológico deberían convertirse en una barrera a la hora de acceder a programas de telerehabilitación~\cite{telehealth_accessibility}.
+En el contexto de la telerehabilitación para personas con enfermedad de Parkinson, la accesibilidad de una aplicación no es un añadido opcional, sino una condición para que la herramienta pueda utilizarse en la práctica diaria.
+Si los menús son complejos, los textos difíciles de leer o se requieren demasiados pasos para completar una tarea, es probable que muchos pacientes abandonen el uso de la plataforma aunque el contenido terapéutico sea adecuado~\cite{telehealth_accessibility}.
 
-Los estándares de accesibilidad web, como las pautas Web Content Accessibility Guidelines (WCAG), recogen cuatro principios generales que sirven de guía para el diseño de interfaces accesibles~\cite{wcag22}.
+Por ello, este tipo de aplicaciones se diseña pensando especialmente en usuarios con posibles limitaciones motoras y menor experiencia con dispositivos digitales, como ocurre con muchos pacientes de Parkinson.
+En TerapiTrack las decisiones de accesibilidad se han centrado principalmente en la interfaz dirigida al paciente, mientras que las vistas destinadas al profesional sanitario mantienen una estructura más cercana a la de una aplicación web convencional, asumiendo un mayor grado de familiaridad con estas herramientas~\cite{GithubTerapitrack}.
 
-\begin{itemize}
-    \item \textbf{Perceptibilidad}: la información y los componentes de la interfaz deben presentarse de forma que puedan percibirse por distintos tipos de usuarios, por ejemplo cuidando el contraste de color, el tamaño de la tipografía o el uso de textos alternativos en imágenes~\cite{wcag22}.
-    \item \textbf{Operabilidad}: los controles deben poder manejarse con diferentes dispositivos de entrada (ratón, teclado, pantallas táctiles, o mandos) y con un número reducido de acciones, algo especialmente relevante en personas con limitaciones motoras~\cite{telehealth_accessibility,rosen2009_telerehab_technologies}.
-    \item \textbf{Comprensibilidad}: los textos, mensajes de error y flujos de navegación han de ser claros y coherentes, evitando tecnicismos innecesarios y sobrecarga de información~\cite{wcag22}.
-    \item \textbf{Robustez}: el contenido debe mostrarse correctamente en distintos navegadores y dispositivos, y ser compatible con tecnologías de apoyo como lectores de pantalla o ampliadores de pantalla~\cite{wcag22}.
-\end{itemize}
-
-Estos principios han guiado el diseño de la interfaz de TerapiTrack, priorizando menús sencillos, textos claros y un número reducido de acciones por pantalla~\cite{GithubTerapitrack}.
+Las pautas Web Content Accessibility Guidelines (WCAG) ofrecen recomendaciones sobre contraste, tipografía, estructura y compatibilidad con tecnologías de apoyo que sirven como referencia para adaptar la interfaz a personas mayores o con dificultades motoras~\cite{wcag22}.
+En la parte de paciente de TerapiTrack estas ideas se han traducido en un menú sencillo, textos breves y claros, pocos elementos interactivos por pantalla y compatibilidad con dispositivos alternativos, como el mando SNES integrado únicamente en las vistas de paciente~\cite{GithubTerapitrack}.
 
 \section{Patrones de diseño y arquitectura Modelo-Vista-Controlador}
 

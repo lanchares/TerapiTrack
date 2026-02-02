@@ -429,13 +429,14 @@ D. José Miguel Ramírez Sanz
 % Abstract en castellano
 \renewcommand*\abstractname{Resumen}
 \begin{abstract}
-Este Trabajo de Fin de Grado presenta el diseño e implementación de TerapiTrack, una plataforma web para la gestión de sesiones de telerehabilitación orientadas a pacientes con enfermedad de Parkinson que residen en zonas rurales o alejadas de los centros de referencia.
+Este Trabajo de Fin de Grado presenta el diseño e implementación de TerapiTrack, una plataforma web para la gestión de sesiones de telerehabilitación orientadas a pacientes con enfermedad de Parkinson que residen en zonas rurales o alejadas de los centros médicos de referencia.
 
 El sistema permite a profesionales sanitarios crear ejercicios terapéuticos en vídeo, programar sesiones personalizadas, guiarlas seleccionando los ejercicios a realizar y evaluar de forma remota el desempeño de los pacientes;
-mientras que éstos pueden realizar los ejercicios en su domicilio, grabándose su ejecución desde el navegador, con la cámara del dispositivo y consultar su progreso a lo largo del tratamiento.
+mientras que estos pueden realizar las sesiones en su domicilio, grabando sus ejercicios desde el navegador, con la cámara del dispositivo, repetir los ejercicios asignados cuando lo deseen para practicar y consultar su progreso a lo largo del tratamiento.
+Además, el administrador puede gestionar usuarios y vinculaciones entre profesionales y pacientes.
 
-TerapiTrack se ha desarrollado con Python y Flask, utiliza SQLAlchemy sobre SQLite y PostgreSQL para la gestión de datos e integra Cloudinary para el almacenamiento escalable de vídeos.
-Además, sigue criterios de accesibilidad web para facilitar su uso por parte de personas con limitaciones motoras o con poca experiencia tecnológica.
+TerapiTrack se ha desarrollado con Flask y Jinja, utiliza SQLAlchemy sobre SQLite y PostgreSQL para la gestión de datos e integra Cloudinary para el almacenamiento escalable de vídeos.
+Además, sigue criterios de accesibilidad web para facilitar su uso por parte de personas con limitaciones motoras o con poca experiencia tecnológica, incluyendo la utilización de un mando SNES para el paciente.
 
 El proyecto incluye una arquitectura modular basada en blueprints, un modelo de datos normalizado, pruebas unitarias con cobertura del 99\% sobre los módulos críticos y despliegue en Heroku.
 \end{abstract}
@@ -452,11 +453,12 @@ Telerehabilitación, enfermedad de Parkinson, aplicación web sanitaria, registr
 \begin{abstract}
 This Final Degree Project presents the design and implementation of TerapiTrack, a web platform for managing telerehabilitation sessions aimed at patients with Parkinson's disease who live in rural areas or far from specialized medical centers.
 
-The system allows healthcare professionals to create therapeutic video exercises, schedule personalized sessions, guide them by selecting the exercises to be performed, and remotely evaluate patient performance.
-Meanwhile, patients can carry out their exercises at home, recording themselves directly through their device’s camera in the browser, and view their progress throughout the treatment.
+The system allows healthcare professionals to create therapeutic video exercises, schedule personalized sessions, guide them by selecting the exercises to be performed, and remotely evaluate patient performance;
+while patients can carry out their sessions at home, recording their exercises directly in the browser with the device’s camera, repeating the assigned exercises whenever they want for additional practice, and viewing their progress throughout the treatment.
+In addition, an administrator can manage users and the links between professionals and patients.
 
-TerapiTrack has been developed using Python and Flask, employs SQLAlchemy with SQLite and PostgreSQL for data management and integrates Cloudinary for scalable video storage.
-In addition, it follows web accessibility standards to ensure usability for individuals with motor limitations or limited technological experience.
+TerapiTrack has been developed using Flask and Jinja, employs SQLAlchemy with SQLite and PostgreSQL for data management and integrates Cloudinary for scalable video storage.
+Furthermore, it follows web accessibility guidelines to ensure usability for individuals with motor limitations or limited technological experience, including support for a SNES gamepad as an alternative input device for patients.
 
 The project features a modular architecture based on blueprints, a normalized data model, unit tests achieving 99\% coverage on critical modules, and deployment on Heroku.
 \end{abstract}
