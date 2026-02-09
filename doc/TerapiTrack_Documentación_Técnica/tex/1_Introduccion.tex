@@ -6,7 +6,7 @@ No obstante, la realización continuada de ejercicios de rehabilitación física
 
 Las limitaciones de movilidad y la lejanía de los centros sanitarios de referencia complican aún más el acceso a estas terapias, repercutiendo en el bienestar de los pacientes y en el esfuerzo de sus familias~\cite{parkinson_telerehab_review}.
 Ante esta problemática, surge TerapiTrack, una plataforma web diseñada para facilitar el acompañamiento y el seguimiento de terapias, principalmente para personas diagnosticadas con la enfermedad de Parkinson, aunque su enfoque flexible y modular permite también su uso en otros casos que requieran terapias a distancia, como personas con otras enfermedades crónicas.
-TerapiTrack busca eliminar barreras geográficas y de accesibilidad, adaptándose a las necesidades y capacidades de distintos tipos de usuarios~\cite{GithubTerapitrack,telehealth_accessibility}.
+TerapiTrack busca eliminar barreras geográficas y de accesibilidad, adaptándose a las necesidades y capacidades de distintos tipos de usuarios~\cite{telehealth_accessibility}.
 
 \section{Contexto del problema}
 
@@ -16,19 +16,19 @@ Para muchos de estos pacientes, viajar hasta la ciudad únicamente para realizar
 
 El proyecto en el que se enmarca este Trabajo de Fin de Grado forma parte de una colaboración más amplia con el Servicio de Neurología del Hospital Universitario de Burgos, liderada por la doctora Esther Cubo.
 El objetivo general de esta colaboración es mejorar la calidad de vida de las personas con enfermedad de Parkinson mediante el uso de herramientas de inteligencia artificial y de telemedicina, trabajando en tres líneas principales: la detección temprana de la enfermedad a partir de pruebas que miden la bradicinesia, la detección de caídas y la aplicación de programas de telerehabilitación con retroalimentación automática~\cite{nunez2021_tfg_ejercicios,cubo2023_telerehab_parkinson,garrido2021_tfm_infraestructura,ramirez2021_tfm_detectron,espinosa2022_tfg_deteccion}.
-Dentro de este conjunto de proyectos, este TFG se sitúa en esta última línea y se centra en el desarrollo de una aplicación web que permita a los pacientes realizar en su domicilio ejercicios de rehabilitación, guiados por vídeos preparados por neurólogos y terapeutas del hospital~\cite{GithubTerapitrack}.
+Dentro de este conjunto de proyectos, este TFG se sitúa en esta última línea y se centra en el desarrollo de una aplicación web que permita a los pacientes realizar en su domicilio ejercicios de rehabilitación, guiados por vídeos preparados por neurólogos y terapeutas del hospital.
 
 \section{Propuesta de solución}
 
 El objetivo principal de TerapiTrack es acercar la rehabilitación y el control terapéutico al entorno cotidiano del paciente, ofreciendo una aplicación web que organice de forma sencilla las sesiones de ejercicios y permita registrar su realización en el domicilio.
 El desarrollo de la aplicación se ha apoyado en una fase de diseño especialmente extensa, en la que durante las primeras semanas del proyecto se han definido con detalle los requisitos y las entidades clave del dominio (usuarios, pacientes, profesionales, ejercicios, sesiones, evaluaciones y vídeos de respuesta), así como los actores implicados y los casos de uso más relevantes del proceso de telerehabilitación.
 A partir de este análisis se han construido el modelo entidad-relación y su correspondiente esquema relacional normalizado, que sustentan la base de datos de TerapiTrack, garantizando la coherencia de la información clínica manejada.
-Estos modelos, junto con el diagrama de casos de uso y la arquitectura modular del sistema, han guiado el diseño de los distintos paneles de usuario y de los flujos de interacción que se describen en los capítulos posteriores y en la documentación técnica de los anexos~\cite{GithubTerapitrack}.
+Estos modelos, junto con el diagrama de casos de uso y la arquitectura modular del sistema, han guiado el diseño de los distintos paneles de usuario y de los flujos de interacción que se describen en los capítulos posteriores y en la documentación técnica de los anexos.
 
 Sobre esta base de diseño, se ha desarrollado la base funcional de la aplicación, estructurada en tres paneles diferenciados: administrador, profesional sanitario y paciente.
 El administrador puede gestionar usuarios, roles y vinculaciones entre pacientes y profesionales, así como configurar parámetros generales del sistema (como por ejemplo, las políticas de retención de vídeos o ciertos límites de almacenamiento).
 El profesional dispone de herramientas para mantener su lista de pacientes, crear y catalogar ejercicios a partir de vídeos, programar sesiones terapéuticas personalizadas y revisar posteriormente las grabaciones y evaluarlas.
-Por su parte, el paciente accede a un panel simplificado desde el que puede consultar sus próximas sesiones, realizarlas guiados por el profesional, repetir los ejercicios asignados en las sesiones y visualizar su evolución a partir de las evaluaciones registradas~\cite{GithubTerapitrack}.
+Por su parte, el paciente accede a un panel simplificado desde el que puede consultar sus próximas sesiones, realizarlas guiados por el profesional, repetir los ejercicios asignados en las sesiones y visualizar su evolución a partir de las evaluaciones registradas.
 
 De este modo, TerapiTrack cubre de extremo a extremo el flujo terapéutico, desde la creación de ejercicios y la programación de las sesiones hasta la evaluación remota del desempeño del paciente.
 
@@ -36,8 +36,8 @@ De este modo, TerapiTrack cubre de extremo a extremo el flujo terapéutico, desd
 
 Para facilitar la validación, el uso y la posible evolución del sistema, se entrega junto con la memoria un conjunto de materiales adicionales:
 \begin{itemize}
-  \item El código fuente completo del proyecto, junto con su historial de cambios en el repositorio de control de versiones (incluida la rama \texttt{Pruebas} utilizada durante el desarrollo).
-  \item La definición de la base de datos y un juego de datos de prueba que permite ejecutar los principales casos de uso sin necesidad de configuración adicional.
+  \item El código fuente completo del proyecto, junto con su historial de cambios en el repositorio de control de versiones (incluida la rama \texttt{Pruebas} utilizada durante el desarrollo), disponible en: \url{https://github.com/lanchares/TerapiTrack}.
+  \item La definición de la base de datos y un juego de datos de prueba que permite ejecutar los principales casos de uso sin necesidad de configuración adicional. En el USB entregado se incluye una base de datos de <<juguete>>, precargada con usuarios, pacientes, sesiones y vídeos de ejercicios, para que el tribunal pueda trabajar con la herramienta sin tener que prepara los datos.
   \item La documentación técnica incluida en los anexos, donde se detallan la arquitectura del sistema, los modelos de datos y los principales diagramas de diseño.
   \item Un manual de instalación y de usuario, con instrucciones paso a paso para desplegar la aplicación y una guía básica para cada tipo de usuario.
   \item Un resumen de las pruebas realizadas sobre el sistema, tanto automatizadas con \textit{pytest} como manuales sobre el modelo de datos y las operaciones habituales, junto con los resultados obtenidos.
@@ -45,6 +45,6 @@ Para facilitar la validación, el uso y la posible evolución del sistema, se en
   \item Un breve documento de credenciales, incluido en el repositorio del proyecto bajo el nombre \texttt{CREDENCIALES.md}, que recoge la URL de despliegue y las cuentas de acceso de prueba para los distintos perfiles.
 \end{itemize}
 
-El objetivo de este material adicional es que cualquier persona interesada pueda entender con rapidez el alcance del proyecto, comprobar su funcionamiento y disponer de una base sobre la que seguir trabajando~\cite{GithubTerapitrack}.
+El objetivo de este material adicional es que cualquier persona interesada pueda entender con rapidez el alcance del proyecto, comprobar su funcionamiento y disponer de una base sobre la que seguir trabajando.
 
 Además, la versión desplegada de TerapiTrack está disponible en: \url{https://terapitrack-tfg-dccabad31cfb.herokuapp.com}, accesible mediante las credenciales de prueba recogidas en el documento \texttt{CREDENCIALES.md}.

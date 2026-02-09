@@ -3,27 +3,28 @@
 \section{Conclusiones}
 
 El desarrollo de TerapiTrack ha permitido pasar de una idea inicial de plataforma de telerehabilitación a una herramienta web funcional que gestiona usuarios, ejercicios, sesiones terapéuticas y evaluaciones en un entorno realista.
-A lo largo del proyecto se han cubierto los principales objetivos funcionales y técnicos planteados, dejando una base razonablemente sólida sobre la que se pueden apoyar futuras extensiones del sistema~\cite{GithubTerapitrack}.
+A lo largo del proyecto se han cubierto los principales objetivos funcionales y técnicos planteados, dejando una base razonablemente sólida sobre la que se pueden apoyar futuras extensiones del sistema.
 
 Desde el punto de vista funcional, la aplicación ofrece paneles diferenciados para administradores, profesionales sanitarios y pacientes, de forma que cada tipo de usuario dispone de un entorno adaptado a sus tareas habituales.
 El sistema permite gestionar la vinculación entre pacientes y profesionales, crear y catalogar ejercicios en vídeo, programar sesiones personalizadas y registrar su realización, incluyendo la subida y almacenamiento de las grabaciones generadas en el domicilio del paciente.
-Además, se ha incorporado una trazabilidad básica de la evolución terapéutica a través del historial de sesiones y evaluaciones asociadas a cada paciente~\cite{GithubTerapitrack,HerokuTerapitrackApp}.
+Además, se ha incorporado una trazabilidad básica de la evolución terapéutica a través del historial de sesiones y evaluaciones asociadas a cada paciente~\cite{HerokuTerapitrackApp}.
 
 En el ámbito técnico, se ha diseñado una arquitectura modular basada en Flask y \textit{blueprints}, apoyada en un modelo de datos relacional normalizado que separa claramente las entidades de usuario, paciente, profesional, ejercicio, sesión, vídeo de respuesta y evaluación~\cite{SQLAlchemyDocs,FlaskDocs}.
 La integración de SQLAlchemy como ORM ha facilitado la evolución del esquema sin perder integridad referencial, mientras que el uso de Cloudinary ha permitido delegar el almacenamiento de vídeos en un servicio específico, evitando problemas de espacio y de ancho de banda en el propio servidor.
 El despliegue en Heroku y la configuración diferenciada de los entornos de desarrollo y producción han demostrado que la aplicación puede ejecutarse en la nube con una configuración razonable de recursos~\cite{CloudinaryConsole,HerokuTerapitrackApp,HerokuDashboard}.
 
-Otro aspecto destacable es la incorporación de pruebas automatizadas con \textit{pytest} sobre los módulos más críticos, alcanzando una cobertura elevada en modelos, decoradores y componentes de configuración~\cite{GithubTerapitrack,PytestDocs}.
-Estas pruebas, combinadas con pruebas manuales sobre los flujos de uso principales en el entorno desplegado, han ayudado a detectar errores de diseño e implementación en fases tempranas y han dado una mayor tranquilidad a la hora de refactorizar código o ajustar funcionalidades~\cite{GithubTerapitrack}.
+Otro aspecto destacable es la incorporación de pruebas automatizadas con \textit{pytest} sobre los módulos más críticos, alcanzando una cobertura elevada en modelos, decoradores y componentes de configuración~\cite{PytestDocs}.
+Estas pruebas, combinadas con pruebas manuales sobre los flujos de uso principales en el entorno desplegado, han ayudado a detectar errores de diseño e implementación en fases tempranas y han dado una mayor tranquilidad a la hora de refactorizar código o ajustar funcionalidades.
 La decisión de seguir una metodología de trabajo iterativa apoyada en Jira también ha sido útil para planificar, seguir el avance real del proyecto y reordenar prioridades cuando ha sido necesario~\cite{JiraTerapitrack}.
 
-Desde una perspectiva más personal, el proyecto ha servido para integrar conocimientos de desarrollo web, bases de datos, control de versiones, despliegue en la nube y documentación técnica en un caso de uso centrado en la mejora de la calidad de vida de personas con enfermedad de Parkinson~\cite{GithubTerapitrack,garrido2021_tfm_infraestructura}.
-El trabajo ha dejado claro lo importante que es mantener cierta disciplina en el uso de herramientas como Git y Jira, así como diseñar pensando en la accesibilidad y en las limitaciones de los usuarios finales desde el principio~\cite{wcag22,telehealth_accessibility}.
-Aunque han aparecido dificultades técnicas y de organización en distintos momentos, la experiencia global ha sido muy enriquecedora y ha permitido entregar una primera versión de TerapiTrack que cumple los objetivos planteados y puede utilizarse en un contexto de telerehabilitación supervisada~\cite{cubo2023_telerehab_parkinson}.
+Desde una perspectiva más personal, el proyecto ha servido para integrar conocimientos de desarrollo web, bases de datos, control de versiones, despliegue en la nube y documentación técnica en un caso de uso centrado en la mejora de la calidad de vida de personas con enfermedad de Parkinson.
+Entre las lecciones aprendidas destacan la utilidad de organizar el código en \textit{blueprints} y emplear decoradores para el control de acceso, la importancia de diseñar un modelo de datos normalizado con tablas intermedias para las relaciones de muchos a muchos y las ventajas de integrar servicios externos como Cloudinary para resolver problemas de escalabilidad en el almacenamiento de vídeos.
+El trabajo ha dejado claro, además, lo importante que es mantener cierta disciplina en el uso de herramientas como Git y Jira, así como diseñar pensando en la accesibilidad y en las limitaciones de los usuarios finales desde el principio~\cite{wcag22,telehealth_accessibility}.
+Aunque han aparecido dificultades técnicas y de organización en distintos momentos, la experiencia global ha sido muy enriquecedora y ha permitido entregar una primera versión de TerapiTrack que cumple los objetivos planteados y puede utilizarse en un contexto de telerehabilitación supervisada.
 
 \section{Líneas de trabajo futuras}
 
-La versión actual de TerapiTrack cubre el ciclo básico de planificación, realización y evaluación de sesiones terapéuticas, pero deja abiertas varias líneas de mejora que podrían abordarse en trabajos posteriores~\cite{GithubTerapitrack}.
+La versión actual de TerapiTrack cubre el ciclo básico de planificación, realización y evaluación de sesiones terapéuticas, pero deja abiertas varias líneas de mejora que podrían abordarse en trabajos posteriores.
 Algunas de estas líneas están relacionadas con la ampliación de la funcionalidad y otras con la incorporación de técnicas de análisis de vídeo más avanzadas o con la adaptación del sistema a un entorno clínico real~\cite{cubo2023_telerehab_parkinson}.
 En particular, las mejoras descritas en este apartado forman parte de la evolución del proyecto de telerehabilitación en el que se enmarca TerapiTrack y no están incluidas en el alcance de la implementación realizada en este TFG.
 
