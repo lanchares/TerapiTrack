@@ -17,7 +17,7 @@ Jira permite crear tareas, agruparlas en sprints, registrar incidencias y visual
 El \textit{backend} de TerapiTrack está desarrollado en \textbf{Python}, un lenguaje de programación de propósito general muy extendido en el ámbito del desarrollo web, la ciencia de datos y la automatización~\cite{pressman_ingenieria_sw}. 
 Entre sus ventajas destacan una sintaxis relativamente sencilla y una comunidad amplia que mantiene librerías para la mayoría de necesidades habituales en un proyecto.
 
-Sobre Python se ha utilizado el framework web \textbf{Flask}, que proporciona las piezas básicas para construir una aplicación web:
+Sobre Python se ha utilizado el \textit{framework} web \textbf{Flask}, que proporciona las piezas básicas para construir una aplicación web:
 definición de rutas, manejo de peticiones y respuestas HTTP, integración con sistemas de plantillas y soporte para extensiones que cubren necesidades como la autenticación o el acceso a bases de datos~\cite{FlaskDocs,JinjaDocs}.
 
 En el proyecto la aplicación principal se define en \texttt{app.py} y se organiza en varios módulos de controladores que agrupan las rutas según el rol del usuario (\texttt{admin\_controlador.py}, \texttt{profesional\_controlador.py}, \texttt{auth\_controlador.py}, etc.), siguiendo el patrón de \emph{blueprints} descrito en la documentación oficial y en guías prácticas específicas~\cite{FlaskBlueprintsDocs,RealPythonBlueprints}.
@@ -62,7 +62,7 @@ Todas ellas heredan de una plantilla base (\texttt{base.html}) que define la est
 Entre las vistas más relevantes se encuentran los distintos paneles de control (\texttt{dashboard.html}) y las páginas de ejecución de sesiones (\texttt{ejecutar\_sesion.html}), donde se combinan los vídeos de ejemplo con la cámara del paciente y los controles necesarios para completar la sesión.
 
 \subsection{Bootstrap y Bootswatch}
-Para el diseño visual se ha empleado \textbf{Bootstrap}, un \emph{framework} CSS que ofrece componentes predefinidos (botones, menús, rejillas, formularios) y un sistema de diseño adaptable a diferentes tamaños de pantalla~\cite{pressman_ingenieria_sw}. 
+Para el diseño visual se ha empleado \textbf{Bootstrap}, un \textit{framework} CSS que ofrece componentes predefinidos (botones, menús, rejillas, formularios) y un sistema de diseño adaptable a diferentes tamaños de pantalla~\cite{pressman_ingenieria_sw}. 
 Sobre Bootstrap se han aplicado temas de \textbf{Bootswatch}, que proporcionan estilos alternativos listos para usar sin modificar el marcado HTML~\cite{Bootswatch}.
 
 El uso de estos componentes facilita mantener una apariencia coherente en toda la aplicación y aplicar criterios básicos de accesibilidad, como tamaños de fuente adecuados, contraste suficiente y distribución ordenada de los elementos en la interfaz~\cite{telehealth_accessibility,wcag22}.
@@ -92,7 +92,7 @@ En el contexto de TerapiTrack, se ha utilizado para comprobar el funcionamiento 
 \subsection{Heroku}
 Para ejecutar la aplicación en un entorno accesible desde internet se ha utilizado \textbf{Heroku}, una plataforma \textit{Platform as a Service} (PaaS)~\cite{HerokuDashboard}.
 Heroku permite desplegar aplicaciones a partir de un repositorio Git y definir el proceso de arranque mediante un fichero \texttt{Procfile}, en el que se indica el comando que debe ejecutarse para iniciar la aplicación Flask con un servidor compatible con WSGI~\cite{HerokuTerapitrackApp}.
-WSGI (Web Server Gateway Interface) es una especificación que define cómo se comunican las aplicaciones web en Python con los servidores que las ejecutan, de manera que distintos servidores y frameworks puedan interoperar entre sí~\cite{FlaskDocs}.
+WSGI (Web Server Gateway Interface) es una especificación que define cómo se comunican las aplicaciones web en Python con los servidores que las ejecutan, de manera que distintos servidores y \textit{frameworks} puedan interoperar entre sí~\cite{FlaskDocs}.
 
 La configuración concreta del entorno (por ejemplo, la URL de la base de datos PostgreSQL o la clave secreta de Flask) se realiza mediante variables de entorno, que la aplicación lee en tiempo de ejecución a través del módulo de configuración.
 

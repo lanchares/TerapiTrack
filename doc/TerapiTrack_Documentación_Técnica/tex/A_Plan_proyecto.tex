@@ -10,31 +10,23 @@ El desarrollo de TerapiTrack se ha organizado siguiendo una metodología ágil i
 La planificación inicial se estructuró en sprints, pero el avance real se fue ajustando a medida que aparecían imprevistos técnicos y se concretaban mejor los requisitos.
 Por este motivo, el tablero de Jira refleja tanto la planificación prevista como los cambios introducidos durante el proyecto.
 
-Para facilitar el seguimiento del proyecto se ha utilizado un repositorio público en GitHub, donde se conserva el historial completo de cambios y la versión final del código fuente de TerapiTrack~\cite{GithubTerapitrack}.
-El repositorio está disponible en \url{https://github.com/lanchares/TerapiTrack}, y ha servido como referencia principal durante la planificación de sprints y la elaboración de este anexo.
+Para facilitar el seguimiento del proyecto se ha utilizado un repositorio público en GitHub, donde se conserva el historial completo de cambios y la versión final del código fuente de TerapiTrack.
+El repositorio está disponible en \url{https://github.com/lanchares/TerapiTrack} y ha servido como referencia principal durante la planificación de sprints y la elaboración de este anexo.
 
 Se ha dado prioridad a completar primero los módulos y tareas considerados esenciales, procurando mantener una entrega de funcionalidad lo más continua posible.
-En las páginas siguientes se describen los sprints realizados y se incluyen los gráficos de evolución extraídos de Jira, donde puede verse la progresión del trabajo en cada iteración.
+En las páginas siguientes se describen los sprints realizados y el foco principal de cada uno.
 
 Aunque se ha utilizado la estructura de sprints para organizar el proyecto, la ejecución no ha seguido de forma estricta el calendario inicial. En varios casos la mayor parte del trabajo se concentró al final del sprint y algunos se cerraron más tarde de la fecha prevista.
 Esto se debe a que el desarrollo se ha realizado de manera individual, lo que ha obligado a reorganizar el tiempo disponible y a reagrupar tareas.
-Aun así, la planificación por sprints y el uso de Jira han resultado útiles para mantener una visión global del avance y de las prioridades en cada momento, por lo que los gráficos deben interpretarse como una guía del trabajo realizado más que como una aplicación estricta de Scrum.
+Aun así, la planificación por sprints y el uso de Jira han resultado útiles para mantener una visión global del avance y de las prioridades en cada momento.
 
 \subsubsection{Sprint 1: Configuración inicial (11--17 marzo 2025)}
 
 Este primer sprint se dedicó a poner en marcha el entorno de trabajo y a conocer las tecnologías básicas del proyecto.
-Se configuró el entorno con Flask, se creó el repositorio en GitHub y se definió una estructura inicial de carpetas y dependencias~\cite{FlaskDocs}.
+Se configuró el entorno con Flask, se creó el repositorio en GitHub y se definió una estructura inicial de carpetas y dependencias.
 Paralelamente se revisó la documentación de Flask y Jinja y se realizaron las primeras pruebas de conexión con SQLite para comprobar la persistencia de datos~\cite{FlaskDocs,JinjaDocs}.
 
 Quedaron pendientes tareas como el diseño completo de la base de datos y la documentación detallada de requisitos, que se trasladaron al sprint siguiente.
-El gráfico \textit{burndown} del Sprint 1 (Figura~\ref{fig:sprint1_burndown}) muestra que la mayor parte del trabajo se concentró al final del periodo, algo lógico en esta fase inicial de familiarización con las herramientas.
-
-\begin{figure}[ht]
-  \centering
-  \includegraphics[width=0.9\textwidth]{img/sprint_1.png}
-  \caption{Gráfico \textit{burndown} del Sprint 1 obtenido de Jira.}
-  \label{fig:sprint1_burndown}
-\end{figure}
 
 \subsubsection{Sprint 2: Estudio (18--24 marzo 2025)}
 
@@ -42,16 +34,9 @@ En el segundo sprint el esfuerzo se centró en profundizar en las tecnologías c
 Se completó el estudio práctico de Flask, SQLAlchemy y Jinja mediante ejemplos y pequeñas pruebas, se diseñó la base de datos y se elaboró el primer modelo entidad-relación~\cite{SQLAlchemyDocs,FlaskDocs,JinjaDocs}.
 También se validó la integración entre Flask y SQLite con pruebas de lectura y escritura, apoyándose en herramientas como DB Browser for SQLite para inspeccionar la base de datos~\cite{DBBrowser}.
 
-Algunos de los scripts y capturas utilizados en estas pruebas se han incluido en el repositorio en la carpeta \texttt{prototipos/} y
-hubo tareas de implementación de modelos en SQLAlchemy no llegaron a completarse y se arrastraron al sprint 3, donde se terminó de consolidar la capa de datos.
-El \textit{burndown} del Sprint 2 (Figura~\ref{fig:sprint2_burndown}) refleja que las finalizaciones se concentran al final del sprint, más como registro de lo realizado que como una ejecución estricta del plan diario.
+Algunos de los scripts y capturas utilizados en estas pruebas se han incluido en el repositorio en la carpeta \texttt{prototipos/}.
+Además, algunas tareas de implementación de modelos en SQLAlchemy no llegaron a completarse y se arrastraron al sprint 3, donde se terminó de consolidar la capa de datos.
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.9\textwidth]{img/sprint_2.png}
-  \caption{Gráfico \textit{burndown} del Sprint 2 obtenido de Jira.}
-  \label{fig:sprint2_burndown}
-\end{figure}
 
 \subsubsection{Sprint 3: Diseño (25--31 marzo 2025)}
 
@@ -60,14 +45,6 @@ Se ampliaron y ajustaron las tablas de la base de datos, se implementaron los mo
 Además, se avanzó en el diseño de las plantillas de Jinja y se revisó la documentación de requisitos para alinearla con las decisiones tomadas~\cite{JinjaDocs}.
 
 La creación de un sistema de permisos basado en Flask-Login quedó únicamente esbozada en este sprint y se abordó con más profundidad en los siguientes~\cite{flask_login}.
-El gráfico \textit{burndown} del Sprint 3 (Figura~\ref{fig:sprint3_burndown}) muestra cómo gran parte de los puntos de historia se cierran hacia el final, cuando se integran y prueban los distintos elementos de diseño.
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.9\textwidth]{img/sprint_3.png}
-  \caption{Gráfico \textit{burndown} del Sprint 3 obtenido de Jira.}
-  \label{fig:sprint3_burndown}
-\end{figure}
 
 \subsubsection{Sprint 4: Base de datos (2--7 abril 2025)}
 
@@ -76,14 +53,6 @@ Se completó la definición del modelo relacional, se ajustaron las relaciones e
 También se avanzó en la definición de permisos por rol y se continuó actualizando la documentación funcional y técnica.
 
 Las pruebas unitarias sobre los modelos y la redacción sistemática de la memoria en \LaTeX{} comenzaron en este Sprint pero se fueron extendiendo a los posteriores.
-El \textit{burndown} del Sprint 4 (Figura~\ref{fig:sprint4_burndown}) refleja este esfuerzo centrado en consolidar la base de datos y en empezar a integrar las pruebas en el ciclo de desarrollo.
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.9\textwidth]{img/sprint_4.png}
-  \caption{Gráfico \textit{burndown} del Sprint 4 obtenido de Jira.}
-  \label{fig:sprint4_burndown}
-\end{figure}
 
 \subsubsection{Sprint 5: Diseño de la interfaz (8--13 abril 2025)}
 
@@ -91,15 +60,7 @@ El quinto Sprint se centró en la parte visible de la aplicación.
 Se diseñó la interfaz de administración de usuarios, se trabajó en los formularios y en la validación básica de datos, y se fueron integrando estos elementos con la capa de modelos existente~\cite{flask_login,FlaskDocs}.
 También se revisaron los requisitos funcionales para asegurarse de que la interfaz cubría los flujos principales de gestión.
 
-Algunas tareas de pruebas unitarias y de depuración más exhaustiva quedaron pendientes y se trasladaron a sprints posteriores.
-El \textit{burndown} del Sprint 5 (Figura~\ref{fig:sprint5_burndown}) refleja esta concentración del trabajo en la parte final del periodo.
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.9\textwidth]{img/sprint_5.png}
-  \caption{Gráfico \textit{burndown} del Sprint 5 obtenido de Jira.}
-  \label{fig:sprint5_burndown}
-\end{figure}
+Algunas tareas de pruebas unitarias y de depuración más exhaustiva quedaron pendientes y se trasladaron al siguiente sprint.
 
 \subsubsection{Sprint 6: Base funcional (3--9 junio 2025)}
 
@@ -108,28 +69,12 @@ Se implementaron los modelos relacionados con ejercicios, sesiones, evaluaciones
 Además, se incorporó el cifrado de contraseñas con \textit{bcrypt} y se reforzó la autenticación de usuarios~\cite{flask_login}.
 
 Quedaron para más adelante algunos aspectos de la interfaz de administración y parte de las pruebas automáticas.
-El \textit{burndown} del Sprint 6 (Figura~\ref{fig:sprint6_burndown}) muestra un incremento importante de trabajo completado en pocos días, reflejando que muchas tareas se habían preparado en los sprints anteriores y se integraron en este bloque.
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.9\textwidth]{img/sprint_6.png}
-  \caption{Gráfico \textit{burndown} del Sprint 6 obtenido de Jira.}
-  \label{fig:sprint6_burndown}
-\end{figure}
 
 \subsubsection{Sprint 7: Base funcional 2 (17--22 junio 2025)}
 
 En el sprint 7 se completaron y pulieron muchas de las funcionalidades introducidas en el sprint anterior.
 Se reforzó la seguridad (protección CSRF, gestión avanzada de sesiones), se implementaron rutas CRUD para usuarios, sesiones, ejercicios y evaluaciones, y se añadieron características clave como la subida de vídeos por parte de los profesionales y la generación de diagramas UML de apoyo~\cite{flask_login,flask_blueprints_doc}.
 También se avanzó en la documentación de casos de uso y en la preparación de material para la memoria.
-
-El \textit{burndown} del Sprint 7 (Figura~\ref{fig:sprint7_burndown}) refleja cómo estas tareas se fueron cerrando en bloque hacia el final del periodo.
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.9\textwidth]{img/sprint_7.png}
-  \caption{Gráfico \textit{burndown} del Sprint 7 obtenido de Jira.}
-  \label{fig:sprint7_burndown}
-\end{figure}
 
 \subsubsection{Sprint 8: Controladores y vistas (23--29 junio 2025)}
 
@@ -138,85 +83,41 @@ Se completaron los paneles de gestión para profesionales y pacientes, se refina
 Paralelamente se realizaron ajustes en los formularios y en la validación de datos en cliente y servidor.
 
 Durante este periodo también se avanzó en tareas de documentación técnica y en la elaboración del diccionario de datos, aunque parte de este trabajo se siguió afinando después fuera del marco de los sprints.
-El \textit{burndown} del Sprint 8 (Figura~\ref{fig:sprint8_burndown}) muestra una evolución casi plana hasta las fechas cercanas al cierre, en las que se registran la mayoría de los puntos completados.
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.9\textwidth]{img/sprint_8.png}
-  \caption{Gráfico \textit{burndown} del Sprint 8 obtenido de Jira.}
-  \label{fig:sprint8_burndown}
-\end{figure}
 
 \subsubsection{Sprint 9: Pruebas iniciales y refactorización (15--23 diciembre 2025)}
 
 El sprint 9 marcó el inicio de la fase de pruebas intensivas.
-Se preparó la batería de tests automatizados, se refactorizaron algunos controladores para simplificar su mantenimiento y se revisaron los modelos de datos para asegurar su coherencia con los casos de uso definitivos~\cite{GithubTerapitrack}.
+Se preparó la batería de tests automatizados, se refactorizaron algunos controladores para simplificar su mantenimiento y se revisaron los modelos de datos para asegurar su coherencia con los casos de uso definitivos.
 También se corrigieron pequeños errores detectados durante las primeras ejecuciones completas de la aplicación.
 
-El \textit{burndown} del Sprint 9 (Figura~\ref{fig:sprint9_burndown}) muestra un sprint corto en el que apenas se registran incidencias resueltas hasta los últimos días.
-Esto se debe a que buena parte del trabajo consistió en tareas de limpieza y reestructuración interna, que se cerraron en bloque una vez verificado que el sistema seguía funcionando correctamente.
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.9\textwidth]{img/sprint_9.png}
-  \caption{Gráfico \textit{burndown} del Sprint 9 centrado en pruebas iniciales y refactorización.}
-  \label{fig:sprint9_burndown}
-\end{figure}
+Buena parte del trabajo consistió en tareas de limpieza y reestructuración interna, que se cerraron en bloque una vez verificado que el sistema seguía funcionando correctamente.
 
 \subsubsection{Sprint 10: Cierre de incidencias (25--30 diciembre 2025)}
 
 En el sprint 10 el objetivo principal fue cerrar incidencias acumuladas de sprints anteriores.
-Se revisaron formularios y mensajes de error, se ajustaron algunas rutas de Flask, se pulieron detalles de la interfaz y se solucionaron problemas menores relacionados con validaciones y permisos~\cite{GithubTerapitrack}.
+Se revisaron formularios y mensajes de error, se ajustaron algunas rutas de Flask, se pulieron detalles de la interfaz y se solucionaron problemas menores relacionados con validaciones y permisos.
 Además, se aprovecharon estos cambios para mejorar la experiencia de uso en los flujos más habituales de profesionales y pacientes.
-
-El \textit{burndown} del Sprint 10 (Figura~\ref{fig:sprint10_burndown}) refleja una línea de trabajo planificada estable y una curva de progreso real que sube en escalones pronunciados al final del sprint.
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.9\textwidth]{img/sprint_10.png}
-  \caption{Gráfico \textit{burndown} del Sprint 10 con cierre de incidencias acumuladas.}
-  \label{fig:sprint10_burndown}
-\end{figure}
 
 \subsubsection{Sprint 11: Pruebas finales y documentación (31 diciembre --6 enero 2026)}
 
 El sprint 11 se dedicó casi por completo a las pruebas finales y a la documentación.
-Se amplió la batería de tests hasta alcanzar una cobertura cercana al 99\%, se ejecutaron pruebas manuales completas sobre los flujos críticos y se revisaron los anexos técnicos, incluyendo la documentación de instalación, despliegue y pruebas~\cite{GithubTerapitrack}.
+Se amplió la batería de tests hasta alcanzar una cobertura del 99\%, se ejecutaron pruebas manuales completas sobre los flujos críticos y se revisaron los anexos técnicos, incluyendo la documentación de instalación, despliegue y pruebas.
 También se realizaron pequeños ajustes en la interfaz basados en estas pruebas finales.
-
-El \textit{burndown} del Sprint 11 (Figura~\ref{fig:sprint11_burndown}) muestra cómo se planifica un número elevado de incidencias y el progreso real avanza en grandes escalones.
-Esto refleja que muchas tareas correspondían a bloques de testing o redacción que sólo podían cerrarse cuando se completaba el conjunto de cambios asociado.
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.9\textwidth]{img/sprint_11.png}
-  \caption{Gráfico \textit{burndown} del Sprint 11 dedicado a pruebas finales y documentación.}
-  \label{fig:sprint11_burndown}
-\end{figure}
 
 \subsubsection{Sprint 12: Cierre y pulido (6--12 enero 2026)}
 
 En el sprint 12 el foco principal fue el cierre y pulido del proyecto de cara a su versión final. 
-Se abordaron tareas como la creación de los diagramas UML, la limpieza del código añadiendo \textit{docstrings} y eliminando elementos provisionales como los emojis, la redacción completa de los anexos y de la memoria, y la elaboración del manual de usuario por roles con capturas de pantalla.~\cite{GithubTerapitrack}
+Se abordaron tareas como la creación de los diagramas UML, la limpieza del código añadiendo \textit{docstrings} y eliminando elementos provisionales como emojis, la redacción completa de los anexos y de la memoria, y la elaboración del manual de usuario por roles con capturas de pantalla.
 
-Durante el sprint también se revisaron los flujos principales de la aplicación para comprobar que la documentación técnica y de usuario describía fielmente la funcionalidad disponible. 
-El \textit{burndown} del Sprint 12 (Figura~\ref{fig:sprint12_burndown}) muestra cómo la mayor parte de las incidencias planificadas se fueron cerrando en los últimos días, reflejando que muchas de estas tareas correspondían a bloques de documentación y ajustes finales más que a nuevas funcionalidades.
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.9\textwidth]{img/sprint_12.png}
-  \caption{Gráfico \textit{burndown} del Sprint 12 centrado en tareas de cierre y pulido.}
-  \label{fig:sprint12_burndown}
-\end{figure}
+Durante el sprint también se revisaron los flujos principales de la aplicación para comprobar que la documentación técnica y de usuario describía fielmente la funcionalidad disponible.
 
 \subsubsection{Sprint 13: Redacción final (13--27 enero 2026)}
 
 El sprint 13 se concibió como un sprint extendido de dos semanas centrado casi por completo en la redacción de la memoria y los anexos, así como en la preparación del material de apoyo para la defensa del Trabajo Fin de Grado. 
-Durante este periodo se actualizaron las descripciones de los módulos, se pulieron las secciones de viabilidad y se verificó la coherencia entre la documentación y la versión final desplegada de TerapiTrack.~\cite{GithubTerapitrack}
+Durante este periodo se actualizaron las descripciones de los módulos, se pulieron las secciones de viabilidad y se verificó la coherencia entre la documentación y la versión final desplegada de TerapiTrack.
 
-Muchas de estas tareas se registraron en Jira como bloques de documentación y no como incidencias técnicas detalladas, por lo que el \textit{burndown} del Sprint 13 no refleja de forma precisa el esfuerzo diario, sino un cierre concentrado al final del periodo. 
-La actividad real puede apreciarse mejor en el historial de commits de la rama \texttt{Pruebas} del repositorio, donde se concentran las actualizaciones de memoria, anexos y pequeños ajustes de la aplicación realizados durante este sprint.~\cite{GithubTerapitrack}
-
+Muchas de estas tareas se registraron en Jira como bloques de documentación y no como incidencias técnicas detalladas, por lo que los registros de Jira no reflejan de forma precisa el esfuerzo diario, sino un cierre concentrado al final del periodo. 
+La actividad real puede apreciarse mejor en el historial de commits de la rama \texttt{Pruebas} del repositorio, donde se concentran las actualizaciones de memoria, anexos y pequeños ajustes de la aplicación realizados durante este sprint.
 
 \section{Estudio de viabilidad}
 
@@ -227,7 +128,7 @@ Antes de abordar los aspectos economicos y legales, en este apartado se valora s
 La viabilidad económica de TerapiTrack se ha analizado suponiendo que una pequeña empresa de desarrollo recibe el encargo de construir una solución similar a la implementada en este TFG.
 El objetivo sería disponer de una primera versión funcional para un piloto con un número reducido de pacientes, desplegada en la nube y con costes de infraestructura ajustados.
 
-Tomando como referencia la planificación temporal del proyecto y el alcance funcional conseguido, puede estimarse que el desarrollo de esta primera versión requeriría en torno a siete meses de trabajo de un desarrollador junior, con un esfuerzo aproximado de 400 horas efectivas dedicadas específicamente a la construcción de la aplicación.
+Tomando como referencia la planificación temporal del proyecto y el alcance funcional conseguido, puede estimarse que el desarrollo de esta primera versión requeriría en torno a siete meses de trabajo de un desarrollador junior, con un esfuerzo aproximado de 300 horas efectivas dedicadas específicamente a la construcción de la aplicación.
 Esta estimación incluye el análisis de requisitos, el diseño de modelos y controladores, la creación e integración con la base de datos, la implementación de vistas y formularios, la lógica asociada al mando y la configuración de pruebas automatizadas y despliegue.
 
 Para estimar el coste de personal se ha adoptado como referencia el XIX Convenio colectivo estatal de empresas de consultoría, estudios de mercado y de la opinión pública, encuadrando el puesto en el Área funcional 3 (Sistemas y Tecnologías de la Información), Grupo profesional C, nivel 3, correspondiente a personal técnico con poca experiencia profesional en las tareas del grupo.
@@ -237,7 +138,7 @@ Sumando los tipos de cotización empresariales habituales a la Seguridad Social 
 Aplicando este porcentaje al salario bruto anual de 24\,105,37\,€, el coste empresa anual del desarrollador junior se sitúa en torno a 31\,819\,€.
 
 Suponiendo una jornada anual estándar de 1\,750 horas efectivas, el coste empresa horario resultante es de aproximadamente 18,18\,€/h.
-En estas condiciones, las 400 horas de trabajo imputadas al desarrollo específico de TerapiTrack representan un coste de personal de unos 7\,272\,€.
+En estas condiciones, las 300 horas de trabajo imputadas al desarrollo específico de TerapiTrack representan un coste de personal de unos 5\,454\,€.
 
 En cuanto a recursos materiales para el desarrollo, la empresa necesitaría al menos un equipo de trabajo estándar (ordenador portátil o de sobremesa) valorado en torno a 1\,000\,€.
 Suponiendo una amortización de tres años y que el proyecto ocupa aproximadamente medio año de dedicación, el coste imputable de \textit{hardware} sería del orden de 170\,€.
@@ -265,31 +166,31 @@ La tabla~\ref{tab:costes_terapitrack} resume de forma orientativa los principale
 \hline
 Concepto & Coste estimado \\
 \hline
-Coste de personal (400 h a 18,18 €/h) & 7\,272 € \\
+Coste de personal (300 h a 18,18 €/h) & 5\,454 € \\
 Coste imputable de \textit{hardware} de desarrollo & 170 € \\
 Mandos SNES USB para 16 pacientes & 104 € \\
 Dyno Basic de Heroku (3 meses) & 18--20 € \\
 Base de datos Heroku Postgres Mini (3 meses) & 15--18 € \\
 Dominio, copias de seguridad y servicios auxiliares & 100 € \\
 \hline
-Coste total aproximado primera versión & 7\,679--7\,684 € \\
+Coste total aproximado primera versión & 5\,861--5\,866 € \\
 \hline
 \end{tabular}
 \caption{Resumen orientativo de costes de la primera versión de TerapiTrack en un escenario de siete meses de proyecto y piloto con dieciséis pacientes.}
 \label{tab:costes_terapitrack}
 \end{table}
 
-En conjunto, combinando el coste de personal, la amortización de \textit{hardware}, la provisión de mandos para los pacientes y un presupuesto realista de infraestructura en la nube, el coste total de una primera versión desplegable de TerapiTrack se situaría en torno a 7\,680\,€.
+En conjunto, combinando el coste de personal, la amortización de \textit{hardware}, la provisión de mandos para los pacientes y un presupuesto realista de infraestructura en la nube, el coste total de una primera versión desplegable de TerapiTrack se situaría en torno a 5\,860\,€.
 Esta cifra no incluye servicios posteriores de soporte continuado, mantenimiento evolutivo o integración con otros sistemas clínicos, que requerirían un contrato específico adicional.
 
 \subsection{Viabilidad legal}
 
 El desarrollo de TerapiTrack se ha llevado a cabo utilizando de forma casi exclusiva software libre y de código abierto, lo que ha permitido reducir significativamente los costes de licenciamiento y facilita tanto la explotación académica como un eventual despliegue profesional sin restricciones legales importantes.
 
-El \textit{backend} está construido sobre Python y el microframework Flask para la gestión de rutas y controladores, mientras que la persistencia de datos se resuelve con SQLAlchemy sobre SQLite~\cite{SQLAlchemyDocs,FlaskDocs}.
+El \textit{backend} está construido sobre Python y el \textit{microframework} Flask para la gestión de rutas y controladores, mientras que la persistencia de datos se resuelve con SQLAlchemy sobre SQLite~\cite{SQLAlchemyDocs,FlaskDocs}.
 Estas tecnologías fundamentales se distribuyen bajo licencias permisivas de tipo BSD o MIT, que autorizan el uso, modificación y redistribución del software siempre que se mantengan los avisos de derechos de autor y las notas de licencia de los autores originales.
 
-Flask se apoya en varias bibliotecas del ecosistema Pallets Projects que se utilizan de forma indirecta a través del framework.
+Flask se apoya en varias bibliotecas del ecosistema Pallets Projects que se utilizan de forma indirecta a través del \textit{framework}.
 Werkzeug proporciona la infraestructura WSGI de bajo nivel para gestionar peticiones y respuestas HTTP, cookies y depuración.
 Jinja2 actúa como motor de plantillas para la generación de vistas HTML.
 Click gestiona la interfaz de línea de comandos, ItsDangerous se encarga de la firma segura de tokens, y MarkupSafe proporciona funciones de escape para prevenir inyecciones de código~\cite{FlaskDocs,JinjaDocs}.
@@ -348,4 +249,4 @@ Typing-Extensions & 4.12.2 & PSF. Tipos adicionales para Python. \\
 \end{table}
 
 En cuanto a la licencia del propio proyecto, TerapiTrack se distribuye como software de código abierto bajo licencia MIT, una licencia permisiva ampliamente utilizada en el ecosistema de desarrollo web~\cite{tuxcareLicenciasOpenSource}.
-Esta licencia permite el uso, copia, modificación y redistribución del código, tanto en proyectos abiertos como propietarios, siempre que se mantenga el aviso de copyright y la nota de licencia originales. La elección de una licencia permisiva como MIT facilita la reutilización del código en futuros proyectos académicos o clínicos, y es coherente con las licencias de la mayoría de dependencias empleadas (Flask, SQLAlchemy, Bootstrap, etc.)~\cite{GithubTerapitrack,Bootswatch,SQLAlchemyDocs,FlaskDocs}.
+Esta licencia permite el uso, copia, modificación y redistribución del código, tanto en proyectos abiertos como propietarios, siempre que se mantenga el aviso de copyright y la nota de licencia originales. La elección de una licencia permisiva como MIT facilita la reutilización del código en futuros proyectos académicos o clínicos, y es coherente con las licencias de la mayoría de dependencias empleadas (Flask, SQLAlchemy, Bootstrap, etc.)~\cite{Bootswatch,SQLAlchemyDocs,FlaskDocs}.

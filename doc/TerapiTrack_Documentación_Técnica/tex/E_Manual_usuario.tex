@@ -47,59 +47,238 @@ En este entorno de pruebas se proporcionan varias cuentas de ejemplo, entre ella
 
 \subsection*{Acceso al sistema}
 
-\begin{itemize}
-  \item Abra el navegador y acceda a la URL proporcionada (por ejemplo, \texttt{http://localhost:5000} en un entorno local).
-  \item Introduzca su correo electrónico y contraseña en el formulario de inicio de sesión.
-  \item Tras la autenticación, el sistema le dirigirá automáticamente al panel correspondiente a su rol (administrador, profesional o paciente).
-\end{itemize}
+Tras iniciar sesión, el usuario puede acceder a su perfil para revisar sus datos básicos y, en su caso, modificarlos (Figura~\ref{fig:perfil}).
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{img/perfil.png}
+  \caption{Vista de perfil del usuario autenticado con sus datos básicos.}
+  \label{fig:perfil}
+\end{figure}
+
+Desde esta pantalla también es posible cambiar la contraseña (Figura~\ref{fig:cambiar-contraseña}) o iniciar el proceso de recuperación mediante correo electrónico (Figura~\ref{fig:recuperar-contraseña}).
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{img/cambiar_contraseña.png}
+  \caption{Formulario para cambiar la contraseña desde el perfil de usuario.}
+  \label{fig:cambiar-contraseña}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\textwidth]{img/recuperar_contraseña.png}
+  \caption{Pantalla de recuperación de contraseña mediante correo electrónico.}
+  \label{fig:recuperar-contraseña}
+\end{figure}
 
 \subsection*{Uso para administradores}
+El panel de administración permite gestionar usuarios y las vinculaciones paciente–profesional, además de consultar estadísticas básicas del sistema.
 
-Desde el panel de administración el usuario puede:
+La Figura~\ref{fig:admin-usuarios} muestra la pantalla de gestión de usuarios, desde la que el administrador puede buscar y filtrar usuarios por nombre, rol y estado, y acceder a las acciones de ver, editar o desactivar cada cuenta.
 
-\begin{itemize}
-  \item Crear nuevos usuarios indicando nombre, apellidos, correo, contraseña y rol.
-  \item Activar o desactivar cuentas existentes cuando sea necesario.
-  \item Vincular pacientes con profesionales mediante una interfaz de asignación sencilla.
-  \item Configurar parámetros globales del sistema, como la política de retención de vídeos o límites de almacenamiento.
-\end{itemize}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{img/admin_usuarios.png}
+  \caption{Listado de usuarios con filtros y acciones rápidas.}
+  \label{fig:admin-usuarios}
+\end{figure}
 
-El panel muestra además un resumen de estadísticas básicas del sistema, como el número de usuarios registrados o el volumen de sesiones programadas.
+La creación de un nuevo usuario se realiza mediante el formulario de la Figura~\ref{fig:admin-crear-usuario}, donde se introducen los datos personales y se selecciona el rol asignado.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{img/admin_crear_usuario.png}
+  \caption{Formulario para dar de alta un nuevo usuario.}
+  \label{fig:admin-crear-usuario}
+\end{figure}
+
+La vista de detalle de un usuario (Figura~\ref{fig:admin-ver-usuario}) permite consultar su información general, la condición médica en el caso de los pacientes y los profesionales asignados.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{img/admin_ver_usuario.png}
+  \caption{Detalle de un usuario con su información general y específica.}
+  \label{fig:admin-ver-usuario}
+\end{figure}
+
+Cuando es necesario modificar algún dato, el administrador utiliza la pantalla de edición mostrada en la Figura~\ref{fig:admin-editar-usuario}, donde puede actualizar tanto la información básica como la condición médica y las notas del paciente.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{img/admin_editar_usuario.png}
+  \caption{Edición de los datos de un usuario paciente.}
+  \label{fig:admin-editar-usuario}
+\end{figure}
+
+La gestión de las relaciones terapéuticas se realiza desde la lista de vinculaciones paciente-profesional (Figura~\ref{fig:admin-vinculaciones}), que permite filtrar por paciente, profesional y rango de fechas.
+Tambien se pueden desvincular relaciones.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{img/admin_vinculaciones.png}
+  \caption{Listado de vinculaciones paciente-profesional con filtros y acciones.}
+  \label{fig:admin-vinculaciones}
+\end{figure}
+
+Para crear una nueva vinculación se utiliza el formulario de la Figura~\ref{fig:admin-vincular}, donde se seleccionan el paciente y el profesional correspondientes.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{img/admin_vincular.png}
+  \caption{Formulario para vincular un paciente con un profesional.}
+  \label{fig:admin-vincular}
+\end{figure}
+
+Por último, el administrador dispone de un panel de estadísticas (Figura~\ref{fig:admin-estadisticas}) que resume la distribución de roles y la evolución de registros por mes.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{img/admin_estadisticas.png}
+  \caption{Panel de estadísticas del sistema con distribución de roles y registros por mes.}
+  \label{fig:admin-estadisticas}
+\end{figure}
 
 \subsection*{Uso para profesionales sanitarios}
 
-En el área de profesional, el flujo típico de trabajo es el siguiente:
+El panel del profesional reúne las herramientas necesarias para gestionar pacientes, ejercicios y sesiones terapéuticas.
 
-\begin{itemize}
-  \item Consultar la lista de pacientes asignados y sus sesiones pendientes o completadas.
-  \item Crear nuevos ejercicios terapéuticos subiendo un vídeo demostrativo y rellenando los datos básicos (nombre, descripción, tipo, duración).
-  \item Definir sesiones terapéuticas combinando varios ejercicios y asignarlas a pacientes concretos, indicando fecha y hora programadas.
-  \item Revisar las sesiones completadas, reproducir los vídeos grabados por el paciente y registrar evaluaciones con una puntuación numérica y comentarios.
-  \item Visualizar gráficos de evolución temporal para analizar el progreso de cada paciente a lo largo de varias sesiones.
-\end{itemize}
+La Figura~\ref{fig:prof-dashboard} muestra el panel inicial del profesional, donde se resumen las sesiones pendientes y se ofrecen accesos rápidos a pacientes, ejercicios y evaluaciones.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{img/profesional_dashboard.png}
+  \caption{Panel inicial del profesional con accesos rápidos a las principales secciones.}
+  \label{fig:prof-dashboard}
+\end{figure}
+
+En la lista de pacientes (Figura~\ref{fig:prof-pacientes}) el profesional puede ver únicamente los pacientes que tiene asignados y acceder al detalle de sus sesiones y evaluaciones.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{img/profesional_pacientes.png}
+  \caption{Listado de pacientes asignados al profesional.}
+  \label{fig:prof-pacientes}
+\end{figure}
+
+La biblioteca de ejercicios (Figura~\ref{fig:prof-ejercicios}) permite buscar y filtrar ejercicios existentes por tipo, duración o condición médica, y reproducir el vídeo demostrativo asociado.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{img/profesional_ejercicios.png}
+  \caption{Biblioteca de ejercicios terapéuticos con filtros y buscador.}
+  \label{fig:prof-ejercicios}
+\end{figure}
+
+Para crear un nuevo ejercicio se utiliza el formulario de la Figura~\ref{fig:prof-crear-ejercicio}, donde el profesional sube el vídeo demostrativo e introduce el nombre, la descripción y el tipo.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{img/profesional_crear_new_ejercicio.png}
+  \caption{Creación de un nuevo ejercicio con su vídeo demostrativo.}
+  \label{fig:prof-crear-ejercicio}
+\end{figure}
+
+La planificación de sesiones comienza en el formulario de creación de sesión (Figura~\ref{fig:prof-crear-sesion}), en el que se seleccionan los ejercicios que la componen, el paciente y la fecha.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{img/profesional_crear_new_sesion.png}
+  \caption{Definición de una sesión terapéutica combinando varios ejercicios.}
+  \label{fig:prof-crear-sesion}
+\end{figure}
+
+Una vez creada, la vista de sesión (Figura~\ref{fig:prof-ver-sesion}) permite revisar los ejercicios incluidos y más informacion de la sesión.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{img/profesional_ver_sesion.png}
+  \caption{Detalle de una sesión con los ejercicios que la componen.}
+  \label{fig:prof-ver-sesion}
+\end{figure}
+
+Durante la terapia guiada en directo, la pantalla de ejecución de sesión (Figura~\ref{fig:prof-ejecutar-sesion}) muestra una simulación de grabación de la camara del dispositivo, junto al listado de ejercicios pendientes, permitiendo al profesional avanzar de un ejercicio a otro.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{img/profesional_ejecutar_sesion.png}
+  \caption{Ejecución de una sesión con el vídeo en directo del paciente y los ejercicios pendientes.}
+  \label{fig:prof-ejecutar-sesion}
+\end{figure}
+
+Tras la sesión, la pantalla de evaluación de sesión (Figura~\ref{fig:prof-evaluar-sesion}) recoge los vídeos de respuesta de cada ejercicio, desde los que se accede a la evaluación individual de cada uno.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{img/profesional_evaluar_sesion.png}
+  \caption{Vista de evaluación de una sesión completada, con acceso a los vídeos de cada ejercicio.}
+  \label{fig:prof-evaluar-sesion}
+\end{figure}
+
+Por último, la Figura~\ref{fig:prof-ver-evaluacion} muestra el detalle de una evaluación ya registrada, donde se consultan la puntuación final y los comentarios del profesional.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{img/profesional_ver_evaluacion.png}
+  \caption{Detalle de una evaluación registrada para un ejercicio de la sesión.}
+  \label{fig:prof-ver-evaluacion}
+\end{figure}
 
 \subsection*{Uso para pacientes}
 
-El área de paciente está simplificada y adaptada para facilitar su manejo:
+El área de paciente está simplificada y adaptada para facilitar su manejo durante la rehabilitación en casa.
 
-\begin{itemize}
-  \item En el \textbf{dashboard} inicial se muestran las sesiones pendientes en un calendario de varias semanas, junto con un acceso rápido a las evaluaciones recientes y a los gráficos de evolución.
-  \item Al seleccionar una sesión pendiente, la aplicación muestra una pantalla dividida en dos partes: el vídeo demostrativo del ejercicio y la imagen de la cámara del paciente.
-  Durante la sesión, el sistema graba automáticamente la ejecución de cada ejercicio.
-  \item Una vez completada la sesión, el paciente puede consultar las evaluaciones que el profesional haya registrado, incluyendo puntuaciones y comentarios, y revisar gráficos que resumen su progresión en el tiempo.
-\end{itemize}
+Desde la pantalla \emph{Mis sesiones} (Figura~\ref{fig:paciente-mis-sesiones}) el paciente visualiza en un calendario las sesiones programadas para las próximas semanas y puede seleccionar una de ellas para iniciarla.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{img/paciente_mis_sesiones.png}
+  \caption{Pantalla \emph{Mis sesiones} con calendario y detalle de la sesión seleccionada.}
+  \label{fig:paciente-mis-sesiones}
+\end{figure}
+
+La vista \emph{Mis ejercicios} (Figura~\ref{fig:paciente-ejercicios}) presenta los ejercicios disponibles en forma de tarjetas con imagen y título, permitiendo al paciente repasarlos y reproducir el vídeo demostrativo asociado.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{img/paciente_ejercicios.png}
+  \caption{Listado \emph{Mis ejercicios} con tarjetas de ejercicios.}
+  \label{fig:paciente-ejercicios}
+\end{figure}
+
+Durante la realización de una sesión guiada, la pantalla de ejecución (Figura~\ref{fig:paciente-ejecutar-sesion}) divide la interfaz en dos partes: a la izquierda se muestra el vídeo demostrativo del ejercicio y a la derecha la imagen captada por la cámara del paciente, que se graba automáticamente mientras dura cada ejercicio.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{img/paciente_ejecutar_sesion.png}
+  \caption{Ejecución de una sesión desde el punto de vista del paciente, con su vídeo en directo.}
+  \label{fig:paciente-ejecutar-sesion}
+\end{figure}
+
+Tras completar varias sesiones, la pantalla \emph{Mi progreso} (Figura~\ref{fig:paciente-progreso}) permite consultar las evaluaciones registradas por el profesional y visualizar la evolución mediante indicadores numéricos y un gráfico de tendencia.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{img/paciente_progreso.png}
+  \caption{Vista \emph{Mi progreso} con indicadores y gráfica de evolución.}
+  \label{fig:paciente-progreso}
+\end{figure}
+
+Por último, la sección de ayuda sobre el mando SNES (Figura~\ref{fig:paciente-ayuda}) explica qué acción realiza cada botón dentro de la aplicación, de modo que el paciente pueda navegar sin necesidad de utilizar el ratón.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{img/paciente_ayuda.png}
+  \caption{Guía de uso del mando SNES con la función de cada botón.}
+  \label{fig:paciente-ayuda}
+\end{figure}
+
 
 \subsection*{Uso del mando SNES}
 
-Para los pacientes que utilizan un mando tipo SNES, la interfaz permite navegar sin necesidad de ratón:
+Para los pacientes que utilizan un mando tipo SNES, la interfaz permite navegar sin necesidad de ratón.
+La cruceta se emplea para moverse entre los distintos elementos de la pantalla (botones, enlaces, tarjetas de sesión), el botón \textbf{A} se utiliza para seleccionar y confirmar acciones, el botón \textbf{B} se reserva para acciones secundarias y el botón \textbf{Y} permite retroceder o cancelar en determinadas pantallas.
 
-\begin{itemize}
-  \item La cruceta se emplea para moverse entre los distintos elementos de la pantalla (botones, enlaces, tarjetas de sesión).
-  \item El botón \textbf{A} se utiliza para seleccionar y confirmar acciones.
-  \item El botón \textbf{B} se reserva para acciones secundarias cuando están disponibles.
-  \item El botón \textbf{Y} permite retroceder o cancelar en determinadas pantallas.
-\end{itemize}
-
-El mando está activo en las principales pantallas del área de paciente (inicio, listado de sesiones, ejecución de ejercicios y vista de progreso), de modo que el usuario pueda completar una sesión completa sin necesidad de utilizar el teclado o el ratón.
-Este esquema de control busca reducir al mínimo el número de movimientos finos necesarios y mantener siempre visibles las opciones disponibles en pantalla.
+El mando está activo en todas las pantallas del área de paciente, de modo que el usuario pueda completar una sesión completa sin necesidad de utilizar el teclado o el ratón.
+Este esquema de control busca reducir al mínimo el número de movimientos necesarios y mantener siempre visibles las opciones disponibles en pantalla.
 

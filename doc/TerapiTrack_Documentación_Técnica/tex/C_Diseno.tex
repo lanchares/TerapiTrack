@@ -310,47 +310,58 @@ En esta sección se describen los principales flujos y procedimientos implementa
 \end{itemize}
 
 Los diagramas de actividad que se muestran a continuación detallan los principales flujos procedimentales del sistema.
-En primer lugar se representan la creación de usuarios por parte del administrador, la creación de ejercicios, la vinculación de pacientes y profesionales y la asignación de sesiones terapéuticas por parte de los profesionales (Figuras~\ref{fig:actividad-crear-usuario}, \ref{fig:actividad-crear-ejercicio}, \ref{fig:actividad-vincular} y \ref{fig:actividad-crear-sesion}).
-A continuación se describen la realización en directo de una sesión por parte del paciente, guiado por el profesional, y la evaluación posterior de los vídeos grabados (Figuras~\ref{fig:actividad-realizar-sesion} y \ref{fig:actividad-evaluar-sesion}).
+En primer lugar se representan la creación de usuarios por parte del administrador, la creación de ejercicios, la vinculación de pacientes y profesionales y la asignación de sesiones terapéuticas por parte de los profesionales (Figuras~\ref{fig:act-crea-usuario-ejercicio} y \ref{fig:act-vincular-sesion}).
+A continuación se describen la realización en directo de una sesión por parte del paciente, guiado por el profesional, y la evaluación posterior de los vídeos grabados (Figuras~\ref{fig:act-realizar} y \ref{fig:act-evaluar}).
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.9\textwidth]{img/actividad_crear_usuario.png}
-  \caption{Diagrama de actividad de creación de usuario por parte del administrador.}
-  \label{fig:actividad-crear-usuario}
+  \subfloat[\label{fig:actividad-crear-usuario}]{
+    \includegraphics[width=0.42\textwidth]{img/actividad_crear_usuario.png}
+  }\hfill
+  \subfloat[\label{fig:actividad-crear-ejercicio}]{
+    \includegraphics[width=0.42\textwidth]{img/actividad_crear_ejercicio.png}
+  }
+  \caption{Diagramas de actividad de creación de usuario y de ejercicio.}
+  \label{fig:act-crea-usuario-ejercicio}
 \end{figure}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[height=0.9\textheight]{img/actividad_crear_ejercicio.png}
-  \caption{Diagrama de actividad de creación de ejercicio por parte del profesional.}
-  \label{fig:actividad-crear-ejercicio}
+  \subfloat[\label{fig:actividad-vincular}]{
+    \includegraphics[width=0.42\textwidth]{img/actividad_vincular.png}
+  }\hfill
+  \subfloat[\label{fig:actividad-crear-sesion}]{
+    \includegraphics[width=0.42\textwidth]{img/actividad_crear_asignar_sesion.png}
+  }
+  \caption{Diagramas de actividad de vinculación y creación de sesión.}
+  \label{fig:act-vincular-sesion}
 \end{figure}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[height=0.9\textheight]{img/actividad_vincular.png}
-  \caption{Diagrama de actividad de vinculación de pacientes/profesionales.}
-  \label{fig:actividad-vincular}
+  \subfloat[\label{fig:actividad-realizar-sesion}]{
+    \includegraphics[width=\textwidth]{img/actividad_realizar_sesion.png}
+  }
+  \caption{Diagrama de actividad de realización de una sesión.}
+  \label{fig:act-realizar}
 \end{figure}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[height=0.9\textheight]{img/actividad_crear_asignar_sesion.png}
-  \caption{Diagrama de actividad de creación y asignación de sesión terapéutica.}
-  \label{fig:actividad-crear-sesion}
+  \subfloat[\label{fig:actividad-evaluar-sesion}]{
+    \includegraphics[width=0.6\textwidth]{img/actividad_evaluar_sesion.png}
+  }
+  \caption{Diagrama de actividad de evaluación de una sesión.}
+  \label{fig:act-evaluar}
 \end{figure}
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\textwidth]{img/actividad_realizar_sesion.png}
-  \caption{Diagrama de actividad de realización de una sesión terapéutica en TerapiTrack.}
-  \label{fig:actividad-realizar-sesion}
-\end{figure}
+\subsection{Diagrama de secuencia de una terapia guiada}
 
+En la Figura~\ref{fig:seq-terapia-guiada} se representa, mediante un diagrama de secuencia UML, la interacción típica entre el profesional, el paciente y TerapiTrack durante una sesión de terapia guiada en directo. El diagrama recoge desde la programación y aceptación de la sesión hasta la ejecución de los ejercicios y el registro de los vídeos y resultados en el sistema, mostrando los mensajes clave intercambiados entre los actores y los componentes principales de la aplicación.
+ 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.9\textwidth]{img/actividad_evaluar_sesion.png}
-  \caption{Diagrama de actividad de evaluación de una sesión terapéutica por parte del profesional.}
-  \label{fig:actividad-evaluar-sesion}
+  \includegraphics[width=\textwidth]{img/secuencia_sesion_guiada.png}
+  \caption{Diagrama de secuencia de una sesión de terapia guiada entre profesional y paciente en TerapiTrack.}
+  \label{fig:seq-terapia-guiada}
 \end{figure}
