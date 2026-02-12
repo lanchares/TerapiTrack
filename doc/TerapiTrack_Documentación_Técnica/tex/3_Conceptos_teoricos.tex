@@ -1,7 +1,7 @@
 \capitulo{3}{Conceptos teóricos}
 
 Este capítulo revisa los conceptos teóricos básicos que sirven de soporte a TerapiTrack, tanto en su diseño como en su implementación.
-Primero se abordan nociones relacionadas con la enfermedad de Parkinson y la rehabilitación y, a continuación, se describen los principios de accesibilidad, los patrones de diseño y los modelos de datos que se han tenido en cuenta durante el desarrollo.
+Primero se abordan nociones relacionadas con la enfermedad de Parkinson y la rehabilitación y, a continuación, se tratan aspectos de accesibilidad en aplicaciones sanitarias, los patrones de diseño, los modelos de datos y los fundamentos de validación y pruebas de software que se han tenido en cuenta durante el desarrollo.
 
 \section{Enfermedades degenerativas y enfermedad de Parkinson}
 
@@ -39,7 +39,7 @@ Si los menús son complejos, los textos difíciles de leer o se requieren demasi
 Por ello, este tipo de aplicaciones se diseña pensando especialmente en usuarios con posibles limitaciones motoras y menor experiencia con dispositivos digitales, como ocurre con muchos pacientes de Parkinson.
 En TerapiTrack las decisiones de accesibilidad se han centrado principalmente en la interfaz dirigida al paciente, mientras que las vistas destinadas al profesional sanitario mantienen una estructura más cercana a la de una aplicación web convencional, asumiendo un mayor grado de familiaridad con estas herramientas.
 
-Las pautas Web Content Accessibility Guidelines (WCAG) ofrecen recomendaciones sobre contraste, tipografía, estructura y compatibilidad con tecnologías de apoyo que sirven como referencia para adaptar la interfaz a personas mayores o con dificultades motoras~\cite{wcag22}.
+Las pautas Web Content Accessibility Guidelines (WCAG) ofrecen recomendaciones sobre contraste, tipografía, estructura y compatibilidad con tecnologías de apoyo, que sirven como referencia para adaptar la interfaz a personas mayores o con dificultades motoras~\cite{wcag22}.
 En la parte de paciente de TerapiTrack estas ideas se han traducido en un menú sencillo, textos breves y claros, pocos elementos interactivos por pantalla y compatibilidad con dispositivos alternativos, como el mando SNES integrado únicamente en las vistas de paciente.
 
 \section{Patrones de diseño y arquitectura Modelo-Vista-Controlador}
@@ -53,7 +53,7 @@ Este patrón organiza la aplicación en tres componentes principales:
     \item \textbf{Controlador}: actúa como intermediario entre el modelo y la vista, recibiendo las peticiones del usuario, invocando la lógica necesaria y seleccionando la respuesta adecuada.
 \end{itemize}
 
-Este tipo de arquitectura favorece que el código relacionado con la persistencia de datos, la lógica de aplicación y la interfaz de usuario pueda evolucionar de manera relativamente independiente, algo especialmente útil en proyectos que pueden ampliarse en el futuro~\cite{gamma_design_patterns}.
+Este tipo de arquitectura favorece que el código relacionado con la persistencia de datos, la lógica de aplicación y la interfaz de usuario puedan evolucionar de manera relativamente independiente, algo especialmente útil en proyectos que pueden ampliarse en el futuro~\cite{gamma_design_patterns}.
 
 \section{Bases de datos relacionales}
 
@@ -62,7 +62,7 @@ Este modelo es el que se ha aplicado en TerapiTrack para organizar usuarios, pac
 
 En este contexto aparecen relaciones de distinto tipo: \textbf{uno a muchos}, como la que se da entre un paciente y las sesiones que tiene programadas, o entre un profesional sanitario y las sesiones que coordina;
 \textbf{uno a uno}, como la que existe entre la tabla de usuarios y las tablas de paciente o profesional, donde cada registro de usuario se especializa en un único tipo de perfil;
-y \textbf{muchos a muchos}, como ocurre al vincular pacientes con varios profesionales sanitarios o al asociar ejercicios concretos a distintas sesiones, que se representan mediante tablas intermedias específicas~\cite{date_db}.
+y \textbf{muchos a muchos}, como ocurre al vincular profesionales sanitarios con varios pacientes o al asociar ejercicios concretos a distintas sesiones, que se representan mediante tablas intermedias específicas~\cite{date_db}.
 
 La \textbf{normalización} es el proceso mediante el cual se descompone la información en tablas más pequeñas para reducir la redundancia y evitar anomalías en las operaciones de inserción, actualización y borrado.
 En términos prácticos, suele implicar diseñar el esquema de forma que cumpla las principales formas normales: primera forma normal (1FN), que exige atributos con valores atómicos;
@@ -78,5 +78,6 @@ Para ello se utilizan diferentes tipos de pruebas, que pueden combinarse según 
 
 Entre las más habituales se encuentran las \textbf{pruebas unitarias}, centradas en módulos o funciones concretas; las \textbf{pruebas de integración}, que comprueban el funcionamiento conjunto de varios componentes; y las \textbf{pruebas funcionales} o de sistema, orientadas a verificar flujos de usuario o casos de uso completos.
 Automatizar parte de estas pruebas permite detectar errores de diseño o programación de manera temprana y reduce el riesgo de fallos en fases avanzadas del desarrollo~\cite{pressman_ingenieria_sw}.
+
 
 Este conjunto de conceptos proporciona el contexto teórico y tecnológico que sustenta la memoria y ayuda a entender las decisiones que se detallan en los capítulos posteriores.

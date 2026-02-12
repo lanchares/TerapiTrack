@@ -17,7 +17,7 @@ Git y GitHub se han utilizado de forma continuada para gestionar el código fuen
 El repositorio remoto de GitHub ha servido como copia de seguridad y como registro de la evolución del proyecto, pero en lugar de trabajar sobre la rama \texttt{main} y crear ramas auxiliares para funcionalidades concretas, casi todo el desarrollo real se ha llevado a cabo en una rama llamada \texttt{Pruebas}.
 La idea inicial era experimentar con cambios y funcionalidades en esta rama auxiliar antes de integrarlos en \texttt{main}, manteniendo la rama principal estable y con un historial limpio.
 
-Durante un periodo de varios meses en verano se trabajó de forma intensiva en local sin realizar \textit{commits} ni subir el código a GitHub, lo que hizo que después se tuvieran que subir bloques grandes de cambios de una sola vez y que algunas tareas marcadas como completadas en Jira no tengan asociado un \textit{commit} concreto~\cite{JiraTerapitrack}.
+Durante un periodo de varios meses en verano se trabajó de forma intensiva en local, sin realizar \textit{commits} ni subir el código a GitHub, lo que hizo que después se tuvieran que subir bloques grandes de cambios de una sola vez y que algunas tareas marcadas como completadas en Jira no tengan asociado un \textit{commit} concreto~\cite{JiraTerapitrack}.
 Una vez que se retomó la rutina de \textit{commits} más frecuentes, toda esa actividad quedó registrada en la rama \texttt{Pruebas}, desde la que se ha desarrollado la mayor parte de las funcionalidades (gestión de ejercicios, sesiones, vídeos, evaluaciones, tests unitarios con alta cobertura de código (en torno al 99\%), integración de Cloudinary, mejoras de documentación en el código, etc.).
 
 Aunque no siempre se ha logrado, en la última fase se intentó corregir esta situación manteniendo una rutina más disciplinada: cuando se completaba una tarea se procuraba hacer un \textit{commit} con un mensaje descriptivo y, en la medida de lo posible, realizar el \textit{push} y la actualización del estado de la tarea en Jira de forma casi simultánea.
@@ -34,10 +34,10 @@ Esta separación facilita localizar rápidamente dónde está definida cada part
 El código fuente de TerapiTrack se organiza en torno a la carpeta \texttt{src}, que contiene los elementos principales de la aplicación:
 
 \begin{itemize}
-  \item \texttt{controladores}: Agrupa las rutas y la lógica de negocio por rol (autenticación, administración, profesional y paciente), e incluye las funciones de vista y los decoradores que verifican el rol del usuario antes de permitir el acceso.
-  \item \texttt{modelos}: Define las entidades del dominio (usuarios, pacientes, profesionales, ejercicios, sesiones, evaluaciones y vídeos de respuesta) y las tablas de asociación para las relaciones de muchos a muchos.
-  \item \texttt{vistas}: Contiene las plantillas Jinja organizadas en subcarpetas por rol (administrador, profesional, paciente), todas ellas heredando de una plantilla base común para mantener una estructura y un estilo coherentes.
-  \item \texttt{static}: Almacena los recursos estáticos de la interfaz web (hojas de estilo, imágenes y vídeos de ejemplo).
+  \item \texttt{controladores}: agrupa las rutas y la lógica de negocio por rol (autenticación, administración, profesional y paciente), e incluye las funciones de vista y los decoradores que verifican el rol del usuario antes de permitir el acceso.
+  \item \texttt{modelos}: define las entidades del dominio (usuarios, pacientes, profesionales, ejercicios, sesiones, evaluaciones y vídeos de respuesta) y las tablas de asociación para las relaciones de muchos a muchos.
+  \item \texttt{vistas}: contiene las plantillas Jinja organizadas en subcarpetas por rol (administrador, profesional, paciente), todas ellas heredando de una plantilla base común para mantener una estructura y un estilo coherentes.
+  \item \texttt{static}: almacena los recursos estáticos de la interfaz web (hojas de estilo, imágenes y vídeos de ejemplo).
   \item Otros módulos de soporte, dedicados a la configuración de la aplicación, la inicialización de extensiones como SQLAlchemy o Flask-Login y la definición de formularios web.
 \end{itemize}
 
@@ -47,7 +47,7 @@ Esta organización ha resultado clave para mantener el proyecto manejable a medi
 
 \subsection{Uso de \textit{blueprints}}
 
-Flask permite organizar las rutas en \textit{blueprints}, módulos independientes que después se registran en la aplicación principal.
+Flask permite organizar las rutas en \textit{blueprints}, que son módulos independientes que después se registran en la aplicación principal.
 En TerapiTrack se ha seguido este patrón para separar la lógica según el rol del usuario (administrador, profesional y paciente), agrupando en cada \textit{blueprint} las vistas y flujos de trabajo correspondientes a ese rol~\cite{FlaskBlueprintsDocs,RealPythonBlueprints}.
 
 De esta forma, cada conjunto de rutas puede evolucionar de manera relativamente independiente sin mezclar código de distintos roles en un mismo módulo.
@@ -73,13 +73,13 @@ Las entidades principales y sus relaciones se describen a continuación.
 \subsection{Entidades principales}
 
 \begin{itemize}
-  \item \textbf{Usuario}: Representa a cualquier persona que accede al sistema, con campos básicos (nombre, correo, contraseña cifrada) y un campo de rol que indica si es administrador, profesional o paciente.
-  \item \textbf{Paciente}: Extiende la información de un usuario de tipo paciente, incluyendo datos clínicos y de contacto.
-  \item \textbf{Profesional}: Extiende la información de un usuario de tipo profesional, con datos de especialidad y contacto.
-  \item \textbf{Ejercicio}: Define un ejercicio de rehabilitación, con su nombre, descripción, duración estimada y la ruta al vídeo de ejemplo.
-  \item \textbf{Sesion}: Representa una sesión terapéutica asignada a un paciente en una fecha concreta, con un estado que indica si está pendiente, en curso o completada.
-  \item \textbf{VideoRespuesta}: Almacena la grabación del paciente al realizar un ejercicio dentro de una sesión, junto con la fecha de grabación y la URL del vídeo.
-  \item \textbf{Evaluacion}: Contiene la calificación y los comentarios del profesional sobre el desempeño del paciente en un ejercicio concreto de una sesión.
+  \item \textbf{Usuario}: representa a cualquier persona que accede al sistema, con campos básicos (nombre, correo, contraseña cifrada) y un campo de rol que indica si es administrador, profesional o paciente.
+  \item \textbf{Paciente}: extiende la información de un usuario de tipo paciente, incluyendo datos clínicos y de contacto.
+  \item \textbf{Profesional}: extiende la información de un usuario de tipo profesional, con datos de especialidad y contacto.
+  \item \textbf{Ejercicio}: define un ejercicio de rehabilitación, con su nombre, descripción, duración estimada y la ruta al vídeo de ejemplo.
+  \item \textbf{Sesion}: representa una sesión terapéutica asignada a un paciente en una fecha concreta, con un estado que indica si está pendiente, en curso o completada.
+  \item \textbf{VideoRespuesta}: almacena la grabación del paciente al realizar un ejercicio dentro de una sesión, junto con la fecha de grabación y la URL del vídeo.
+  \item \textbf{Evaluacion}: contiene la calificación y los comentarios del profesional sobre el desempeño del paciente en un ejercicio concreto de una sesión.
 \end{itemize}
 
 \subsection{Relaciones de muchos a muchos}
@@ -87,8 +87,8 @@ Las entidades principales y sus relaciones se describen a continuación.
 Algunas relaciones del sistema requieren tablas intermedias para conectar entidades de forma flexible:
 
 \begin{itemize}
-  \item \textbf{Paciente-Profesional}: Un paciente puede estar atendido por varios profesionales y un profesional puede llevar el seguimiento de varios pacientes. Esta relación se modela mediante una tabla de asociación específica, que permite modificar las vinculaciones sin duplicar información ni alterar los datos básicos de pacientes y profesionales.
-  \item \textbf{Ejercicio-Sesión}: Una sesión puede incluir varios ejercicios y un mismo ejercicio puede aparecer en distintas sesiones. Para representar esta relación se utiliza la tabla intermedia \texttt{Ejercicio\_Sesion}, que enlaza cada sesión con los ejercicios que la componen y sirve de punto de unión con las entidades \texttt{VideoRespuesta} y \texttt{Evaluacion}, de modo que cada combinación de sesión y ejercicio pueda tener su propia grabación y su propia evaluación.
+  \item \textbf{Paciente-Profesional}: un paciente puede estar atendido por varios profesionales y un profesional puede llevar el seguimiento de varios pacientes. Esta relación se modela mediante una tabla de asociación específica, que permite modificar las vinculaciones sin duplicar información ni alterar los datos básicos de pacientes y profesionales.
+  \item \textbf{Ejercicio-Sesión}: una sesión puede incluir varios ejercicios y un mismo ejercicio puede aparecer en distintas sesiones. Para representar esta relación se utiliza la tabla intermedia \texttt{Ejercicio\_Sesion}, que enlaza cada sesión con los ejercicios que la componen y sirve de punto de unión con las entidades \texttt{VideoRespuesta} y \texttt{Evaluacion}, de modo que cada combinación de sesión y ejercicio pueda tener su propia grabación y su propia evaluación.
 \end{itemize}
 
 La decisión de normalizar estas relaciones evita duplicar información y facilita modificar las asignaciones sin afectar a los datos de base de las entidades.
@@ -107,11 +107,12 @@ A partir de esta experiencia se decidió separar la entidad genérica \texttt{Us
 Esta decisión simplificó la lógica de la aplicación y permitió mantener el modelo preparado para añadir nuevos roles en el futuro sin romper la estructura existente.
 
 También fue necesario reflexionar sobre cómo modelar las relaciones entre profesionales y pacientes, y entre ejercicios y sesiones. Inicialmente se barajó la posibilidad de restringir a un único profesional por paciente o de asociar los ejercicios directamente a las sesiones, pero pronto se vio que esto no se ajustaba a la realidad clínica ni a los requisitos de flexibilidad del sistema.
-Finalmente se optó por modelar ambas relaciones como muchos a muchos mediante tablas de asociación: una para vincular pacientes y profesionales, y otra (\texttt{Ejercicio\_Sesion}) para enlazar ejercicios y sesiones.
+Finalmente se optó por modelar ambas relaciones como muchos a muchos mediante tablas de asociación: una para vincular pacientes y profesionales, y otra para enlazar ejercicios y sesiones.
 Esta última tabla actúa como punto de unión entre el plan terapéutico (la sesión) y el contenido concreto (los ejercicios), y permitió reutilizar un mismo ejercicio en varias sesiones distintas sin duplicar información.
 
 La parte más delicada llegó al integrar en el modelo la información del desempeño del paciente a lo largo del tiempo.
 En los primeros bocetos solo existía una entidad de \texttt{Progreso}, que concentraba tanto la referencia al ejercicio y al paciente como la puntuación, los comentarios del profesional y la ruta del vídeo de respuesta, lo que dificultaba separar el hecho de haber realizado un ejercicio de la valoración que se hacía sobre él.
+
 Tras varias pruebas se reorganizó esta parte introduciendo las entidades \texttt{VideoRespuesta} y \texttt{Evaluacion}, ambas asociadas a la tabla intermedia \texttt{Ejercicio\_Sesion}.
 De este modo, cada ejercicio de cada sesión puede tener su propia grabación y, opcionalmente, una evaluación asociada, lo que refleja mejor el flujo real del tratamiento y evita inconsistencias cuando se añaden, modifican o repiten sesiones.
 
@@ -144,15 +145,15 @@ La introducción de decoradores centralizó esta lógica y simplificó el manten
 Un profesional puede crear una sesión para un paciente seleccionando los ejercicios que debe realizar y la fecha en que debe completarla.
 Este proceso se implementa mediante un formulario en el que se elige al paciente, se añaden ejercicios desde una lista disponible y se establece la fecha y hora en que debe ejecutarse.
 
-Al guardar la sesión, el sistema crea un registro en la tabla \texttt{Sesion} y registros asociados en la tabla intermedia \texttt{Ejercicio\_Sesion} para cada ejercicio incluido, almacenando también su posición dentro de la secuencia.
+Al guardar la sesión, el sistema crea un registro en la tabla \texttt{Sesion} y registros asociados en la tabla intermedia \texttt{Ejercicio\_Sesion} para cada ejercicio incluido.
 
 Uno de los problemas que surgió al implementar este flujo fue evitar que se pudieran añadir ejercicios duplicados a la misma sesión.
 La solución consistió en incluir una restricción de unicidad sobre la pareja (sesión, ejercicio) en la tabla intermedia y validar en el controlador que no se intente insertar el mismo ejercicio dos veces.
 
 \subsection{Ejecución de sesiones por parte del paciente}
 
-Cuando un paciente accede a su panel, puede ver las sesiones que tiene asignadas para el día actual.
-Al seleccionar una sesión, se muestra una página en la que el paciente sigue en todo momento las indicaciones del profesional: es este quien controla qué ejercicio se realiza en cada momento y cuándo se pasa al siguiente, mientras que en la pantalla del paciente solo se muestra el vídeo de ejemplo del ejercicio activo y se registra la grabación de su movimiento.
+Cuando un paciente accede a su panel, puede ver las sesiones que tiene asignadas en las proximas tres semanas.
+Al seleccionar una sesión, se muestra una página en la que el paciente sigue en todo momento las indicaciones del profesional: es este quien controla qué ejercicio se realiza en cada momento y cuándo se pasa al siguiente, mientras que en la pantalla del paciente solo se muestra el vídeo de ejemplo del ejercicio activo y se registra la grabación del ejercicio.
 
 Este flujo ha sido uno de los más complejos de implementar, porque requiere coordinar la reproducción de vídeos, la captura desde la cámara del navegador y el almacenamiento de las grabaciones.
 Inicialmente se almacenaban los vídeos en una carpeta local del servidor (\texttt{uploads}), pero esto resultaba poco escalable y complicaba el despliegue en Heroku.
@@ -205,16 +206,16 @@ La tabla \ref{tab:flujos_uso} resume los flujos de uso más relevantes de Terapi
 \subsection{Visualización del progreso del paciente}
 
 Además de almacenar las evaluaciones individuales de cada ejercicio, TerapiTrack genera gráficos de evolución temporal que muestran de forma agregada las puntuaciones obtenidas por el paciente en sus sesiones.
-Estos gráficos, implementados con Chart.js en las vistas de profesional y paciente, permiten identificar tendencias de mejora o empeoramiento y facilitan que ambos comprendan de un vistazo cómo ha evolucionado el tratamiento a lo largo del tiempo~\cite{parkinson_telerehab_review}.
+Estas visualizaciones permiten identificar tendencias de mejora o empeoramiento y facilitan que paciente y profesional comprendan de un vistazo cómo ha evolucionado el tratamiento a lo largo del tiempo.
 
 \section{Interfaz de usuario}
 
-Antes de implementar las plantillas HTML, se realizaron bocetos en papel de las principales pantallas (paneles, listados y formularios), que sirvieron como guía inicial aunque varias vistas se ampliaron o remodelaron durante el desarrollo, dando lugar a la interfaz web actual de TerapiTrack para cada rol del sistema.
+Antes de implementar las plantillas HTML se realizaron bocetos en papel de las principales pantallas (paneles, listados y formularios), que sirvieron como guía inicial, aunque varias vistas se ampliaron o remodelaron durante el desarrollo, dando lugar a la interfaz web actual de TerapiTrack para cada rol del sistema.
 
 \subsection{Interfaz del administrador}
 
 El administrador dispone de un panel de control que le permite consultar de un vistazo el estado global del sistema y acceder rápidamente a las principales acciones de gestión (usuarios, vinculaciones y parámetros generales).
-En la Figura~\ref{fig:admin-dashboard} se muestran los indicadores básicos y los accesos directos más relevantes, mientras que desde la pantalla de configuración (Figura~\ref{fig:admin-configuracion}) puede ajustar aspectos como la política de retención de vídeos o el límite de almacenamiento.
+En la Figura~\ref{fig:admin-dashboard} se muestran los indicadores básicos y los accesos directos más relevantes, mientras que desde la pantalla de configuración (Figura~\ref{fig:admin-configuracion}) se pueden ajustar aspectos como la política de retención de vídeos o el límite de almacenamiento.
 
 \begin{figure}[H]
   \centering
@@ -261,7 +262,7 @@ Esta pantalla (Figura~\ref{fig:prof-evaluar-ejercicio}) constituye el último pa
 
 \subsection{Interfaz del paciente}
 
-El paciente accede a un panel principal simplificado, con cuatro accesos directos a ejercicios, sesiones programadas, progreso y ayuda, dispuesto en forma de mandos circulares fáciles de seleccionar.
+El paciente accede a un panel principal simplificado, con cuatro accesos directos a \emph{Ejercicios}, \emph{Sesiones}, \emph{Progreso} y \emph{Ayuda}, dispuesto en forma de mandos circulares fáciles de seleccionar.
 Desde esta pantalla puede desplazarse entre las opciones con las flechas del mando SNES y confirmar con los botones de acción, lo que reduce la necesidad de movimientos de precisión con el ratón y facilita el uso a pacientes con temblor o rigidez.
 
 \begin{figure}[H]
@@ -284,18 +285,18 @@ La interfaz de TerapiTrack se ha diseñado teniendo en cuenta que muchos de los 
 \subsection{Navegación simplificada}
 
 Cada rol dispone de un menú de navegación adaptado a sus necesidades, con un número reducido de opciones claramente etiquetadas.
-Por ejemplo, el menú del paciente incluye únicamente <<Mis sesiones>>, <<Ejercicios disponibles>> y <<Mi perfil>>, evitando sobrecargar la interfaz con opciones que no va a utilizar.
+Por ejemplo, el menú del paciente incluye únicamente <<Sesiones>>, <<Ejercicios>>, <<Ayuda>> y <<Progreso>>, evitando sobrecargar la interfaz con opciones que no va a utilizar.
 
-La plantilla base (\texttt{base.html}) define la estructura común de todas las páginas (cabecera, menú, pie de página) y se encarga de mostrar mensajes de error o confirmación de forma coherente en todo el sistema mediante \emph{flash messages} de Flask.
+La plantilla base (\texttt{base.html}) define la estructura común de todas las páginas (cabecera, menú, pie de página, estilos) y se encarga de mostrar mensajes de error o confirmación de forma coherente en todo el sistema mediante \emph{flash messages} de Flask.
 
 \subsection{Controles grandes y contraste adecuado}
 
-En las pantallas de ejecución de sesiones se han utilizado botones grandes, con un tamaño de fuente generoso y un espaciado suficiente entre elementos para facilitar la interacción con ratón, teclado o pantalla táctil.
+En las pantallas de ejecución de sesiones se han utilizado botones grandes, con un tamaño de fuente generoso y un espaciado suficiente entre elementos para facilitar la interacción con ratón, teclado o mando SNES.
 Los colores de fondo y de texto se han elegido siguiendo las recomendaciones de WCAG para asegurar un contraste suficiente, especialmente en mensajes de error (rojo) y de éxito (verde)~\cite{wcag22}.
 
 \subsection{Feedback visual claro}
 
-Durante la ejecución de una sesión, el sistema muestra de forma clara en qué ejercicio se encuentra el paciente y cuántos quedan pendientes.
+Durante la ejecución de una sesión, el sistema muestra de forma clara en qué ejercicio se encuentra el paciente.
 Cuando se graba un vídeo, aparece un indicador de <<grabando>> que cambia de color, y una vez finalizada la grabación se muestra un mensaje de confirmación antes de pasar al siguiente ejercicio.
 
 Este tipo de feedback se consideró fundamental durante las pruebas, porque ayuda al paciente a sentir que tiene el control del proceso y reduce la incertidumbre sobre si el sistema está funcionando correctamente.
@@ -307,14 +308,14 @@ El sistema se ha probado de forma continua durante el desarrollo, combinando pru
 
 \subsection{Pruebas unitarias con Pytest}
 
-Se ha implementado un conjunto de pruebas unitarias en la carpeta \texttt{tests}, que cubre las operaciones básicas de los modelos (creación, actualización, borrado y consultas) y varios de los flujos principales de los controladores~\cite{PytestDocs}.
+Se ha implementado un conjunto de pruebas unitarias en la carpeta \texttt{tests}, que cubre las operaciones básicas de los modelos (creación, actualización, borrado y consultas) y varios de los flujos principales de los controladores.
 Para ejecutarlas se utiliza el comando \texttt{pytest tests/ -v --cov=src --cov-report=html}, que genera un informe de cobertura por fichero en formato HTML~\cite{PytestDocs}.
 
 En la versión final del proyecto se han definido 190 tests y se ha alcanzado una cobertura global del 99\%, con todos los modelos y las funciones auxiliares al 100\% y los controladores principales (administrador, profesional, paciente y autenticación) en torno al 99\% de líneas cubiertas.
 Aunque esta cobertura no garantiza que el código esté libre de errores, sí proporciona una red de seguridad que facilita realizar cambios sin romper funcionalidades ya existentes~\cite{PytestDocs}.
-En la práctica, estas pruebas permitieron detectar regresiones al refactorizar controladores y modelos, corrigiéndose varios fallos de validación y de control de acceso antes de desplegar nuevas versiones.
+En la práctica, estas pruebas permitieron detectar regresiones al refactorizar controladores y modelos, de modo que se corrigieron varios fallos de validación y de control de acceso antes de desplegar nuevas versiones.
 
-La Figura~\ref{fig:cobertura-tests} resume la cobertura de pruebas unitarias obtenida con \texttt{pytest}, mostrando que los modelos y funciones auxiliares alcanzan el 100\,\% y los controladores en torno al 99\,\%.
+En la práctica, la batería de pruebas permitió comprobar la cobertura global del código, que en la versión final del proyecto alcanza en torno al 99\% en los módulos principales.
 
 \begin{figure}[H]
   \centering
@@ -327,11 +328,11 @@ La Figura~\ref{fig:cobertura-tests} resume la cobertura de pruebas unitarias obt
 
 Además de las pruebas automáticas, se han realizado pruebas manuales tanto en el entorno de desarrollo como en el despliegue de Heroku, simulando distintos perfiles de usuario (administrador, profesional, paciente) y comprobando el comportamiento del sistema con datos reales y con conexiones a Cloudinary~\cite{CloudinaryConsole}.
 En paralelo, se han ejecutado pruebas sobre la base de datos desde \texttt{flask shell} y mediante consultas SQL en DB Browser for SQLite para verificar la creación de entidades, las relaciones de muchos a muchos y operaciones de actualización habituales (cambio de estado de sesiones, modificación de evaluaciones, etc.), que se describen con más detalle en el anexo de documentación técnica.
-Estas pruebas han permitido detectar problemas que no eran evidentes en el entorno local, como tiempos de respuesta más largos al subir vídeos grandes o errores de permisos en rutas específicas, cuya corrección se ha ido registrando en Jira y consolidando en la rama \texttt{Pruebas} siguiendo el ciclo iterativo descrito en la primera sección de este capítulo~\cite{JiraTerapitrack}.
+Estas pruebas han permitido detectar problemas que no eran evidentes en el entorno local, como tiempos de respuesta más largos al subir vídeos grandes o errores de permisos en rutas específicas, cuya corrección se ha ido registrando en Jira y consolidando en la rama \texttt{Pruebas}, siguiendo el ciclo iterativo descrito en la primera sección de este capítulo~\cite{JiraTerapitrack}.
 
 \subsubsection{Análisis estático con SonarQube}
 
-Además de las pruebas automatizadas con \texttt{pytest}, se realizó un análisis estático del código utilizando SonarQube como se puede ver en la figura~\ref{fig:cobertura-tests} con el objetivo de detectar \emph{code smells}, posibles errores y problemas de mantenibilidad.
+Además de las pruebas automatizadas con \texttt{pytest}, se realizó un análisis estático del código utilizando SonarQube, como se puede ver en la figura~\ref{fig:cobertura-tests}, con el objetivo de detectar \emph{code smells}, posibles errores y problemas de mantenibilidad.
 Para ello se configuró un proyecto específico para TerapiTrack, se lanzó el escaneo sobre el código de \texttt{src} y se revisaron los informes generados en la interfaz web de la herramienta.
 
 El resultado del análisis indicó que no se detectaban vulnerabilidades de seguridad ni errores críticos, y que la mayor parte de las incidencias correspondían a recomendaciones de estilo (nombres de variables, longitud de funciones o duplicidad leve de código). Estas observaciones se utilizaron para refactorizar algunos controladores y modelos, mejorando la legibilidad y reduciendo el acoplamiento entre módulos, aunque se mantuvieron ciertos \emph{smells} considerados aceptables para el alcance de un prototipo académico.

@@ -1,6 +1,6 @@
 \capitulo{4}{Técnicas y herramientas}
-Este capítulo presenta las metodologías, tecnologías y utilidades empleadas en el desarrollo de TerapiTrack. 
-El propósito es ofrecer una visión ordenada del entorno de trabajo y de la base tecnológica sobre la que se construye la aplicación, de manera que sirva de referencia para entender las decisiones de diseño descritas en los capítulos siguientes.
+Este capítulo presenta las metodologías, tecnologías y utilidades empleadas en el desarrollo. 
+El propósito es ofrecer una visión ordenada del entorno de trabajo y de la base tecnológica sobre la que se construye la aplicación, de manera que sirva de referencia para entender las decisiones de diseño.
 
 \section{Metodología de desarrollo}
 
@@ -43,7 +43,7 @@ La selección del motor de base de datos en cada entorno se realiza a través de
 Además, se dispone del script \texttt{poblar\_bd.py}, que permite inicializar la base de datos con datos de ejemplo (usuarios, pacientes, ejercicios, sesiones y evaluaciones) para facilitar las pruebas.
 
 \subsection{Herramienta complementaria: DB Browser for SQLite}
-Como apoyo al trabajo con la base de datos local se ha utilizado \textbf{DB Browser for SQLite}, una herramienta gráfica que permite inspeccionar tablas, ejecutar consultas y modificar registros de forma visual~\cite{DBBrowser}.
+Como apoyo al trabajo, con la base de datos local se ha utilizado \textbf{DB Browser for SQLite}, una herramienta gráfica que permite inspeccionar tablas, ejecutar consultas y modificar registros de forma visual~\cite{DBBrowser}.
 Su uso ha sido especialmente útil en las primeras iteraciones del diseño del esquema y durante la depuración de datos de prueba.
 
 \section{Tecnologías de frontend}
@@ -58,7 +58,7 @@ La capa de presentación de TerapiTrack se construye sobre varias tecnologías w
 \end{itemize}
 
 Las plantillas principales se organizan en carpetas por rol (\texttt{admin}), (\texttt{profesional}), (\texttt{paciente}). 
-Todas ellas heredan de una plantilla base (\texttt{base.html}) que define la estructura común de menús, cabeceras y mensajes.
+Todas ellas heredan de una plantilla base (\texttt{base.html}) que define la estructura común de menús, cabeceras, mensajes y algun estilo común estre vistas.
 Entre las vistas más relevantes se encuentran los distintos paneles de control (\texttt{dashboard.html}) y las páginas de ejecución de sesiones (\texttt{ejecutar\_sesion.html}), donde se combinan los vídeos de ejemplo con la cámara del paciente y los controles necesarios para completar la sesión.
 
 \subsection{Bootstrap y Bootswatch}
@@ -74,10 +74,9 @@ En TerapiTrack se utiliza para generar las gráficas temporales de puntuaciones 
 \subsection{Soporte para mando SNES}
 
 Además del uso con ratón y teclado, TerapiTrack incorpora soporte para un mando SNES conectado por USB mediante la \textit{Gamepad API} del navegador.
-En el área de paciente, las acciones básicas de navegación (mover el foco entre elementos, seleccionar opciones o volver atrás) pueden realizarse con los botones del mando, lo que facilita el uso de la aplicación a personas con dificultades motoras finas o menor familiaridad con el ratón~\cite{telehealth_accessibility}.
+En el área de paciente, la mayoria de acciones de navegación (mover el foco entre elementos, seleccionar opciones o volver atrás) pueden realizarse con los botones del mando, lo que facilita el uso de la aplicación a personas con dificultades motoras finas o menor familiaridad con el ratón~\cite{telehealth_accessibility}.
 
 Esta funcionalidad se ha implementado mediante un módulo JavaScript que escucha los eventos del mando, traduce las pulsaciones a acciones de la interfaz y actualiza el foco de forma visual para indicar qué elemento está seleccionado en cada momento.
-
 
 \section{Testing y garantía de calidad}
 
@@ -120,25 +119,35 @@ Durante el desarrollo también se han utilizado varias herramientas de apoyo:
 
 El conjunto de técnicas y herramientas descritas en este capítulo constituye la base tecnológica de TerapiTrack y sirve como referencia para comprender los aspectos de diseño e implementación que se desarrollan en los capítulos de aspectos relevantes y en los anexos técnicos.
 
-\tablaSmall{Herramientas utilizadas en el proyecto}{l l p{7.5cm}}
+\begingroup
+\small
+\renewcommand{\arraystretch}{1.05}
+\tablaSmall{Herramientas utilizadas en el proyecto}
+{p{0.27\textwidth} p{0.18\textwidth} p{0.45\textwidth}}
 {herramientas_terapitrack}
 { \textbf{Herramienta} & \textbf{Ámbito} & \textbf{Descripción} \\}
 {
-Flask & Backend & Lógica de servidor y gestión de rutas y vistas web. \\
-SQLAlchemy & Base de datos & ORM para definir modelos y gestionar consultas sobre bases de datos relacionales. \\
-SQLite / PostgreSQL & Base de datos & Motores relacionales usados respectivamente en desarrollo local y en despliegue en la nube. \\
-DB Browser for SQLite & Base de datos & Cliente gráfico para inspección, consulta y edición de la base de datos SQLite. \\
-Jinja & Plantillas & Motor de plantillas para generar dinámicamente las páginas HTML desde Flask. \\
-HTML5 / JavaScript & Frontend & Estructura del contenido y lógica en el navegador para dotar de interactividad a la interfaz. \\
-Bootstrap / Bootswatch & Frontend & Framework CSS y temas visuales para construir una interfaz adaptable y coherente. \\
-Cloudinary & Almacenamiento & Servicio externo para almacenar y servir archivos multimedia generados por la aplicación. \\
-Jira & Gestión & Planificación, seguimiento de tareas y organización en sprints. \\
-Git & Versionado & Sistema de control de versiones distribuido para gestionar la evolución del código. \\
-Git Bash & Versionado & Uso de Git desde la línea de comandos en el entorno local. \\
-GitHub & Repositorio & Alojamiento remoto del código, sistema de \textit{issues} y revisión de cambios. \\
-Visual Studio Code & Desarrollo & Entorno integrado de edición, depuración y ejecución del código fuente. \\
-LaTeX Workshop / Overleaf & Documentación & Herramientas para la redacción y compilación de la memoria y los anexos en \LaTeX{}. \\
-Heroku & Despliegue & Plataforma PaaS utilizada para ejecutar la aplicación Flask y la base de datos en la nube. \\
+Python & Backend & Lenguaje principal del servidor y scripts. \\
+Flask & Backend & Framework web para rutas y vistas. \\
+SQLAlchemy & Base de datos & ORM para modelos y consultas. \\
+SQLite / PostgreSQL & Base de datos & Motores relacionales en desarrollo y producción. \\
+DB Browser for SQLite & Base de datos & Cliente gráfico para la BD local. \\
+Jinja & Plantillas & Generación de HTML dinámico. \\
+HTML5 / JavaScript & Frontend & Estructura y lógica en el navegador. \\
+Bootstrap / Bootswatch & Frontend & CSS y temas para la interfaz. \\
+Chart.js & Frontend & Gráficos de evolución de pacientes. \\
+Gamepad API & Frontend & Soporte del mando SNES. \\
+Cloudinary & Storage & Servicio para vídeos y recursos. \\
+Pytest & Testing & Pruebas automatizadas del sistema. \\
+Jira & Gestión & Planificación y seguimiento de tareas. \\
+Git & Versionado & Control de versiones del código. \\
+Git Bash & Versionado & Uso de Git desde la consola. \\
+GitHub & Repositorio & Alojamiento remoto e \emph{issues}. \\
+VS Code & Desarrollo & Editor principal del proyecto. \\
+LaTeX Workshop / Overleaf & Doc. & Edición y compilación en \LaTeX{}. \\
+Draw.io & Doc. & Diagramas de arquitectura y flujos. \\
+Heroku & Despliegue & Ejecución de la aplicación en la nube. \\
 }
+\endgroup
 
 Como se resume en la tabla~\ref{tabla:herramientas_terapitrack}, estas herramientas cubren desde el desarrollo y la gestión de datos hasta el despliegue y la documentación del proyecto, proporcionando un entorno de trabajo completo para TerapiTrack.
