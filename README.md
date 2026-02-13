@@ -212,7 +212,7 @@ git push heroku main
 
 - **Metodología:** Scrum con sprints de 1-2 semanas
 - **Tablero Jira:** https://terapitrack.atlassian.net/
-- **Tareas completadas:** 77 de 86 (90%)
+- **Tareas completadas:** 84 de 86
 - **Épicas:** Usuarios, Ejercicios, Sesiones, Grabación, Interfaz, Configuración, Documentación
 
 ---
