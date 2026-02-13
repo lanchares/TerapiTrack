@@ -343,3 +343,12 @@ El resultado del análisis indicó que no se detectaban vulnerabilidades de segu
   \caption{Resumen del análisis estático de TerapiTrack en SonarQube.}
   \label{fig:sonarqube-resumen}
 \end{figure}
+
+\section{Retos técnicos y soluciones adoptadas}
+
+Durante el proyecto surgieron muchos desafios técnicos, los mas significativos fueron:
+\begin{enumerate}
+    \item \textbf{Persistencia efímera en Heroku:} el sistema de archivos local de Heroku se reinicia diariamente, eliminando vídeos subidos. Se solucionó integrando Cloudinary para almacenamiento persistente en la nube.
+    \item \textbf{Conflictos en Jinja2:} en vistas complejas, la duplicidad de etiquetas \texttt{endblock} rompía el diseño sin generar errores explícitos. Se solucionó mediante una auditoría y mostrando \textit{logs} por pantalla.
+    \item \textbf{Captura de eventos de hardware:} la implementación inicial del mando con \texttt{pygame} (backend) falló en el despliegue web. La solución fue migrar la lógica al frontend usando la Gamepad API de HTML5.
+\end{enumerate}

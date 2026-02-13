@@ -111,9 +111,9 @@ Se abordaron tareas como la creación de los diagramas UML, la limpieza del cód
 
 Durante el sprint también se revisaron los flujos principales de la aplicación para comprobar que la documentación técnica y de usuario describía fielmente la funcionalidad disponible.
 
-\subsubsection{Sprint 13: Redacción final (13--27 enero 2026)}
+\subsubsection{Sprint 13: Redacción final (13 enero --13 febrero 2026)}
 
-El sprint 13 se concibió como un sprint extendido de dos semanas centrado casi por completo en la redacción de la memoria y los anexos, así como en la preparación del material de apoyo para la defensa del Trabajo Fin de Grado. 
+El sprint 13 se concibió como un sprint extendido de un mes centrado casi por completo en la redacción de la memoria y los anexos, así como en la preparación del material de apoyo para la defensa del Trabajo de Fin de Grado. 
 Durante este periodo se actualizaron las descripciones de los módulos, se pulieron las secciones de viabilidad y se verificó la coherencia entre la documentación y la versión final desplegada de TerapiTrack.
 
 Muchas de estas tareas se registraron en Jira como bloques de documentación y no como incidencias técnicas detalladas, por lo que los registros de Jira no reflejan de forma precisa el esfuerzo diario, sino un cierre concentrado al final del periodo. 
@@ -221,26 +221,26 @@ La tabla~\ref{tab:dependencias_terapitrack} recoge el análisis de licencias de 
 \textbf{Dependencia} & \textbf{Versión} & \textbf{Licencia y uso (orientativo)} \\
 \midrule
 Flask & 3.1.0 & BSD-3-Clause. Framework web. \\
-Werkzeug & 3.1.3 & BSD-3-Clause. Librería WSGI (uso indirecto vía Flask). \\
+Werkzeug & 3.1.3 & BSD-3-Clause. Librería WSGI. \\
 Jinja2 & 3.1.6 & BSD-3-Clause. Motor de plantillas. \\
 SQLAlchemy & 2.0.39 & MIT. ORM para BD relacional. \\
 Flask-SQLAlchemy & 3.1.1 & BSD-3-Clause. Integración SQLAlchemy--Flask. \\
-SQLite & (embebido) & Dominio público. BD embebida en desarrollo. \\
-psycopg2-binary & 2.9.11 & LGPL / BSD-like. Conector PostgreSQL en producción. \\
+SQLite & (embebido) & Dominio público. BD en desarrollo. \\
+psycopg2-binary & 2.9.11 & LGPL / BSD-like. Conector PostgreSQL. \\
 Flask-Login & 0.6.3 & MIT. Gestión de sesiones de usuario. \\
 Flask-WTF & 1.2.2 & BSD-3-Clause. Formularios con CSRF. \\
 WTForms & 3.2.1 & BSD-3-Clause. Validación de formularios. \\
 bcrypt & 4.3.0 & Apache-2.0. Cifrado de contraseñas. \\
 Flask-Bcrypt & 1.0.1 & BSD-3-Clause. Integración bcrypt--Flask. \\
-Bootstrap & 5.3.x & MIT. Framework CSS para la interfaz. \\
-Bootswatch & (temas) & MIT. Colección de temas para Bootstrap. \\
-cloudinary & 1.44.1 & MIT. Cliente para almacenamiento de vídeos. \\
-gunicorn & 23.0.0 & MIT. Servidor WSGI para despliegue en producción. \\
-APScheduler & 3.11.0 & BSD-3-Clause. Programación de tareas (por ejemplo, borrado periódico). \\
+Bootstrap & 5.3.x & MIT. Framework CSS interfaz. \\
+Bootswatch & (temas) & MIT. Colección temas para Bootstrap. \\
+cloudinary & 1.44.1 & MIT. Cliente almacenamiento vídeos. \\
+gunicorn & 23.0.0 & MIT. Servidor WSGI para despliegue. \\
+APScheduler & 3.11.0 & BSD-3-Clause. Programación de tareas. \\
 python-dotenv & 1.2.1 & BSD-3-Clause. Carga de variables de entorno. \\
-greenlet & 3.1.1 & MIT. Soporte de contextos ligeros (usado por SQLAlchemy). \\
+greenlet & 3.1.1 & MIT. Soporte de contextos ligeros. \\
 Blinker & 1.9.0 & MIT. Sistema de señales en Flask. \\
-Colorama & 0.4.6 & BSD-3-Clause. Colores en la salida de terminal. \\
+Colorama & 0.4.6 & BSD-3-Clause. Colores salida terminal. \\
 Typing-Extensions & 4.12.2 & PSF. Tipos adicionales para Python. \\
 \bottomrule
 \end{tabular}

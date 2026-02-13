@@ -268,12 +268,12 @@ En TerapiTrack, los modelos de SQLAlchemy actúan como \textit{Modelo}, los \tex
 A nivel lógico, la arquitectura se organiza en tres capas principales:
 
 \begin{itemize}
-  \item \textbf{Capa de presentación}: Incluye las vistas de Flask y las plantillas Jinja que generan las páginas HTML,
+  \item \textbf{Capa de presentación}: incluye las vistas de Flask y las plantillas Jinja que generan las páginas HTML,
   donde se definen los formularios, los mensajes de validación y los componentes visuales construidos con Bootstrap y Bootswatch,
   diferenciando las interfaces de administrador, profesional y paciente, y se corresponde principalmente con la carpeta \texttt{src/vistas}.
-  \item \textbf{Capa de negocio}: Implementada en los \textit{blueprints} de la carpeta \texttt{src/controladores}, contiene la lógica de aplicación: gestión de usuarios y roles, asignación de pacientes a profesionales, planificación de sesiones, grabación y evaluación de ejercicios,
+  \item \textbf{Capa de negocio}: implementada en los \textit{blueprints} de la carpeta \texttt{src/controladores}, contiene la lógica de aplicación: gestión de usuarios y roles, asignación de pacientes a profesionales, planificación de sesiones, grabación y evaluación de ejercicios,
   así como las comprobaciones de permisos antes de cada operación.
-  \item \textbf{Capa de datos}: Formada por los modelos SQLAlchemy de \texttt{src/modelos} y por la base de datos SQLite.
+  \item \textbf{Capa de datos}: formada por los modelos SQLAlchemy de \texttt{src/modelos} y por la base de datos SQLite.
   Mapea las entidades del diccionario de datos a tablas, aplica las restricciones de integridad y proporciona métodos para consultas y actualizaciones transaccionales.
 \end{itemize}
 
@@ -299,13 +299,13 @@ Además, la aplicación está preparada para su despliegue en un entorno \textit
 En esta sección se describen los principales flujos y procedimientos implementados, que se apoyan en la arquitectura anterior y en el modelo de datos descrito:
 
 \begin{itemize}
-  \item \textbf{Gestión de usuarios}: Incluye el alta, desactivación, modificación y autenticación de usuarios, con control de roles y permisos.
+  \item \textbf{Gestión de usuarios}: incluye el alta, desactivación, modificación y autenticación de usuarios, con control de roles y permisos.
   El flujo típico comienza con el administrador creando una cuenta, continúa con el acceso del usuario mediante correo y contraseña, y termina con la asignación de un panel específico según su rol.
-  \item \textbf{Asignación de pacientes a profesionales}: El administrador establece relaciones muchos a muchos entre pacientes y profesionales mediante la tabla \texttt{Paciente\_Profesional},
+  \item \textbf{Asignación de pacientes a profesionales}: el administrador establece relaciones muchos a muchos entre pacientes y profesionales mediante la tabla \texttt{Paciente\_Profesional},
   permitiendo que un profesional gestione a varios pacientes y que un paciente pueda estar vinculado a diferentes perfiles sanitarios.
-  \item \textbf{Gestión de ejercicios y sesiones}: Los profesionales crean ejercicios con su vídeo demostrativo y configuran sesiones terapéuticas combinando varios ejercicios.
+  \item \textbf{Gestión de ejercicios y sesiones}: los profesionales crean ejercicios con su vídeo demostrativo y configuran sesiones terapéuticas combinando varios ejercicios.
   Posteriormente asignan estas sesiones a pacientes concretos, definiendo fechas programadas y controlando el estado de cada sesión (pendiente, completada o cancelada).
-  \item \textbf{Grabación y evaluación}: Durante la realización de una sesión, el sistema registra la ejecución de cada ejercicio mediante la cámara del dispositivo y almacena el vídeo asociado.
+  \item \textbf{Grabación y evaluación}: durante la realización de una sesión, el sistema registra la ejecución de cada ejercicio mediante la cámara del dispositivo y almacena el vídeo asociado.
   Más tarde, los profesionales revisan esos vídeos, asignan una puntuación y añaden comentarios, generando un histórico de evaluaciones que se utiliza para visualizar la evolución del paciente a lo largo del tiempo.
 \end{itemize}
 
