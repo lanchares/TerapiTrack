@@ -177,48 +177,6 @@ pytest tests/test_admin_controlador.py -v
 
 ---
 
-## Estructura del proyecto
-
-TerapiTrack/
-├── src/
-│ ├── controladores/ # Lógica de rutas (patrón MVC)
-│ │ ├── auth_controlador.py # Autenticación y login
-│ │ ├── admin_controlador.py # Gestión de usuarios
-│ │ ├── profesional_controlador.py # Sesiones y evaluaciones
-│ │ └── paciente_controlador.py # Rutinas y progreso
-│ ├── modelos/ # Modelos SQLAlchemy
-│ │ ├── usuario.py
-│ │ ├── paciente.py
-│ │ ├── profesional.py
-│ │ ├── sesion.py
-│ │ ├── ejercicio.py
-│ │ ├── evaluacion.py
-│ │ └── videoRespuesta.py
-│ ├── vistas/ # Templates Jinja2
-│ │ ├── admin/ # Vistas de administración
-│ │ ├── auth/ # Login y perfil
-│ │ ├── profesional/ # Gestión de sesiones
-│ │ └── paciente/ # Ejecución de rutinas
-│ ├── static/ # Recursos estáticos
-│ │ ├── css/
-│ │ ├── js/
-│ │ ├── uploads/ejercicios/ # Vídeos subidos por profesionales
-│ │ └── videos/ # Vídeos base del sistema
-│ ├── forms.py # Formularios WTForms
-│ ├── config.py # Configuración
-│ └── extensiones.py # Inicialización de extensiones
-├── tests/ # Tests unitarios e integración
-├── config/ # Archivos de configuración JSON
-├── doc/ # Memoria y anexos (LaTeX)
-├── app.py # Punto de entrada
-├── poblar_bd.py # Script de población de BD
-├── Procfile # Configuración Heroku
-├── requirements.txt # Dependencias
-├── pytest.ini # Configuración pytest
-└── README.md
-
----
-
 ## Uso del mando SNES
 
 TerapiTrack incluye soporte completo para mandos SNES conectados por USB, facilitando el uso a pacientes con dificultades motoras.
